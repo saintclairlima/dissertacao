@@ -1,2 +1,223 @@
-\chapter{Considerações Finais}
-\label{cap:cap6}
+\chapter{Metodologia}
+\label{cap:Metodologia}
+
+\section{Definição do Conjunto de Dados}
+\label{sec.Metodologia.1}
+
+Estabelecida a abordagem a ser utilizada para o desenvolvimento da ferramenta proposta, tornou-se necessário definir quais conjuntos de dados/documentos seriam incluídos no processo de desenho, implementação, testes e validação dos resultados. Dado que, conforme apresentado na Seção \ref{sec:DocAlern.1}, há diferentes conjuntos com características diversas, tanto mais estáticos quanto extremamente dinâmicos, era necessário começar definindo que tipos de documentos e quais domínios dentre todos seriam significativos.
+
+A escolha dos dados para desenvolvimento foi feita com o intuito de se alcançar dois objetivos específicos. O primeiro seria garantir que o objeto final dessa fase preliminar de desenvolvimento pudesse ser de uso relevante para a Casa Legislativa, tanto em termos de funcionalidade, mas também no sentido de abarcar um conjunto de informações que seja de interesse e relevância aos usuários do público interno ou externo à \ac{ALERN}. Além deste, pretende-se assegurar que o domínio em que se enquadre o corpus escolhido coincida com as áreas de conhecimento e atuação dos integrantes do grupo de especialistas que se voluntariaram a avaliar a qualidade das respostas geradas. Com isso, seria potencializado o processo de testes e validação dos resultados da aplicação, tanto pelo volume de pessoas que poderão utilizar na fase de testes -- dado que informações escolhidas de forma estratégica atrairão mais usuários -- quanto pela qualidade do conhecimento dos avaliadores.
+
+O recorte de documentos selecionados para compor o corpus textual sobre o qual esta proposta atuará foi feito sob sugestão e orientação de servidores atuantes nos setores de gestão de pessoas CDHO (Coordenadoria de Desenvolvimento Humano e Organizacional) e setores envolvidos em diversas fases do processo legislativo -- duas áreas da ALERN em que é comum o surgimento de dúvidas procedimentais, bem como a busca por informações que pautem ou desabonem uma ou outra medida a ser tomada ou ações dos servidores em geral. A coleção de documentos inclui a normatização e regimentação da atuação parlamentar, a regulação de direitos e deveres dos servidores (em especial no que se refere a benefícios/auxílios, cálculo de vencimentos, férias e bonificações), planos de cargos  e carreiras, avaliação do servidor em estágio probatório de trabalho, assim como o regime jurídico dos servidores do Rio Grande do Norte (dos quais os servidores da \ac{ALERN} são um subconjunto).
+
+Ao se analisar os elementos do conjunto de documentos selecionados, é possível perceber que há certo grau de homogeneidade entre os documentos em alguns quesitos. Alguns exemplos de proximidade entre esses componentes são a interrelação entre as temáticas, as suas estruturas semelhantes entre si, seguindo a divisão padrão de textos normativos -- com capítulos, seções, artigos, parágrafos, alíneas, etc. --, o tom do vocabulário e o estilo da escrita característicos de texto legislativo, entre outros. Essa homogeneidade, em especial no que se refere à estrutura, facilita sua manipulação, sua eventual fragmentação e seu processamento, em preparação para sua inclusão no fluxo de atividades do sistema.
+
+Não obstante, também é facilmente perceptível que os exemplares da lista de documentos possuem características distintas entre si: há variação considerável no comprimento dos documentos como um todo, alguns são apenas leis que alteram a redação de outra peça existente no conjunto sem oferecer outros conteúdos, entre outras características que os diferenciam entre si. Também é relevante essa disparidade, visto que, mesmo dentro de um contexto de documentos semi-estruturados, há diversidade suficiente para que seu tratamento seja adequado e aplicável a textos puramente não estruturados.
+
+Uma característica peculiar do conjunto de dados utilizado é a possibilidade de documentos normativos diferentes estabelecerem como fatos informações conflitantes e se contradizerem. Há duas situações, que conseguimos prever, nas quais é possível que haja choque de informações: atualização da regulação e especificidades hierárquicas.
+
+A primeira se dá pelo motivo de que, pela própria dinâmica da atividade legislativa, determinadas leis/normas são atualizadas, modificadas ou criadas com o tempo; de forma que algo que é estabelecido como fato hoje pode ser impactado por um novo ato normativo, por alteração do texto da lei, por sua revogação e afins. De forma a mitigar essa problemática, é necessária a manutenção dos documentos e suas representações vetoriais, garantindo que sua versão mais atualizada (preferencialmente a versão compilada de seu texto) seja a disponibilizada pelo banco vetorial.
+
+A segunda se dá quando uma peça normativa de abrangência maior prevê algo, enquanto um ato normativo de alcance específico preveem, paradoxalmente, coisas distintas. Um caso específico, para fins de demonstração, é o fato de o Regime Jurídico dos servidores públicos civis do Estado do Rio Grande do Norte determina que:
+
+\begin{citacao}
+    A gratificação natalina, devida a ocupante de cargo efetivo ou em comissão, corresponde a 1/12 (um doze avos) da remuneração a que fizer jus no mês de dezembro, por mês de exercício no respectivo ano. \cite{RegimeJuridico:RN}
+\end{citacao}
+
+
+Assim, enquanto no âmbito mais amplo do Estado do RN a gratificação natalina é calculada unicamente em função da remuneração base do servidor, a Resolução Nº 77, de 10 de julho de 2024 \cite{RegimentoInterno:ALRN}, que trata da base de cálculo do terço de férias e da gratificação natalina (13º salário) especificamente dos servidores da \ac{ALERN} prevê que:
+\begin{citacao}
+    Fica determinado que os valores percebidos a título de auxílio-alimentação e auxílio de assistência à saúde, por se tratarem de vantagens pecuniárias que compõem a remuneração do servidor, serão incluídos na base de cálculo do terço constitucional de férias e da gratificação natalina (13º salário) dos servidores e, naquilo que couber, dos membros da Assembleia Legislativa do Estado do Rio Grande do Norte.
+\end{citacao}
+
+Como ambos os documentos estão disponíveis no banco vetorial, uma busca por "Os valores recebidos como auxílio-alimentação compõem a base de cálculo para a gratificação natalina?" pode resultar no retorno de ambos os fragmentos, provendo ao \ac{LLM} informações conflitantes, visto que não foi fornecido um contexto na pergunta. Embora seja possível uma abordagem mais efetiva e elegante para a resolução deste problema (como uma organização hierárquica -- em termos de abrangência -- dos documentos), no escopo deste estudo, limitamo-nos a informar ao \ac{LLM}, junto com o texto do fragmento, o seu título e autor, que por si só já delimitam o âmbito em que a peça normativa se aplica.
+
+\subsection{Preparação dos Dados Selecionados}
+\label{subsec:Metodologia.1.1}
+
+Feita a coleta dos arquivos com os textos dos documentos elencados para a composição do conjunto a ser utilizado, foi necessário definir como o texto seria tratado. Considerando que modelos como o escolhido para utilização com a função de criação de \textit{embeddings} para armazenamento dos documentos no banco vetorial, o INSTRUCTOR-XL, têm uma limitação no número de \textit{tokens} de entrada para geração da representação em vetores (em geral 512 \textit{tokens}) \cite{Instructor:3}, a escolha feita foi pela fragmentação de cada um dos documentos em porções de texto com um número máximo de 300 palavras. Com isso, cada fragmento de um documento seria tratado pelo Chroma DB como um documento por si só, ficando sua relação de pertencimento registrada nos metadados, para casos de eventuais  buscas pelo documento como um todo. Dessa forma, ao serem tokenizados os fragmentos dos documentos no conjunto, as representações vetoriais resultantes ficam dimensionadas de forma a respeitar a limitação de tamanho da entrada recebida pelo modelo utilizado, eliminando a necessidade de supressão de informações por truncamento dos \textit{tokens} excedentes.
+
+A fragmentação do volume do texto de fato é desejável e otimiza o processo de recuperação de documentos (fragmentos menores permitem maior granularidade no cálculo da semelhança semântica com o \textit{input} do usuário), além de reduzir o tamanho geral do \textit{prompt} a ser fornecido ao \ac{LLM} para geração do conteúdo sintético a responder a pergunta feita, visto que este incluirá o conteúdo dos documentos recuperados. Todavia, a divisão do conteúdo considerando meramente o tamanho de cada fragmento pode implicar em dispersão de contexto, colocando uma parte de uma ideia em um fragmento, isolando-a de sua parte complementar alocada em outro, de forma que a ideia completa se perde no instante da recuperação de documentos, podendo não ser identificada pela busca semântica de similaridade.
+
+Destarte, como uma abordagem para mitigar essa fragmentação/dispersão contextual, o processo de segmentação dos documentos se utilizou da estrutura intrínseca de cada um deles (divisão em artigos, parágrafos, alíneas e afins), de forma que os fragmentos ficaram orientados à divisão por artigo, dado que cada artigo é uma unidade autocontida, semanticamente coerente, sendo, no grosso dos exemplos, independente dos outros artigos, salvo quando de citação e referência. Mais claramente, cada documento foi segmentado de tal sorte que cada artigo compõe um fragmento. Apesar disso, ainda há um número não insignificante de artigos cujo teor textual ultrapassa o número de 300 palavras (via de regra por conter um grande número de parágrafos, incisos e alíneas), incorrendo no mesmo problema que ora é abordado, exceto que em um número muito menor de ocorrências, dada a raridade de artigos longos no conjunto de dados em questão.
+
+Como uma forma de evitar essa situação, a abordagem adotada foi, nos casos de artigos mais extensos, secionar adicionalmente o artigo, em suas partes menores (caput, parágrafos, incisos e alíneas) e agrupá-las de forma que cada um desses agrupamentos consista de uma combinação do caput e parágrafos/incisos/alíneas cujo comprimento total não ultrapasse o limite escolhido de 300 palavras. Assim, embora essa fragmentação automatizada -- independente de divisão feita sob análise caso a caso -- não resolva o problema em sua completude, ao se garantir que cada um desses segmentos mantenha o contexto geral do artigo, condensado no caput, mitiga-se uma fragmentação extrema da ideia geral do artigo, obtendo-se uma coesão maior do que haveria no caso da divisão com base somente no número de palavras.
+
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{Imagens/fragmentacao-artigos.png}
+    \caption{Estratégia de Fragmentação de Artigos Extensos} 
+    \label{fig:fragmentacao-artigos}
+\end{figure}
+
+\subsection{Inclusão dos Documentos (fragmentos) no Banco Vetorial}
+\label{subsec:Metodologia.1.2}
+
+A inclusão dos documentos no banco vetorial, o Chroma DB, em forma de seus fragmentos, foi realizada utilizando as ferramentas de manipulação do banco, de forma direta e simples. A estrutura de cada fragmento inserido possui, além do conteúdo textual, algumas outras informações que podem ser utilizadas a posteriori.
+
+A estrutura final de cada uma das entradas no Chroma DB se configura como se segue:
+\begin{itemize}
+    \item id: identificador único da entrada (fragmento)
+    \item page\_content: texto original do fragmento
+    \item metadata: metadados com informações relevantes a respeito do fragmento, bem como do documento como um todo, incluindo:
+    \begin{itemize}
+        \item título: O título do documento original
+        \item subtítulo: O número do artigo e indicador nos casos de subdivisão de conteúdo
+        \item autor: Entidade/sujeito autor do documento
+        \item fonte: Link para o arquivo de origem do documento
+    \end{itemize}
+\end{itemize}
+
+
+
+Como uma peculiaridade do Chroma DB, há o fato de que o id de cada entrada inserida é informado no momento da inserção, não sendo algo que o banco vetorial se encarrega de realizar. Semelhantemente, os elementos dos metadados são definidos, tanto em seus campos quanto em seu conteúdo, de forma flexível, ao se inserir um documento (fragmento, no caso presente) em uma coleção. Destarte, é possível incluir campos de controle adicionais, de forma a interligar fragmentos co-dependentes (como no caso de artigos segmentados por terem um tamanho maior que o número máximo de palavras definido).
+
+Após a inclusão, os documentos são passíveis de serem recuperados em consultas realizadas junto ao banco vetorial, com base na sua similaridade semântica com uma pergunta ou critério de busca definidos. Assim, as solicitações realizadas ao Chroma DB estão definidas de forma tal a recuperar os cinco documentos mais relevantes, ordenados de forma decrescente pelo grau de similaridade com a pergunta utilizada como critério de consulta.
+
+\subsection{Configuração do LLM}
+\label{subsec:Metodologia.1.3}
+A configuração do Llama, visto que foi feita a opção pelo uso do Ollama como meio de simplificar o processo, se deu de forma direta. Os arquivos de instalação do Ollama foram obtidos e executados diretamente da sua página de download. \cite{Ollama:2} Após a instalação, foi realizada a inclusão do modelo Llama em sua versão 3.1, propriamente dito, tornando-o disponível para utilização.
+
+O consumo da geração do modelo fica disponível por meio de uma API REST, a qual se encarrega de fazer o gerenciamento dos recursos disponíveis para a otimização do conteúdo. As requisições feitas à API apontam o modelo específico a ser utilizado (o Llama3.1, no caso deste estudo), o \textit{prompt} a ser utilizado pelo modelo, junto com um contexto (uma representação em \textit{embeddings} das interações anteriores com o modelo), também indicando se a resposta deve ser enviada \textit{token} a \textit{token}, à medida que é gerada, ou de forma inteiriça, com todo o conteúdo gerado sendo disponibilizado quando do término de sua produção pelo \ac{LLM}.
+
+De forma a direcionar o comportamento do Llama na geração das respostas, cada requisição feita à API utiliza um modelo de \textit{prompt} com uma estrutura e informações fixas, alterando somente a pergunta feita e o teor dos documentos em que a resposta deve se basear. O modelo é dividido em quatro seções:
+
+\begin{itemize}
+    \item Definição do papel que o Llama deve assumir: “ALERN e ALRN significam Assembleia Legislativa do Estado do Rio Grande do Norte. Você é um assistente que responde a dúvidas de servidores da ALRN sobre o regimento interno da ALRN, o regime jurídico dos servidores estaduais do RN, bem como resoluções da ALRN. Assuma um tom formal, porém caloroso, com gentileza nas respostas. Utilize palavras e termos que sejam claros, autoexplicativos e linguagem simples, próximo do que o cidadão comum utiliza”;
+    \item Diretrizes a serem seguidas na geração da resposta: “Use as informações dos DOCUMENTOS fornecidos para gerar uma resposta clara para a PERGUNTA. Na resposta, não mencione que foi fornecido documentos de referência. Cite os nomes dos DOCUMENTOS e números dos artigos em que a resposta se baseia. A resposta não deve ter saudação, vocativo, nem qualquer tipo de introdução que dê a entender que não houve interação anterior. Se você não souber a resposta, assuma um tom gentil e diga que não tem informações suficientes para responder”;
+    \item Conteúdo dos documentos a serem utilizados para a geração da resposta;
+    \item Pergunta a ser respondida pelo \ac{LLM}.
+\end{itemize}
+
+\section{API de Gerenciamento de Fluxo}
+\label{sec:Metodologia.2}
+
+A integração de todos os serviços oferecidos pelas camadas mencionadas é realizada por uma API de gerenciamento de fluxo, que se encarrega de receber requisições de alguma interface de usuário, com as perguntas a serem utilizadas como critérios de consulta e acionar os serviços das outras camadas para a geração da resposta. Após receber os dados resultantes de cada um dos serviços nas fases intermediárias do processo inteiro, eles são formatados e preparados para serem direcionados ao elemento seguinte, até, finalmente, encaminhar à interface de usuário o produto final, na forma de uma resposta, com uma lista de documentos que lhe dão suporte.
+
+A Figura \ref{fig:diag-atividade-assist-busca} demonstra o fluxo inteiro do processo como um todo.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Imagens/diagram.png}
+    \caption{Diagrama de Atividades do Assistente de Busca}
+    \label{fig:diag-atividade-assist-busca}
+\end{figure}
+
+Além de incluir a pergunta, a resposta e o conjunto de documentos que foram utilizados na composição do \textit{prompt} enviado ao \ac{LLM}, a API de Gerenciamento de Fluxo coleta dados a respeito do processo como um todo (tempo levado na execução de cada etapa, métricas utilizadas, dentre outros) e os inclui na resposta devolvida ao usuário. Também cabe a esse elemento garantir persistência de dados sobre cada uma das interações realizadas, permitindo que, a posteriori, sejam analisados e utilizados para refinamento do processo e da estrutura proposta.
+
+\section{Interface de Usuário}
+\label{sec:Metodologia.3}
+
+Dado o objetivo deste estudo, foi definida uma página \textit{web} como interface de usuário -- considerando sua simplicidade de desenvolvimento e implementação -- nos moldes de uma aplicação de envio/recebimento de mensagens de texto, como é o mais comum ao se desenhar uma ferramenta de \textit{chatbot}. A opção foi feita por manter uma interface limpa e minimalista, restringindo-se somente ao campo de envio de mensagens do usuário, bem como uma área superior com a exibição das mensagens enviadas e recebidas.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{Imagens/interface_usuario.png}
+    \caption{Interface de Usuário do Assistente de Busca}
+    \label{fig:interface-assist-busca}
+\end{figure}
+
+A mecânica de consulta consiste apenas de uma solicitação realizada à API de gerenciamento do fluxo de informações, por meio de requisição HTTP, que envia a pergunta ou frase de consulta a ser utilizada como critérios de busca no banco vetorial, bem como um vetor de \textit{embeddings} contendo os dados das interações mais recentes, o qual será utilizado como informação do contexto, junto ao \ac{LLM}, de forma a manter um senso de continuidade no \textit{chat}.
+
+
+\section{Medição dos Resultados}
+\label{sec:Metodologia.4}
+A forma pretendida de avaliação do desempenho do Assistente de Busca como um todo se baseia no parecer dado por especialistas nas matérias de que trata o corpus documental que foi selecionado para o desenvolvimento e testes. O grupo de especialistas inclui, dentre outros, servidores atuantes na Coordenadoria de Desenvolvimento Humano e Organizacional (CDHO), da Assembleia Legislativa do Rio Grande do Norte, dado que a prática diária de suas atividades os torna familiarizados com os meandros das Resoluções e definições regimentais contidas na seleção de documentos abordada neste estudo.
+
+Assim, interagiriam os especialistas com a interface de usuário, inserindo perguntas sobre aspectos relevantes cobertos pelos atos normativos no conjunto de documentos selecionados. As interações dos especialistas não serão guiadas ou direcionadas, de forma que as perguntas feitas sejam orgânicas e o mais próximo possível do tipo de uso que o Assistente de Busca terá após sua implementação e disponibilização. Observarão, os avaliadores, as respostas geradas, aferindo quantitativamente a sua exatidão e fornecendo eles mesmos um texto breve com o teor do que deveria ser a resposta ideal.
+
+Os dados coletados da interação serão armazenados para análise posterior, e, a depender da quantidade de dados coletados, utilizados para eventual refinamento e ajuste fino dos modelos que servem de base para as camadas da ferramenta.
+
+Não obstante, há um aspecto relevante a ser considerado, o qual potencialmente emergirá das condições de avaliação propostas. Dado que os especialistas farão perguntas sem direcionamento, é improvável que o conjunto total de perguntas submetidas ao Assistente de Busca tenha uma variedade grande o suficiente para abordar toda a amplitude de matérias presentes nos documentos. Perguntas repetidas, aspectos sobre os quais não lhes ocorrerá perguntar, assuntos cuja natureza seja considerada demasiadamente óbvia para questionamento, entre outros, são alguns dos problemas cuja ocorrência pode ser prevista com algum grau de confiança.
+
+No que concerne à avaliação realizada pelos especialistas, além da possível falta de cobertura das perguntas feitas, há outro ponto delicado cuja abordagem é relevante. Dado que a avaliação dos especialistas em relação ao Assistente, da forma como descrita, se debruça somente sobre o resultado final do processo -- a resposta -- a identificação de possíveis elementos responsáveis pela qualidade aquém da esperada se torna menos efetiva, posto que são perdidas informações dos processos intermediários da geração da resposta. Nessas condições, embora seja possível a identificação de respostas inadequadas, os dados não são suficientes para determinar se a falha ocorreu na recuperação dos documentos junto ao banco vetorial ou se a resposta gerada pelo Llama foi incorreta, mesmo com as informações adequadas disponíveis.
+
+Com o fim de mitigar esses dois problemas apontados, uma segunda categoria de avaliações será feita, na qual os avaliadores serão apresentados a conjuntos de pares de perguntas e respostas, acompanhados de uma lista de fragmentos de documentos relacionados à pergunta e à resposta. Deverão os especialistas quantificar a corretude das respostas, informar qual seria uma resposta aceitável, bem como aferir a relevância dos fragmentos de documentos utilizados como base para a geração das respostas.
+
+Tal conjunto de perguntas/respostas/fragmentos foi gerado previamente, de forma automatizada, buscando alcançar tantos aspectos quantos possíveis dentre o corpus documental que serviu de base para este estudo. Para isto, cada um dos fragmentos documentais foi utilizado em um \textit{prompt} de geração de conteúdo a ser processado por uma instância do modelo GPT-4o, da Open AI (por meio da API fornecida pela Open AI, para consulta externa) com o seguinte \textit{prompt}, concatenado ao conteúdo textual do fragmento de documento:
+
+\setlength{\fboxsep}{10pt}
+\noindent\fbox{
+    \parbox{\dimexpr\textwidth-30pt\relax}{
+        \raggedright
+        \setlength{\parindent}{1em}
+        \setlength{\parskip}{1ex}
+        \texttt{
+            Você é um gerador de perguntas sobre partes de textos legislativos. Quando recebe um texto, você cria pelo menos 5 perguntas que possam ser respondidas com fragmentos do texto recebido. Nos casos de Artigos revogados, retorne uma lista vazia: []. A saída deve ser uma lista de objetos JSON, com os atributos \{\{"pergunta": "Texto da pergunta Gerada", "resposta": "fragmento do artigo que responde a pergunta"\}\}. Não adicione nada na resposta, exceto a lista de objetos JSON, sem qualquer comentário adicional.
+        }
+    }
+}
+
+O resultado gerado pelo GPT-4o foi analisado com fins de assegurar sua correção em termos de formato JSON, para garantir que o arquivo estivesse válido e pudesse ser usado no processo de avaliação. Dessa forma, cada fragmento no banco vetorial recebeu um conjunto de perguntas, acompanhado de trechos de seu conteúdo que poderiam ser utilizados como respostas curtas, todos diretamente relacionados ao seu conteúdo textual. Esses trechos com potencial de responder a pergunta elaborada serão utilizados como texto de referência ao se avaliar a qualidade do conteúdo das perguntas geradas pelo \ac{LLM}, conforme descrito na Seção \ref{subsec:Resultados.2.2}. A Figura \ref{fig:geracao-perguntas} resume o processo de geração das perguntas.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{Imagens/geracao-perguntas.png}
+    \caption{Geração de pares pergunta-resposta por meio de LLM}
+    \label{fig:geracao-perguntas}
+\end{figure}
+
+Após a geração do conjunto de perguntas "sintéticas" para cada fragmento, cada pergunta foi usada para realizar buscas no banco vetorial com o objetivo de identificar documentos semanticamente semelhantes. Como resultado, para cada pergunta associada a um fragmento, foi gerado um conjunto de documentos considerados semanticamente próximos (ver Figura \ref{fig:recuperacao-fragmentos}).
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{Imagens/recuperacao-fragmentos.png}
+    \caption{Recuperação de documentos do Banco Vetorial}
+    \label{fig:recuperacao-fragmentos}
+\end{figure}
+
+Com as perguntas e os documentos correspondentes à sua semelhança disponíveis, foi possível utilizar esses materiais, conforme detalhado na Seção \ref{subsec:Metodologia.1.3}, para criar um \textit{prompt} e solicitar ao Llama que gerasse uma resposta completa baseada na seleção de documentos. Esse processo emula a dinâmica seguida pelo Assistente de Busca durante seu uso comum pelos usuários, simulando uma interação que visa fornecer respostas completas e relevantes a partir de consultas realizadas (Figura \ref{fig:geracao-respostas}).
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{Imagens/geracao-respostas.png}
+    \caption{Recuperação de documentos do Banco Vetorial}
+    \label{fig:geracao-respostas}
+\end{figure}
+
+\begin{table}
+    \caption{Estrutura dos dados sintéticos gerados para cada fragmento}
+    \centering
+    \begin{tabular}{ l p{10cm} }
+         \hline
+         \textbf{Informação} & \textbf{Descrição} \\  
+         \hline
+         Id & Identificador do fragmento usado para gerar a pergunta \\
+         Pergunta & Pergunta gerada pelo Llama com base no fragmento \\
+         Recorte & Trecho do fragmento que o Llama identificou como resposta curta \\
+         Fragmentos & Lista de fragmentos relevantes recuperados do banco de vetores \\
+         Resposta Llama & Resposta gerada pelo Llama com base na pergunta e nos fragmentos relevantes \\
+         \hline
+    \end{tabular}
+    
+    Fonte: O autor (2024)
+    \label{tab:dados-sinteticos}
+\end{table}
+
+Havendo sido concluídas todas essas etapas, foi possível obter, para cada pergunta gerada sinteticamente, uma estrutura de dados como a apresentada na Tabela \ref{tab:dados-sinteticos}. Esses dados gerados possibilitam não somente a abordagem de mitigação dos problemas apontados, como também a realização de uma avaliação preliminar também automatizada, com foco nas duas etapas de geração das respostas: a recuperação de documentos por similaridade, junto ao banco vetorial, e a elaboração do texto final da resposta feita pelo Llama, com base no teor dos documentos selecionados.
+
+\subsection{Recuperação de Documentos (\textit{Retrieval})}
+\label{subsec:Metodologia.4.1}
+Como forma de avaliar a recuperação dos documentos realizada pelo banco de vetores, é possível lançar mão de dois campos presentes na estrutura de dados apresentada na Tabela \ref{tab:dados-sinteticos}, a saber: Id (que contém o identificador do fragmento utilizado para gerar a pergunta) e Fragmentos (que contém os fragmentos recuperados do banco vetorial). Consideremos que cada pergunta foi gerada com base no conteúdo de um fragmento específico de documento. A partir disso, é possível assumir que é natural que exista uma similaridade entre o teor da pergunta e o do fragmento original. Pelos mesmos motivos, também é esperado que, entre os documentos recuperados na avaliação de semelhança semântica, esteja incluído o próprio documento que serviu de base para a criação da pergunta.
+
+Adicionalmente, considerando que é possível recuperar o conteúdo do fragmento base -- gerador da pergunta -- bem como obter o texto dos fragmentos retornados pelo banco vetorial, existe uma abordagem alternativa à verificação do grau de similaridade entre a pergunta e os documentos retornados. Em vez de se lançar mão da pergunta, utiliza-se como parâmetro de avaliação a similaridade entre o conteúdo do fragmento base com os textos dos documentos retornados.
+
+Em suma, para cada pergunta sintética utilizada, avaliaremos se o id do documento original, utilizado para gerar a pergunta, figura entre os ids do conjunto de documentos retornados do banco vetorial. Consideraremos bem sucedida a execução do processo caso haja a presença do id alvo no conjunto de documentos recuperados.
+
+
+\subsection{Geração das Respostas pelo LLM}
+\label{subsec:Metodologia.4.2}
+A avaliação da qualidade das respostas geradas pelo \ac{LLM} é um aspecto fundamental para garantir a eficácia e a confiabilidade das respostas geradas com base nos documentos recuperados. Uma avaliação eficaz não deve se limitar a quantificar a similaridade entre a resposta gerada e a pergunta original. Em vez disso, foca na capacidade de a resposta satisfazer as expectativas informacionais do usuário. Essa abordagem assegura que as respostas não apenas sejam relevantes em um sentido superficial, mas que realmente atendam aos critérios de completude e precisão em relação ao corpus documental utilizado.
+
+Embora a similaridade entre a pergunta e a resposta seja uma métrica viável, demonstra-se insuficiente para avaliar a qualidade da resposta em um nível mais profundo. A análise de proximidade semântica da resposta em relação à pergunta não garante que a resposta abranja de forma adequada o contexto e o conteúdo desejado pelo próprio fato de que uma resposta, por definição, deve conter informações inexistentes na pergunta. Portanto, a avaliação deve ir além da correspondência superficial e considerar o quão bem a resposta aborda e resolve a questão apresentada.
+
+Para avaliar a qualidade das respostas em termos de satisfação da pergunta, ferramentas como o BERTScore, proposto por \citeonline{BERTScore:1}, abordado na Seção \ref{sec:Teorico.7}, se mostram úteis. Sua aplicação em sistemas de \ac{RAG} oferece uma maneira objetiva de quantificar o desempenho dos \ac{LLM}s no que tange à satisfatoriedade de suas respostas às perguntas. Essa métrica considera a semelhança semântica e permite identificar se uma resposta contém informações relevantes e está alinhada com o que foi solicitado pela pergunta. A utilização do BERTScore, portanto, contribui para a validação da qualidade da resposta gerada, não apenas em termos de similaridade de palavras, mas em relação à precisão e completude, características essenciais para a construção de sistemas de perguntas e respostas de alta qualidade. Como resultado, se alcança uma medida mais robusta de como a resposta aborda de maneira contextualizada a pergunta, indo além da análise de correspondência lexical.
+
+\begin{comment}
+    \subsection{Interação com usuário}
+    \label{subsec:Metodologia.4.3}
+    
+    Descrever como se fará testes na interface de usuário. Realmente necessário para fins da dissertação ou foca somente na estrutura de recebimento da pergunta e geração da resposta?
+\end{comment}
