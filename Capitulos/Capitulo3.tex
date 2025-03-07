@@ -1,6 +1,7 @@
 \chapter{Referencial Teórico}
 \label{cap:Teorico}
 
+Neste Capítulo trataremos de alguns conceitos, definições e técnicas relevantes para definir o recorte contextual de nossa proposta, bem como para estabelecer convenções terminológicas aqui adotadas.
 
 \section{Processamento de Linguagem Natural (PLN)}
 \label{sec:Teorico.1}
@@ -141,9 +142,11 @@ A avaliação da qualidade do texto gerado por \ac{LLM}s pode ser levada a cabo 
 
 Entre elas, destacam-se as métricas baseadas em n-gramas, como BLEU (\textit{Bilingual Evaluation Understudy}) e ROUGE (\textit{Recall-Oriented Understudy for Gisting Evaluation}). Ao analisar sequências sobrepostas de palavras ou unidades sublexicais (n-gramas), essas métricas fornecem recursos para análises quantitativas sobre a fidelidade linguística e o alinhamento semântico das saídas geradas pelos modelos em relação aos textos de referência. Apesar de terem sido desenvolvidas em paradigmas anteriores do \ac{PLN}, sua aplicabilidade aos \ac{LLM}s evidencia sua relevância duradoura.
 
-A pontuação BLEU, um marco consolidado na avaliação de tradução automática, quantifica a precisão do texto gerado avaliando a sobreposição de n-gramas com traduções de referência, fornecidas/notadas por humanos. \cite{BLEU:1} Inicialmente concebido para avaliar traduções bilíngues, o BLEU foi ampliado para diversos domínios, incluindo a sumarização e a geração de paráfrases. Sua aplicação se baseia no cálculo da proporção de n-gramas no texto candidato que aparecem no texto de referência, sendo utilizada a média calculada dos resultados ao longo de um corpus para gerar uma pontuação de qualidade geral. Notavelmente, o BLEU incorpora n-gramas de ordem superior (por exemplo, bigramas ou trigramas) para capturar a precisão contextual, enquanto atenua a dependência excessiva de unigramas. Embora seja raro que traduções humanas atinjam pontuações perfeitas, a capacidade da métrica de facilitar comparações entre sistemas ressalta sua utilidade na padronização de práticas de avaliação em diversas aplicações.
+A pontuação BLEU, um marco consolidado na avaliação de tradução automática, quantifica a precisão do texto gerado avaliando a sobreposição de n-gramas com traduções de referência, fornecidas/anotadas por humanos. \cite{BLEU:1} Inicialmente concebido para avaliar traduções bilíngues, o BLEU foi ampliado para diversos domínios, incluindo a sumarização e a geração de paráfrases. Sua aplicação se baseia no cálculo da proporção de n-gramas no texto candidato que aparecem no texto de referência, sendo utilizada a média calculada dos resultados ao longo de um corpus para gerar uma pontuação de qualidade geral. Notavelmente, o BLEU incorpora n-gramas de ordem superior (por exemplo, bigramas ou trigramas) para capturar a precisão contextual, enquanto atenua a dependência excessiva de unigramas. Embora seja raro que traduções humanas atinjam pontuações perfeitas, a capacidade da métrica de facilitar comparações entre sistemas ressalta sua utilidade na padronização de práticas de avaliação em diversas aplicações.
 
-O ROUGE, por outro lado, é uma métrica focada no \textit{recall}, que enfatiza a completude das informações capturadas no texto gerado em relação ao texto de referência. \cite{ROUGE:1} Empregado predominantemente em tarefas de sumarização, o ROUGE mede o grau em que o conteúdo essencial é retido. O ROUGE calcula precisão, \textit{recall} e \textit{f1-score} do texto candidato em relação ao texto de referência. Considerando que o ROUGE é orientado ao \textit{recall}, se demonstra, ele, particularmente adequado para aplicações em que a captura de informações abrangentes é crucial, complementando métricas orientadas à precisão, como o BLEU, e fornecendo uma perspectiva holística sobre a qualidade textual.
+O ROUGE, por outro lado, é uma métrica focada no \textit{recall} calculado, também, com base na sobreposição dos n-gramas do texto de referência e do texto avaliado, enfatizando a completude das informações capturadas no texto gerado em relação ao texto de referência. \cite{ROUGE:1} Empregado predominantemente em tarefas de sumarização, o ROUGE mede o grau em que o conteúdo essencial é retido. O ROUGE calcula precisão, \textit{recall} e \textit{f1-score} do texto candidato em relação ao texto de referência. Considerando que o ROUGE é orientado ao \textit{recall}, se demonstra, ele, particularmente adequado para aplicações em que a captura de informações abrangentes é crucial, complementando métricas orientadas à precisão, como o BLEU, e fornecendo uma perspectiva holística sobre a qualidade textual.
+
+%AFAZER: verificar a necessidade de incluir as equações dos cálculos das medidas ROUGE e BLEU
 
 Todavia, as métricas tradicionais baseadas em n-grams, como BLEU e ROUGE, enfrentam desafios consideráveis ao lidar com textos que apresentam variação significativa em relação às referências. Uma de suas limitações se refere à identificação de paráfrases, conforme apontado por \citeonline{BERTScore:1}, ao apontar que:
 
@@ -154,22 +157,34 @@ Todavia, as métricas tradicionais baseadas em n-grams, como BLEU e ROUGE, enfre
 
 Além disso, por se basear em n-gramas, tais métricas não conseguem capturar relações de dependência semântica que não estão tão próximas no texto, se estendendo para além do tamanho do n-grama, bem como se demonstram incapazes de perceber adequadamente alterações significativas na ordem semântica. Por exemplo, uma troca de ``A porque B'' para ``B porque A'' pode não impactar substancialmente a pontuação BLEU, mesmo que a mudança semântica seja relevante. 
 
-Como solução para essas limitações, o BERTScore foi desenvolvido, introduzindo uma abordagem baseada em embeddings contextuais, se propondo a ser
+Como solução para essas limitações, o BERTScore foi desenvolvido, introduzindo uma abordagem baseada em \textit{embeddings} contextuais, se propondo a ser
 
 \begin{citacao}
     \textit{a new metric for evaluating generated text against gold standard references. BERTSCORE is purposely designed to be simple, task-agnostic, and easy to use. Our analysis illustrates how BERTSCORE resolves some of the limitations of commonly used metrics, especially on challenging adversarial examples.} \cite{BERTScore:1}
     \footnote{uma nova métrica para a avaliação de textos gerados em comparação com textos de referência. O BERTSCORE foi intencionalmente projetado para ser simples, independente da natureza da tarefa e fácil de usar. Nossa análise ilustra como o BERTSCORE resolve algumas das limitações das métricas comumente utilizadas, especialmente em exemplos adversariais desafiadores. (Tradução nossa)}
 \end{citacao}
 
-A métrica calcula a similaridade entre dois textos, sendo um a referência anotada, \(x\), e o outro um fragmento de texto gerado, \(\hat{x}\), utilizando as similaridades de cosseno entre suas representações por \textit{embeddings}. O \textit{score} completo faz uma comparação dos \textit{embeddings} de cada \textit{token} em \(x\) com os \textit{embeddings} de cada \textit{token} em \(\hat{x}\), buscando pelo par de \textit{tokens} com maior similaridade de cosseno para calcular o recall. A precisão, similarmente, é calculada ao se realizar uma busca pelos tokens de  presentes em x, para calcular a precisão. O F1 score é calculado pela combinação da precisão e recall calculados.
+A métrica calcula a similaridade entre dois textos, sendo um a referência anotada, \(x\), e o outro um fragmento de texto gerado, \(\hat{x}\), utilizando as similaridades de cosseno entre suas representações por \textit{embeddings}. 
+
+\begin{citacao}
+    
+    \textit{The complete score matches each token in \(x\)) to a token in \(\hat{x}\) to compute recall, and each token in \(\hat{x}\) to a token in \(x\) to compute precision. We use greedy matching to maximize the matching similarity score, where each token is matched to the most similar token in the other sentence. We combine precision and recall to compute an F1 measure.} \cite{BERTScore:1}
+    \footnote{[Para se chegar à] pontuação completa, [associamos] cada \textit{token} em \(x\) a um \textit{token} em \(\hat{x}\) para calcular o \textit{recall} e cada \textit{token} em \(\hat{x}\) a um \textit{token} em \(x\) para calcular a precisão. Utilizamos uma estratégia de \textit{greedy matching} para maximizar a pontuação de similaridade, pela qual cada \textit{token} é pareado com o \textit{token} mais semelhante na outra frase. Por fim, combinamos precisão e \textit{recall} para calcular a medida F1.}
+\end{citacao}
+
+Destarte, temos o \textit{recall} no BERTScore definido como a média da soma das pontuações máximas de similaridade entre os \textit{tokens} de \(x\) e \(\hat{x}\):
 
 \[
 R_{\text{BERT}} = \frac{1}{|x|} \sum_{x_i \in x} \max_{\hat{x}_j \in \hat{x}} \text{x}_i^{\top} \hat{\text{x}}_j
 \]
 
+Ao passo que a precisão é calculada como a média da doma das pontuações máximas de similaridade entre os \textit{tokens} de \(\hat{x}\) e \(x\)
+
 \[
 P_{\text{BERT}} = \frac{1}{|\hat{x}|} \sum_{\hat{x}_j \in \hat{x}} \max_{x_i \in x} \text{x}_i^{\top} \hat{\text{x}}_j
 \]
+
+Por fim, o F1 \textit{score} é calculado a partir da precisão e do \textit{recall}, da seguinte forma:
 
 \[
 F_{\text{BERT}} = 2 \frac{P_{\text{BERT}} \cdot R_{\text{BERT}}}{P_{\text{BERT}} + R_{\text{BERT}}}
@@ -177,7 +192,9 @@ F_{\text{BERT}} = 2 \frac{P_{\text{BERT}} \cdot R_{\text{BERT}}}{P_{\text{BERT}}
 
 Essa abordagem permite uma avaliação mais robusta, uma vez que \textit{embeddings} pré-treinados capturam nuances contextuais e semânticas das palavras em suas respectivas frases. O BERTScore, portanto, é capaz de reconhecer paráfrases e lidar com dependências semânticas distantes, superando limitações que comprometem a eficácia de métricas tradicionais.
 
-Semelhantemente ao BLEU e ao ROUGE, o BERTScore fundamenta-se em duas métricas principais: precisão e \textit{recall}. A precisão avalia o quanto o conteúdo do texto candidato é relevante em relação ao texto de referência, de forma que uma alta precisão indica que a maior parte da informação no texto candidato está semanticamente alinhada com o texto de referência, refletindo a fidelidade do conteúdo gerado. O \textit{recall}, por sua vez, mensura o quanto do conteúdo presente no texto de referência é capturado pelo texto candidato; assim, um valor alto de \textit{recall} sugere que o texto gerado cobre bem as informações essenciais do texto de referência, evidenciando sua completude.
+Em suma, semelhantemente ao BLEU e ao ROUGE, o BERTScore fundamenta-se em duas métricas principais: precisão e \textit{recall}, porém com base em fatores diferentes: enquanto nos primeiros ambas as medidas são calculadas com base na ``sobreposição'' de \textit{tokens} nos textos candidatos (ou seja, sua presença em ambos os textos), o BERTScore o faz com base na similaridade das representações por \textit{embeddings} dos elementos comparados. No BertScore, portanto, a precisão avalia o quanto o conteúdo do texto candidato é relevante em relação ao texto de referência, de forma que uma alta precisão indica que a maior parte da informação no texto candidato está semanticamente alinhada com o texto de referência, refletindo a fidelidade do conteúdo gerado. O \textit{recall}, por sua vez, mensura o quanto do conteúdo presente no texto de referência é capturado pelo texto candidato; assim, um valor alto de \textit{recall} sugere que o texto gerado cobre bem as informações essenciais do texto de referência, evidenciando sua completude.
 
-Combinando precisão e abrangência, o BERTScore oferece uma métrica sofisticada que, além de avaliar similaridade, captura as nuances semânticas necessárias para tarefas como tradução, sumarização e parafraseamento. Dessa forma, destaca-se como uma alternativa avançada às métricas baseadas em n-gramas, particularmente em cenários que exigem uma análise mais refinada e sensível ao contexto linguístico.
+Combinando precisão e \textit{recall}/abrangência, o BERTScore oferece uma métrica sofisticada que, além de avaliar similaridade, captura as nuances semânticas necessárias para tarefas como tradução, sumarização e parafraseamento. Dessa forma, destaca-se como uma alternativa avançada às métricas baseadas em n-gramas, particularmente em contextos que exigem uma análise mais refinada e sensível ao contexto linguístico.
 
+%AFAZER: Escrever fechamento do capítulo
+Havendo abordado os conceitos e técnicas que viabilizam a ferramenta que propomos para ampliar o ferramental de consulta a informações no contexto do corpo de documentos da \ac{Alern}, exploremos abordagens propostas para cenários análogos.

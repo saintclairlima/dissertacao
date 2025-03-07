@@ -30,6 +30,9 @@ A Figura \ref{fig:arq-assist-busca} apresenta as partes componentes do Assistent
 
 \section{Banco Vetorial}
 \label{sec:Assistente.1}
+
+Conforme apontado na Seção \ref{sec:Teorico.4}, bancos vetoriais são ferramentas particularmente eficazes em armazenar documentos -- ou fragmentos destes, no nosso caso -- assim como suas representações em formato de vetores de \textit{embeddings}. Dado que esta nossa proposta envolve a geração de texto sob demanda do usuário, aprimorando-a com conteúdo recuperado, a utilização de um banco vetorial se torna uma opção promissora como ferramenta de recuperação de informações base para o processo generativo. Nesta seção, portanto, abordamos o banco vetorial escolhido para integrar a estrutura \ac{RAG} que propomos.
+
 \subsection{Chroma DB}
 \label{subsec:Assistente.1.1}
 
@@ -48,7 +51,17 @@ Quando da realização de uma consulta ao banco vetorial, em uma coleção espec
 \subsection{Modelo da função de \textit{embeddings}}
 \label{subsec:Assistente.1.2}
 
-Considerando a possibilidade oferecida pelo banco vetorial de se fornecer uma função de geração de \textit{embeddings} personalizada, sopesamos a utilização de diferentes modelos, levando em conta seu desempenho para fins de cálculo de similaridade -- levando em conta, especificamente, os resultados sobre a amostra de dados utilizada neste estudo (ver Seção \ref{sec.Metodologia.1}, que trata da definição dos dados deste estudo). Dentre os modelos avaliados, a opção feita foi pelo \textit{instructor-xl}. Trata-se de um modelo desenvolvido pela equipe de pesquisa de Processamento de Linguagem Natural (NLP) da Universidade de Hong Kong, incluindo a participação de pesquisadores de outras instituições, como \textit{University of Washington}, Meta AI e \textit{Allen Institute for AI}, publicado em 2023 \cite{Instructor:1}. O modelo selecionado pertence à série de modelos INSTRUCTOR, que são projetados para gerar \textit{embeddings} de texto de alta qualidade e se baseiam na arquitetura Transformer, assim como modelos de estado da arte, como \ac{BERT} e \ac{GPT}.
+Considerando a possibilidade oferecida pelo banco vetorial de se fornecer uma função de geração de \textit{embeddings} personalizada, sopesamos a utilização de diferentes modelos, considerando seu desempenho para fins de cálculo de similaridade -- levando em conta, especificamente, os resultados sobre a amostra de dados utilizada neste estudo (ver Seção \ref{sec.Metodologia.1}, que trata da definição dos dados deste estudo).
+
+%AFAZER: explorar os resultados de outros modelos, como:
+% instructor-xl -- já utilizado
+% pierreguillou/bert-base-cased-squad-v1.1-portuguese
+% Alibaba-NLP/gte-multilingual-base
+% text-embedding-ada-002
+% llama
+%Após fazer testes, justificar a utilização do 
+
+Dentre os modelos avaliados, a opção feita foi pelo \textit{instructor-xl}. Trata-se de um modelo desenvolvido pela equipe de pesquisa de Processamento de Linguagem Natural (NLP) da Universidade de Hong Kong, incluindo a participação de pesquisadores de outras instituições, como \textit{University of Washington}, Meta AI e \textit{Allen Institute for AI}, publicado em 2023 \cite{Instructor:1}. O modelo selecionado pertence à série de modelos INSTRUCTOR, que são projetados para gerar \textit{embeddings} de texto de alta qualidade e se baseiam na arquitetura Transformer, assim como modelos de estado da arte, como \ac{BERT} e \ac{GPT}.
 
 No trabalho de  \citeonline{Instructor:2}, os seus publicadores o definem como \textit{“One Embedder [for] Any Task”} (Um Gerador de \textit{Embeddings} para Qualquer Tarefa) e como
 
@@ -72,13 +85,13 @@ Baseado na arquitetura \textit{Transformers}, similar ao modelo \ac{GPT}, o Llam
 
 A Meta AI, em sua introdução ao projeto, afirma que o Llama foi projetado como alternativa a outros \ac{LLM}s, como o GPT da OpenAI, com foco em ser mais eficiente em termos de recursos computacionais. Nesse contexto, o modelo é definido como
 \begin{citacao}
-    a state-of-the-art foundational large language model designed to help researchers advance their work in this subfield of AI. Smaller, more performant models such as LLaMA enable others in the research community who don’t have access to large amounts of infrastructure to study these models, further democratizing access in this important, fast-changing field. \cite{Llama:2} \footnote{um LLM de propósito geral, de última geração, projetado para ajudar pesquisadores a avançarem em seus trabalhos neste subcampo da IA. Modelos menores e mais eficientes, como o LLaMA, permitem que outros na comunidade de pesquisa que não têm acesso a grandes infraestruturas estudem esses modelos, democratizando ainda mais o acesso a este campo importante e em rápida evolução. (Tradução nossa)}
+    a state-of-the-art foundational large language model designed to help researchers advance their work in this subfield of AI. Smaller, more performant models such as LLaMA enable others in the research community who don’t have access to large amounts of infrastructure to study these models, further democratizing access in this important, fast-changing field. \cite{Llama:2} \footnote{um LLM de propósito geral, de última geração, projetado para ajudar pesquisadores a avançarem em seus trabalhos neste subcampo da IA. Modelos menores e mais eficientes, como o Llama, permitem que outros na comunidade de pesquisa que não têm acesso a grandes infraestruturas estudem esses modelos, democratizando ainda mais o acesso a este campo importante e em rápida evolução. (Tradução nossa)}
 \end{citacao}
 
 
 Um dos pontos fortes do Llama no contexto dos \ac{LLM}s é precisamente este fato de ele exigir um poder computacional consideravelmente reduzido e recursos mais modestos em comparação com outros modelos de referência à época de seu lançamento, sendo, pela natureza de seu treinamento -- baseado em dados não rotulados -- ideal para ser refinado para uma ampla gama de aplicações e tarefas.
 
-O artigo de publicação do modelo aponta que o treinamento do Llama incluiu um número de \textit{tokens} na ordem de trilhões e utilizou exclusivamente conjuntos de dados publicamente disponíveis, sem contar com dados em bancos de dados proprietários ou de acesso restrito. Quando do lançamento da versão original, a versão do Llama com 13 bilhões de parâmetros ofereceu melhor desempenho que o GPT-3, que utiliza 175 bilhões de parâmetros; assim como o LLaMA65B se mostrou  competitivo com modelos maiores, como Chinchilla-70B e PaLM-540B (com 70 e 540 milhões de parâmetros, respectivamente).
+O artigo de publicação do modelo aponta que o treinamento do Llama incluiu um número de \textit{tokens} na ordem de trilhões e utilizou exclusivamente conjuntos de dados publicamente disponíveis, sem contar com dados em bancos de dados proprietários ou de acesso restrito. Quando do lançamento da versão original, a versão do Llama com 13 bilhões de parâmetros ofereceu melhor desempenho que o GPT-3, que utiliza 175 bilhões de parâmetros; assim como o Llama-65B se mostrou  competitivo com modelos maiores, como Chinchilla-70B e PaLM-540B (com 70 e 540 milhões de parâmetros, respectivamente).
 
 Ao realizar o lançamento do Llama, em fevereiro de 2023, com o intuito de manter a integridade e evitar o potencial mau uso do modelo mediante uma publicação não supervisionada, a Meta AI optou por realizar a disponibilização sob uma licença de uso não-comercial, com foco em aplicações para fins de pesquisa, apenas. O acesso ao modelo, então, era garantido mediante análise caso a caso para acadêmicos, para organizações civis e governamentais, como também para laboratórios da indústria internacional, a qual se seguia à submissão de manifestação de interesse.
 
