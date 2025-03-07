@@ -1,14 +1,81 @@
 \chapter{Metodologia}
 \label{cap:Metodologia}
 
+Neste Capítulo, abordaremos a definição de todos os elementos componentes da solução proposta, bem como os critérios utilizados nas tomadas de decisão quanto a recortes de dados de entrada e seu tratamento e preparação, modelos utilizados, critérios de avaliação e afins. Começamos, na Seção \ref{sec:Metodologia.1}, apontando a forma de preparação dos dados a serem consultados e usados como base para a geração final das respostas (sua seleção, tratamento, preparação e persistência no banco vetorial). As Seções \ref{sec:Metodologia.2} e \ref{sec:Metodologia.3} abordam, respectivamente, (1) a configuração do ambiente de execução do \ac{LLM} e (2) sua integração com os dados recuperados do banco vetorial -- efetivamente definindo a estrutura \ac{RAG}. A exposição da aplicação ao usuário, por meio de uma interface web simples é descrita na Seção \ref{sec:Metodologia.4}, ao passo que as medições dos resultados e avaliações são apresentadas na Seção \ref{sec:Metodologia.5}.
+
 \section{Definição do Conjunto de Dados}
-\label{sec.Metodologia.1}
+\label{sec:Metodologia.1}
 
 Estabelecida a abordagem a ser utilizada para o desenvolvimento da ferramenta proposta, tornou-se necessário definir quais conjuntos de dados/documentos seriam incluídos no processo de desenho, implementação, testes e validação dos resultados. Dado que, conforme apresentado na Seção \ref{sec:DocAlern.1}, há diferentes conjuntos com características diversas, tanto mais estáticos quanto extremamente dinâmicos, era necessário começar definindo que tipos de documentos e quais domínios dentre todos seriam significativos.
 
 A escolha dos dados para desenvolvimento foi feita com o intuito de se alcançar dois objetivos específicos. O primeiro seria garantir que o objeto final dessa fase preliminar de desenvolvimento pudesse ser de uso relevante para a Casa Legislativa, tanto em termos de funcionalidade, mas também no sentido de abarcar um conjunto de informações que seja de interesse e relevância aos usuários do público interno ou externo à \ac{Alern}. Além deste, pretende-se assegurar que o domínio em que se enquadre o corpus escolhido coincida com as áreas de conhecimento e atuação dos integrantes do grupo de especialistas que se voluntariaram a avaliar a qualidade das respostas geradas. Com isso, seria potencializado o processo de testes e validação dos resultados da aplicação, tanto pelo volume de pessoas que poderão utilizar na fase de testes -- dado que informações escolhidas de forma estratégica atrairão mais usuários -- quanto pela qualidade do conhecimento dos avaliadores.
 
 O recorte de documentos selecionados para compor o corpus textual sobre o qual esta proposta atuará foi feito sob sugestão e orientação de servidores atuantes nos setores de gestão de pessoas (CDHO - Coordenadoria de Desenvolvimento Humano e Organizacional) e setores envolvidos em diversas fases do processo legislativo -- em especial por serem a gestão de pessoas e o processo legislativo duas áreas da \ac{Alern} em que é comum o surgimento de dúvidas procedimentais, bem como a busca por informações que pautem ou desabonem uma ou outra medida a ser tomada ou ações dos servidores em geral. A coleção de documentos inclui a normatização e regimentação da atuação parlamentar, a regulação de direitos e deveres dos servidores (em especial no que se refere a benefícios/auxílios, cálculo de vencimentos, férias e bonificações), planos de cargos e carreiras, avaliação do servidor em estágio probatório de trabalho, assim como o regime jurídico dos servidores do Rio Grande do Norte (dos quais os servidores da \ac{Alern} são um subconjunto).
+
+%AFAZER: descrever as colunas das tabelas abaixo
+
+\begin{table}
+    \caption{Palavras/Tokens/Artigos por Documento}
+    \centering
+    \begin{tabular}{ c c c c }
+        \hline
+        \textbf{Doc.} & \textbf{num palavras} & \textbf{num tokens} & \textbf{num artigos} \\  
+        \hline
+        1 & 15228 & 23079 & 245 \\
+        2 & 43579 & 65850 & 376 \\
+        3 & 651 & 1197 & 7 \\
+        4 & 1778 & 2648 & 21 \\
+        5 & 4735 & 6903 & 46 \\
+        6 & 1573 & 2329 & 14 \\
+        7 & 511 & 758 & 7 \\
+        8 & 4361 & 6306 & 41 \\
+        9 & 1024 & 1546 & 9 \\
+        10 & 432 & 651 & 7 \\
+        \hline
+    \end{tabular}   
+    
+    Fonte: O autor (2024)
+    \label{tab:descricao-documentos-1}
+\end{table}
+
+\begin{table}
+    \caption{Quantitativos por Artigo}
+    \centering
+    \begin{tabular}{ c c c c c }
+        \hline
+        \textbf{Doc.} & \textbf{pals./art.} & \textbf{tokens/art.} & \textbf{arts. 300+ pals} & \textbf{arts. 500+ tokens} \\  
+        \hline
+        1 & 62,2 & 94,2 & 2 & 7 \\
+        2 & 115,9 & 175,1 & 33 & 58 \\
+        3 & 93,0 & 171,0 & 1 & 1 \\
+        4 & 84,7 & 126,1 & 1 & 1 \\
+        5 & 102,9 & 150,1 & 2 & 6 \\
+        6 & 112,4 & 166,4 & 1 & 3 \\
+        7 & 73,0 & 108,3 & 0 & 0 \\
+        8 & 106,4 & 153,8 & 2 & 6 \\
+        9 & 113,8 & 171,8 & 1 & 3 \\
+        10 & 61,7 & 93,0 & 0 & 0 \\
+        \hline
+    \end{tabular}   
+    
+    Fonte: O autor (2024)
+    \label{tab:descricao-documentos-2}
+\end{table}
+
+Os documentos descritos nas Tabelas \ref{tab:descricao-documentos-1} e \ref{tab:descricao-documentos-2} -- identificados na primeira coluna -- são os seguintes:
+
+\begin{enumerate}
+    \item Lei Complementar Estadual Nº 122/1994
+    \item Resolução Nº 031/2021 – ALRN
+    \item Resolução Nº 075/2024 – ALRN
+    \item Resolução Nº 078/2024 – ALRN
+    \item Resolução Nº 106/2018 – ALRN
+    \item Resolução Nº 2388/2019 – ALRN
+    \item Resolução Nº 077/2024 – ALRN
+    \item Resolução Nº 089/2017 – ALRN
+    \item Resolução Nº 618/2022 – ALRN
+    \item Resolução Nº 64/2022 – ALRN
+\end{enumerate}
 
 Ao se analisar os elementos do conjunto de documentos selecionados, é possível perceber que há certo grau de homogeneidade entre os documentos em alguns quesitos. Alguns exemplos de proximidade entre esses componentes são a interrelação entre as temáticas, as suas estruturas semelhantes entre si, seguindo a divisão padrão de textos normativos -- com capítulos, seções, artigos, parágrafos, alíneas, etc. --, o tom do vocabulário e o estilo da escrita característicos de texto legislativo, entre outros. Essa homogeneidade, em especial no que se refere à estrutura, facilita sua manipulação, sua eventual fragmentação e seu processamento, em preparação para sua inclusão no fluxo de atividades do sistema.
 
@@ -39,7 +106,7 @@ Feita a coleta dos arquivos com os textos dos documentos elencados para a compos
 
 A fragmentação do volume do texto de fato é desejável e otimiza o processo de recuperação de documentos (fragmentos menores permitem maior granularidade no cálculo da semelhança semântica com o \textit{input} do usuário), além de reduzir o tamanho geral do \textit{prompt} a ser fornecido ao \ac{LLM} para geração do conteúdo sintético a responder a pergunta feita, visto que este incluirá o conteúdo dos documentos recuperados. Todavia, a divisão do conteúdo considerando meramente o tamanho de cada fragmento pode implicar em dispersão de contexto, colocando uma parte de uma ideia em um fragmento, isolando-a de sua parte complementar alocada em outro, de forma que a ideia completa se perde no instante da recuperação de documentos, podendo não ser identificada pela busca semântica de similaridade.
 
-Destarte, como uma abordagem para mitigar essa fragmentação/dispersão contextual, o processo de segmentação dos documentos se utilizou da estrutura intrínseca de cada um deles (divisão em artigos, parágrafos, alíneas e afins), de forma que os fragmentos ficaram orientados à divisão por artigo, dado que cada artigo é uma unidade autocontida, semanticamente coerente, sendo, no grosso dos exemplos, independente dos outros artigos, salvo quando de citação e referência. Mais claramente, cada documento foi segmentado de tal sorte que cada artigo compõe um fragmento. Apesar disso, ainda há um número não insignificante de artigos cujo teor textual ultrapassa o número de 300 palavras (via de regra por conter um grande número de parágrafos, incisos e alíneas), incorrendo no mesmo problema que ora é abordado, exceto que em um número muito menor de ocorrências, dada a raridade de artigos longos no conjunto de dados em questão.
+Destarte, como uma abordagem para mitigar essa fragmentação/dispersão contextual, o processo de segmentação dos documentos se utilizou da estrutura intrínseca de cada um deles (divisão em artigos, parágrafos, alíneas e afins), de forma que os fragmentos ficaram orientados à divisão por artigo, dado que cada artigo é uma unidade autocontida, semanticamente coerente, sendo, no grosso dos exemplos, independente dos outros artigos, salvo quando de citação e referência. Mais claramente, cada documento foi segmentado de tal sorte que cada artigo compõe um fragmento. Apesar disso, conforme se vê na Tabela \ref{tab:descricao-documentos-2} ainda há, no corpus selecionado, 43 artigos cujo teor textual ultrapassa o número de 300 palavras (via de regra por conter um grande número de parágrafos, incisos e alíneas), incorrendo no mesmo problema que ora é abordado, exceto que em um número muito menor de ocorrências, dada a raridade de artigos longos no conjunto de dados em questão.
 
 Como uma forma de evitar essa situação, a abordagem adotada foi, nos casos de artigos mais extensos, secionar adicionalmente o artigo, em suas partes menores (caput, parágrafos, incisos e alíneas) e agrupá-las de forma que cada um desses agrupamentos consista de uma combinação do caput e parágrafos/incisos/alíneas cujo comprimento total não ultrapasse o limite escolhido de 300 palavras. Assim, embora essa fragmentação automatizada -- independente de divisão feita sob análise caso a caso -- não resolva o problema em sua completude, ao se garantir que cada um desses segmentos mantenha o contexto geral do artigo, condensado no caput, mitiga-se uma fragmentação extrema da ideia geral do artigo, obtendo-se uma coesão maior do que haveria no caso da divisão com base somente no número de palavras.
 
@@ -74,25 +141,25 @@ A estrutura final de cada uma das entradas no Chroma DB se configura como se seg
 
 Como uma peculiaridade do Chroma DB, há o fato de que o id de cada entrada inserida é informado no momento da inserção, não sendo algo que o banco vetorial se encarrega de realizar. Semelhantemente, os elementos dos metadados são definidos, tanto em seus campos quanto em seu conteúdo, de forma flexível, ao se inserir um documento (fragmento, no caso presente) em uma coleção. Destarte, é possível incluir campos de controle adicionais, de forma a interligar fragmentos co-dependentes (como no caso de artigos segmentados por terem um tamanho maior que o número máximo de palavras definido).
 
-Após a inclusão, os documentos são passíveis de serem recuperados em consultas realizadas junto ao banco vetorial, com base na sua similaridade semântica com uma pergunta ou critério de busca definidos. Assim, as solicitações realizadas ao Chroma DB estão definidas de forma tal a recuperar os cinco documentos mais relevantes, ordenados de forma decrescente pelo grau de similaridade com a pergunta utilizada como critério de consulta.
+Após a inclusão, os documentos são passíveis de serem recuperados em consultas realizadas junto ao banco vetorial, com base na sua similaridade semântica com uma pergunta ou critério de busca definidos. Assim, as solicitações realizadas ao Chroma DB estão definidas de forma tal a recuperar os \textit{n} documentos mais relevantes, ordenados de forma decrescente pelo grau de similaridade com a pergunta utilizada como critério de consulta.
 
-\subsection{Configuração do LLM}
-\label{subsec:Metodologia.1.3}
-A configuração do Llama, visto que foi feita a opção pelo uso do Ollama como meio de simplificar o processo, se deu de forma direta. Os arquivos de instalação do Ollama foram obtidos e executados diretamente da sua página de download. \cite{Ollama:2} Após a instalação, foi realizada a inclusão do modelo Llama em sua versão 3.1, propriamente dito, tornando-o disponível para utilização.
+\section{Configuração do LLM}
+\label{sec:Metodologia.2}
+A configuração do Llama, visto que foi feita a opção pelo uso do Ollama como meio de simplificar o processo, se deu de forma direta. Os arquivos de instalação do Ollama foram obtidos e executados diretamente da sua página de download. \cite{Ollama:2} Após a instalação, foi realizada a inclusão do modelo Llama em sua versão 3.1 (versão de 8B parâmetros), propriamente dito, tornando-o disponível para utilização.
 
 O consumo da geração do modelo fica disponível por meio de uma API REST, a qual se encarrega de fazer o gerenciamento dos recursos disponíveis para a otimização do conteúdo. As requisições feitas à API apontam o modelo específico a ser utilizado (o Llama3.1, no caso deste estudo), o \textit{prompt} a ser utilizado pelo modelo, junto com um contexto (uma representação em \textit{embeddings} das interações anteriores com o modelo), também indicando se a resposta deve ser enviada \textit{token} a \textit{token}, à medida que é gerada, ou de forma inteiriça, com todo o conteúdo gerado sendo disponibilizado quando do término de sua produção pelo \ac{LLM}.
 
 De forma a direcionar o comportamento do Llama na geração das respostas, cada requisição feita à API utiliza um modelo de \textit{prompt} com uma estrutura e informações fixas, alterando somente a pergunta feita e o teor dos documentos em que a resposta deve se basear. O modelo é dividido em quatro seções:
 
 \begin{itemize}
-    \item Definição do papel que o Llama deve assumir: “ALERN e ALRN significam Assembleia Legislativa do Estado do Rio Grande do Norte. Você é um assistente que responde a dúvidas de servidores da ALRN sobre o regimento interno da ALRN, o regime jurídico dos servidores estaduais do RN, bem como resoluções da ALRN. Assuma um tom formal, porém caloroso, com gentileza nas respostas. Utilize palavras e termos que sejam claros, autoexplicativos e linguagem simples, próximo do que o cidadão comum utiliza”;
-    \item Diretrizes a serem seguidas na geração da resposta: “Use as informações dos DOCUMENTOS fornecidos para gerar uma resposta clara para a PERGUNTA. Na resposta, não mencione que foi fornecido documentos de referência. Cite os nomes dos DOCUMENTOS e números dos artigos em que a resposta se baseia. A resposta não deve ter saudação, vocativo, nem qualquer tipo de introdução que dê a entender que não houve interação anterior. Se você não souber a resposta, assuma um tom gentil e diga que não tem informações suficientes para responder”;
+    \item Definição do papel que o Llama deve assumir: ``ALERN e ALRN significam Assembleia Legislativa do Estado do Rio Grande do Norte. Você é um assistente que responde a dúvidas de servidores da ALRN sobre o regimento interno da ALRN, o regime jurídico dos servidores estaduais do RN, bem como resoluções da ALRN. Assuma um tom formal, porém caloroso, com gentileza nas respostas. Utilize palavras e termos que sejam claros, autoexplicativos e linguagem simples, próximo do que o cidadão comum utiliza'';
+    \item Diretrizes a serem seguidas na geração da resposta: ``Use as informações dos DOCUMENTOS fornecidos para gerar uma resposta clara para a PERGUNTA. Na resposta, não mencione que foi fornecido documentos de referência. Cite os nomes dos DOCUMENTOS e números dos artigos em que a resposta se baseia. A resposta não deve ter saudação, vocativo, nem qualquer tipo de introdução que dê a entender que não houve interação anterior. Se você não souber a resposta, assuma um tom gentil e diga que não tem informações suficientes para responder'';
     \item Conteúdo dos documentos a serem utilizados para a geração da resposta;
     \item Pergunta a ser respondida pelo \ac{LLM}.
 \end{itemize}
 
 \section{API de Gerenciamento de Fluxo}
-\label{sec:Metodologia.2}
+\label{sec:Metodologia.3}
 
 A integração de todos os serviços oferecidos pelas camadas mencionadas é realizada por uma API de gerenciamento de fluxo, que se encarrega de receber requisições de alguma interface de usuário, com as perguntas a serem utilizadas como critérios de consulta e acionar os serviços das outras camadas para a geração da resposta. Após receber os dados resultantes de cada um dos serviços nas fases intermediárias do processo inteiro, eles são formatados e preparados para serem direcionados ao elemento seguinte, até, finalmente, encaminhar à interface de usuário o produto final, na forma de uma resposta, com uma lista de documentos que lhe dão suporte.
 
@@ -108,7 +175,7 @@ A Figura \ref{fig:diag-atividade-assist-busca} demonstra o fluxo inteiro do proc
 Além de incluir a pergunta, a resposta e o conjunto de documentos que foram utilizados na composição do \textit{prompt} enviado ao \ac{LLM}, a API de Gerenciamento de Fluxo coleta dados a respeito do processo como um todo (tempo levado na execução de cada etapa, métricas utilizadas, dentre outros) e os inclui na resposta devolvida ao usuário. Também cabe a esse elemento garantir persistência de dados sobre cada uma das interações realizadas, permitindo que, a posteriori, sejam analisados e utilizados para refinamento do processo e da estrutura proposta.
 
 \section{Interface de Usuário}
-\label{sec:Metodologia.3}
+\label{sec:Metodologia.4}
 
 Dado o objetivo deste estudo, foi definida uma página \textit{web} como interface de usuário -- considerando sua simplicidade de desenvolvimento e implementação -- nos moldes de uma aplicação de envio/recebimento de mensagens de texto, como é o mais comum ao se desenhar uma ferramenta de \textit{chatbot}. A opção foi feita por manter uma interface limpa e minimalista, restringindo-se somente ao campo de envio de mensagens do usuário, bem como uma área superior com a exibição das mensagens enviadas e recebidas.
 
@@ -123,7 +190,7 @@ A mecânica de consulta consiste apenas de uma solicitação realizada à API de
 
 
 \section{Medição dos Resultados}
-\label{sec:Metodologia.4}
+\label{sec:Metodologia.5}
 A forma pretendida de avaliação do desempenho do Assistente de Busca como um todo se baseia no parecer dado por especialistas nas matérias de que trata o corpus documental que foi selecionado para o desenvolvimento e testes. O grupo de especialistas inclui, dentre outros, servidores atuantes na Coordenadoria de Desenvolvimento Humano e Organizacional (CDHO), da Assembleia Legislativa do Rio Grande do Norte, dado que a prática diária de suas atividades os torna familiarizados com os meandros das Resoluções e definições regimentais contidas na seleção de documentos abordada neste estudo.
 
 Assim, interagiriam os especialistas com a interface de usuário, inserindo perguntas sobre aspectos relevantes cobertos pelos atos normativos no conjunto de documentos selecionados. As interações dos especialistas não serão guiadas ou direcionadas, de forma que as perguntas feitas sejam orgânicas e o mais próximo possível do tipo de uso que o Assistente de Busca terá após sua implementação e disponibilização. Observarão, os avaliadores, as respostas geradas, aferindo quantitativamente a sua exatidão e fornecendo eles mesmos um texto breve com o teor do que deveria ser a resposta ideal.
@@ -159,7 +226,7 @@ O resultado gerado pelo GPT-4o foi analisado com fins de assegurar sua correçã
     \label{fig:geracao-perguntas}
 \end{figure}
 
-Após a geração do conjunto de perguntas "sintéticas" para cada fragmento, cada pergunta foi usada para realizar buscas no banco vetorial com o objetivo de identificar documentos semanticamente semelhantes. Como resultado, para cada pergunta associada a um fragmento, foi gerado um conjunto de documentos considerados semanticamente próximos (ver Figura \ref{fig:recuperacao-fragmentos}).
+Após a geração do conjunto de perguntas ``sintéticas'' para cada fragmento, cada pergunta foi usada para realizar buscas no banco vetorial com o objetivo de identificar documentos semanticamente semelhantes. Como resultado, para cada pergunta associada a um fragmento, foi gerado um conjunto de documentos considerados semanticamente próximos (ver Figura \ref{fig:recuperacao-fragmentos}).
 
 \begin{figure}
     \centering
@@ -168,7 +235,7 @@ Após a geração do conjunto de perguntas "sintéticas" para cada fragmento, ca
     \label{fig:recuperacao-fragmentos}
 \end{figure}
 
-Com as perguntas e os documentos correspondentes à sua semelhança disponíveis, foi possível utilizar esses materiais, conforme detalhado na Seção \ref{subsec:Metodologia.1.3}, para criar um \textit{prompt} e solicitar ao Llama que gerasse uma resposta completa baseada na seleção de documentos. Esse processo emula a dinâmica seguida pelo Assistente de Busca durante seu uso comum pelos usuários, simulando uma interação que visa fornecer respostas completas e relevantes a partir de consultas realizadas (Figura \ref{fig:geracao-respostas}).
+Com as perguntas e os documentos correspondentes à sua semelhança disponíveis, foi possível utilizar esses materiais, conforme detalhado na Seção \ref{sec:Metodologia.2}, para criar um \textit{prompt} e solicitar ao Llama que gerasse uma resposta completa baseada na seleção de documentos. Esse processo emula a dinâmica seguida pelo Assistente de Busca durante seu uso comum pelos usuários, simulando uma interação que visa fornecer respostas completas e relevantes a partir de consultas realizadas (Figura \ref{fig:geracao-respostas}).
 
 \begin{figure}
     \centering
