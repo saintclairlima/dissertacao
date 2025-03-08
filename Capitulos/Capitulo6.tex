@@ -12,14 +12,30 @@ A escolha dos dados para desenvolvimento foi feita com o intuito de se alcançar
 
 O recorte de documentos selecionados para compor o corpus textual sobre o qual esta proposta atuará foi feito sob sugestão e orientação de servidores atuantes nos setores de gestão de pessoas (CDHO - Coordenadoria de Desenvolvimento Humano e Organizacional) e setores envolvidos em diversas fases do processo legislativo -- em especial por serem a gestão de pessoas e o processo legislativo duas áreas da \ac{Alern} em que é comum o surgimento de dúvidas procedimentais, bem como a busca por informações que pautem ou desabonem uma ou outra medida a ser tomada ou ações dos servidores em geral. A coleção de documentos inclui a normatização e regimentação da atuação parlamentar, a regulação de direitos e deveres dos servidores (em especial no que se refere a benefícios/auxílios, cálculo de vencimentos, férias e bonificações), planos de cargos e carreiras, avaliação do servidor em estágio probatório de trabalho, assim como o regime jurídico dos servidores do Rio Grande do Norte (dos quais os servidores da \ac{Alern} são um subconjunto).
 
-%AFAZER: descrever as colunas das tabelas abaixo
+Os documentos selecionados têm suas características detalhadas nas Tabelas \ref{tab:descricao-documentos-1} e \ref{tab:descricao-documentos-2}. A Tabela \ref{tab:descricao-documentos-1} contém os quantitativos de \textit{tokens}, palavras e artigos em cada documento. A Tabela \ref{tab:descricao-documentos-2}, por sua vez, caracteriza a distribuição média de palavras e \textit{tokens} por artigo, em cada documento, bem como expõe a quantidade de artigos com mais de 300 palavras e com mais de 500 \textit{tokens} em cada documento -- sendo esse segundo dado algo relevante de se considerar, dado a limitação da quantidade de \textit{tokens} suportada por modelos específicos (ver início da Seção \ref{subsec:Metodologia.1.1} para mais detalhes).
+
+Os documentos descritos nas Tabelas 1 e 2 -- identificados na primeira coluna -- são
+os seguintes:
+
+\begin{enumerate}
+    \item Lei Complementar Estadual Nº 122/1994
+    \item Resolução Nº 031/2021 – Alern
+    \item Resolução Nº 075/2024 – Alern
+    \item Resolução Nº 078/2024 – Alern
+    \item Resolução Nº 106/2018 – Alern
+    \item Resolução Nº 2388/2019 – Alern
+    \item Resolução Nº 077/2024 – Alern
+    \item Resolução Nº 089/2017 – Alern
+    \item Resolução Nº 618/2022 – Alern
+    \item Resolução Nº 064/2022 – Alern
+\end{enumerate}
 
 \begin{table}
-    \caption{Palavras/Tokens/Artigos por Documento}
+    \caption{Quantitativos de Palavras/\textit{Tokens}/Artigos por Documento}
     \centering
     \begin{tabular}{ c c c c }
         \hline
-        \textbf{Doc.} & \textbf{num palavras} & \textbf{num tokens} & \textbf{num artigos} \\  
+        \textbf{Doc.} & \textbf{palavras} & \textbf{\textit{tokens}} & \textbf{artigos} \\  
         \hline
         1 & 15228 & 23079 & 245 \\
         2 & 43579 & 65850 & 376 \\
@@ -34,12 +50,12 @@ O recorte de documentos selecionados para compor o corpus textual sobre o qual e
         \hline
     \end{tabular}   
     
-    Fonte: O autor (2024)
+    Fonte: O autor (2025)
     \label{tab:descricao-documentos-1}
 \end{table}
 
 \begin{table}
-    \caption{Quantitativos por Artigo}
+    \caption{Quantitativos Palavras e \textit{Tokens} por Artigo em cada Documento}
     \centering
     \begin{tabular}{ c c c c c }
         \hline
@@ -58,24 +74,9 @@ O recorte de documentos selecionados para compor o corpus textual sobre o qual e
         \hline
     \end{tabular}   
     
-    Fonte: O autor (2024)
+    Fonte: O autor (2025)
     \label{tab:descricao-documentos-2}
 \end{table}
-
-Os documentos descritos nas Tabelas \ref{tab:descricao-documentos-1} e \ref{tab:descricao-documentos-2} -- identificados na primeira coluna -- são os seguintes:
-
-\begin{enumerate}
-    \item Lei Complementar Estadual Nº 122/1994
-    \item Resolução Nº 031/2021 – ALRN
-    \item Resolução Nº 075/2024 – ALRN
-    \item Resolução Nº 078/2024 – ALRN
-    \item Resolução Nº 106/2018 – ALRN
-    \item Resolução Nº 2388/2019 – ALRN
-    \item Resolução Nº 077/2024 – ALRN
-    \item Resolução Nº 089/2017 – ALRN
-    \item Resolução Nº 618/2022 – ALRN
-    \item Resolução Nº 64/2022 – ALRN
-\end{enumerate}
 
 Ao se analisar os elementos do conjunto de documentos selecionados, é possível perceber que há certo grau de homogeneidade entre os documentos em alguns quesitos. Alguns exemplos de proximidade entre esses componentes são a interrelação entre as temáticas, as suas estruturas semelhantes entre si, seguindo a divisão padrão de textos normativos -- com capítulos, seções, artigos, parágrafos, alíneas, etc. --, o tom do vocabulário e o estilo da escrita característicos de texto legislativo, entre outros. Essa homogeneidade, em especial no que se refere à estrutura, facilita sua manipulação, sua eventual fragmentação e seu processamento, em preparação para sua inclusão no fluxo de atividades do sistema.
 
@@ -108,16 +109,40 @@ A fragmentação do volume do texto de fato é desejável e otimiza o processo d
 
 Destarte, como uma abordagem para mitigar essa fragmentação/dispersão contextual, o processo de segmentação dos documentos se utilizou da estrutura intrínseca de cada um deles (divisão em artigos, parágrafos, alíneas e afins), de forma que os fragmentos ficaram orientados à divisão por artigo, dado que cada artigo é uma unidade autocontida, semanticamente coerente, sendo, no grosso dos exemplos, independente dos outros artigos, salvo quando de citação e referência. Mais claramente, cada documento foi segmentado de tal sorte que cada artigo compõe um fragmento. Apesar disso, conforme se vê na Tabela \ref{tab:descricao-documentos-2} ainda há, no corpus selecionado, 43 artigos cujo teor textual ultrapassa o número de 300 palavras (via de regra por conter um grande número de parágrafos, incisos e alíneas), incorrendo no mesmo problema que ora é abordado, exceto que em um número muito menor de ocorrências, dada a raridade de artigos longos no conjunto de dados em questão.
 
-Como uma forma de evitar essa situação, a abordagem adotada foi, nos casos de artigos mais extensos, secionar adicionalmente o artigo, em suas partes menores (caput, parágrafos, incisos e alíneas) e agrupá-las de forma que cada um desses agrupamentos consista de uma combinação do caput e parágrafos/incisos/alíneas cujo comprimento total não ultrapasse o limite escolhido de 300 palavras. Assim, embora essa fragmentação automatizada -- independente de divisão feita sob análise caso a caso -- não resolva o problema em sua completude, ao se garantir que cada um desses segmentos mantenha o contexto geral do artigo, condensado no caput, mitiga-se uma fragmentação extrema da ideia geral do artigo, obtendo-se uma coesão maior do que haveria no caso da divisão com base somente no número de palavras.
+Como uma forma de evitar essa situação, a abordagem adotada foi, nos casos de artigos mais extensos, secionar adicionalmente o artigo, em suas partes menores (caput, parágrafos, incisos e alíneas) e agrupá-las de forma que cada um desses agrupamentos consista de uma combinação do caput e parágrafos/incisos/alíneas cujo comprimento total não ultrapasse o limite escolhido de 300 palavras, conforme a Figura \ref{fig:fragmentacao-artigos}. Assim, embora essa fragmentação automatizada -- independente de divisão feita sob análise caso a caso -- não resolva o problema em sua completude, ao se garantir que cada um desses segmentos mantenha o contexto geral do artigo, condensado no caput, mitiga-se uma fragmentação extrema da ideia geral do artigo, obtendo-se uma coesão maior do que haveria no caso da divisão com base somente no número de palavras.
 
-
-
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{Imagens/fragmentacao-artigos.png}
     \caption{Estratégia de Fragmentação de Artigos Extensos} 
     \label{fig:fragmentacao-artigos}
 \end{figure}
+
+O resultado final do quantitativo de fragmentos por documento está descrito na Tabela \ref{tab:descricao-fragmentos-1}
+
+\begin{table}[H]
+    \caption{Quantitativos de artigos e Fragmentos por Documento}
+    \centering
+    \begin{tabular}{ c c c c }
+        \hline
+        \textbf{Documento} & \textbf{Artigos} & \textbf{300+} & \textbf{Fragmentos} \\  
+        \hline
+        1. Lei Complementar Estadual Nº 122/1994 & 245 & 2 & 248 \\
+        2. Resolução Nº 031/2021 – Alern & 376 & 33 & 420 \\
+        3. Resolução Nº 075/2024 – Alern & 7 & 1 & 8 \\
+        4. Resolução Nº 078/2024 – Alern & 21 & 1 & 22 \\
+        5. Resolução Nº 106/2018 – Alern & 46 & 2 & 48 \\
+        6. Resolução Nº 2388/2019 – Alern & 14 & 1 & 15 \\
+        7. Resolução Nº 077/2024 – Alern & 7 & 0 & 7 \\
+        8. Resolução Nº 089/2017 – Alern & 41 & 2 & 44 \\
+        9. Resolução Nº 618/2022 – Alern & 9 & 1 & 10 \\
+        10. Resolução Nº 064/2022 – Alern & 7 & 0 & 7 \\
+        \hline
+    \end{tabular}   
+    
+    Fonte: O autor (2025)
+    \label{tab:descricao-fragmentos-1}
+\end{table}
 
 \subsection{Inclusão dos Documentos (fragmentos) no Banco Vetorial}
 \label{subsec:Metodologia.1.2}
@@ -150,6 +175,8 @@ A configuração do Llama, visto que foi feita a opção pelo uso do Ollama como
 O consumo da geração do modelo fica disponível por meio de uma API REST, a qual se encarrega de fazer o gerenciamento dos recursos disponíveis para a otimização do conteúdo. As requisições feitas à API apontam o modelo específico a ser utilizado (o Llama3.1, no caso deste estudo), o \textit{prompt} a ser utilizado pelo modelo, junto com um contexto (uma representação em \textit{embeddings} das interações anteriores com o modelo), também indicando se a resposta deve ser enviada \textit{token} a \textit{token}, à medida que é gerada, ou de forma inteiriça, com todo o conteúdo gerado sendo disponibilizado quando do término de sua produção pelo \ac{LLM}.
 
 De forma a direcionar o comportamento do Llama na geração das respostas, cada requisição feita à API utiliza um modelo de \textit{prompt} com uma estrutura e informações fixas, alterando somente a pergunta feita e o teor dos documentos em que a resposta deve se basear. O modelo é dividido em quatro seções:
+
+%AFAZER: Adicionar figura mostrando a estrutura dos dados enviados ao Ollama/Llama
 
 \begin{itemize}
     \item Definição do papel que o Llama deve assumir: ``ALERN e ALRN significam Assembleia Legislativa do Estado do Rio Grande do Norte. Você é um assistente que responde a dúvidas de servidores da ALRN sobre o regimento interno da ALRN, o regime jurídico dos servidores estaduais do RN, bem como resoluções da ALRN. Assuma um tom formal, porém caloroso, com gentileza nas respostas. Utilize palavras e termos que sejam claros, autoexplicativos e linguagem simples, próximo do que o cidadão comum utiliza'';
