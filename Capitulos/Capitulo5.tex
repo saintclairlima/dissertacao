@@ -53,15 +53,13 @@ Quando da realização de uma consulta ao banco vetorial, em uma coleção espec
 
 Considerando a possibilidade oferecida pelo banco vetorial de se fornecer uma função de geração de \textit{embeddings} personalizada, sopesamos a utilização de diferentes modelos, considerando seu desempenho para fins de cálculo de similaridade -- levando em conta, especificamente, os resultados sobre a amostra de dados utilizada neste estudo (ver Seção \ref{sec:Metodologia.1}, que trata da definição dos dados deste estudo).
 
-%AFAZER: explorar os resultados de outros modelos, como:
-% instructor-xl -- já utilizado
-% pierreguillou/bert-base-cased-squad-v1.1-portuguese
-% Alibaba-NLP/gte-multilingual-base
-% text-embedding-ada-002
-% llama
-%Após fazer testes, justificar a utilização do 
+%AFAZER: preparar uma transição melhor que essa abaixo
+Após alguma exploração preliminar, elencamos alguns modelos para comparação, os quais são introduzidos a seguir. 
 
-Dentre os modelos avaliados, a opção feita foi pelo \textit{instructor-xl}. Trata-se de um modelo desenvolvido pela equipe de pesquisa de Processamento de Linguagem Natural (NLP) da Universidade de Hong Kong, incluindo a participação de pesquisadores de outras instituições, como \textit{University of Washington}, Meta AI e \textit{Allen Institute for AI}, publicado em 2023 \cite{Instructor:1}. O modelo selecionado pertence à série de modelos INSTRUCTOR, que são projetados para gerar \textit{embeddings} de texto de alta qualidade e se baseiam na arquitetura Transformer, assim como modelos de estado da arte, como \ac{BERT} e \ac{GPT}.
+\subsubsection{Instructor}
+\label{subsec:Assistente.1.2.1}
+
+Dentre os modelos avaliados, o que mais chamou atenção foi o \textit{instructor-xl} dada a sua proposta de flexibilidade. Trata-se de um modelo desenvolvido pela equipe de pesquisa de Processamento de Linguagem Natural (NLP) da Universidade de Hong Kong, incluindo a participação de pesquisadores de outras instituições, como \textit{University of Washington}, Meta AI e \textit{Allen Institute for AI}, publicado em 2023 \cite{Instructor:1}. O modelo selecionado pertence à série de modelos INSTRUCTOR, que são projetados para gerar \textit{embeddings} de texto de alta qualidade e se baseiam na arquitetura Transformer, assim como modelos de estado da arte, como \ac{BERT} e \ac{GPT}.
 
 No trabalho de  \citeonline{Instructor:2}, os seus publicadores o definem como \textit{“One Embedder [for] Any Task”} (Um Gerador de \textit{Embeddings} para Qualquer Tarefa) e como
 
@@ -72,7 +70,16 @@ No trabalho de  \citeonline{Instructor:2}, os seus publicadores o definem como \
 Os INSTRUCTORs são, portanto, modelos de criação de \textit{embeddings} textuais de forma adaptativa. Em vez de gerar \textit{embeddings} baseando-se unicamente nos parâmetros alcançados em seu treinamento, ele lança mão de instruções em linguagem natural fornecidas no momento de sua execução, as quais devem descrever as tarefas em que os \textit{embeddings} serão utilizados. Ao utilizar as instruções como elementos ``direcionadores'' do processo de geração de \textit{embeddings}, pretende-se que o resultado final seja otimizado para as tarefas definidas, fazendo as vezes de um ``ajuste fino''. Essa abordagem demonstra, segundo os seus desenvolvedores, bom desempenho em não somente ``compreender'' texto em um sentido mais aberto e genérico, sendo capaz, também, de interpretá-lo com uma visão direcionada a aplicações e casos de uso particulares.
 
 Desta forma, as representações vetoriais geradas são otimizadas para tarefas específicas (como classificação, recuperação de informações, agrupamento, avaliação semântica, entre outras) e/ou domínios diferentes sem a necessidade de refinamento do modelo nos moldes tradicionais de \textit{finetuning}, tornando-o adaptável e mais relevante para diversas aplicações.
-A versão utilizada no Assistente de Busca, especificamente, é a \textit{instructor-xl}, sendo a variante dentre a família de modelos INSTRUCTOR com maior tamanho, otimizada para desempenho e equilíbrio entre precisão e eficiência em aplicações de processamento de linguagem natural.
+A versão do modelo que escolhemos testar para possível uso no Assistente de Busca, especificamente, é a \textit{instructor-xl}, sendo a variante dentre a família de modelos INSTRUCTOR com maior tamanho, otimizada para desempenho e equilíbrio entre precisão e eficiência em aplicações de processamento de linguagem natural.
+
+\subsubsection{ada-002}
+\label{subsec:Assistente.1.2.1}
+
+Outro modelo selecionado por ser promissor foi o ada-002, desenvolvido e oferecido como um serviço pela OpenAi desde o final do ano de 2022. A página de apresentação do modelo o descreve como a unificação de cinco modelos anteriores (\textit{text-similarity}, \textit{text-search-query}, \textit{text-search-doc}, \textit{code-search-text} and \textit{code-search-code}) em um único modelo aprimorado, alcançando melhores resultados em busca textual, similaridade de frases e \textit{benchmarking} de busca em código. \cite{ADA:1}
+
+Um dos pontos positivos apontados na página é o fato de utilizar uma forma compacta de representação em \textit{embeddings} (apenas 1536 dimensões), apresentando melhor custo-benefício para utilização em bancos vetoriais, a despeito do suporte a um contexto maior. A isso adiciona-se o fato de ser menos computacionalmente custoso de se utilizar, dado que o processamento é delegado à API da OpenAI, enviando o texto a ser processado, via requisição HTTP e recebendo os \textit{embeddings} como resposta.
+
+Como ponto negativo há o custo atrelado a cada requisição feita à API, tanto para gerar os \textit{embeddings} dos documentos quanto, posteriormente, para gerar os \textit{embeddings} de cada consulta feita ao banco de vetores, enquanto houver utilização da aplicação.
 
 \section{Geração de Conteúdo}
 \label{sec:Assistente.2}

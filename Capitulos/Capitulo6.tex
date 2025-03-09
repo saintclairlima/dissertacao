@@ -123,7 +123,7 @@ O resultado final do quantitativo de fragmentos por documento está descrito na 
 \begin{table}[H]
     \caption{Quantitativos de artigos e Fragmentos por Documento}
     \centering
-    \begin{tabular}{ c c c c }
+    \begin{tabular}{ l c c c }
         \hline
         \textbf{Documento} & \textbf{Artigos} & \textbf{300+} & \textbf{Fragmentos} \\  
         \hline
@@ -246,7 +246,7 @@ Tal conjunto de perguntas/respostas/fragmentos foi gerado previamente, de forma 
 
 O resultado gerado pelo GPT-4o foi analisado com fins de assegurar sua correção em termos de formato JSON, para garantir que o arquivo estivesse válido e pudesse ser usado no processo de avaliação. Dessa forma, cada fragmento no banco vetorial recebeu um conjunto de perguntas, acompanhado de trechos de seu conteúdo que poderiam ser utilizados como respostas curtas, todos diretamente relacionados ao seu conteúdo textual. Esses trechos com potencial de responder a pergunta elaborada serão utilizados como texto de referência ao se avaliar a qualidade do conteúdo das perguntas geradas pelo \ac{LLM}, conforme descrito na Seção \ref{subsec:Resultados.2.2}. A Figura \ref{fig:geracao-perguntas} resume o processo de geração das perguntas.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{Imagens/geracao-perguntas.png}
     \caption{Geração de pares pergunta-resposta por meio de LLM}
@@ -255,7 +255,7 @@ O resultado gerado pelo GPT-4o foi analisado com fins de assegurar sua correçã
 
 Após a geração do conjunto de perguntas ``sintéticas'' para cada fragmento, cada pergunta foi usada para realizar buscas no banco vetorial com o objetivo de identificar documentos semanticamente semelhantes. Como resultado, para cada pergunta associada a um fragmento, foi gerado um conjunto de documentos considerados semanticamente próximos (ver Figura \ref{fig:recuperacao-fragmentos}).
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{Imagens/recuperacao-fragmentos.png}
     \caption{Recuperação de documentos do Banco Vetorial}
@@ -264,14 +264,16 @@ Após a geração do conjunto de perguntas ``sintéticas'' para cada fragmento, 
 
 Com as perguntas e os documentos correspondentes à sua semelhança disponíveis, foi possível utilizar esses materiais, conforme detalhado na Seção \ref{sec:Metodologia.2}, para criar um \textit{prompt} e solicitar ao Llama que gerasse uma resposta completa baseada na seleção de documentos. Esse processo emula a dinâmica seguida pelo Assistente de Busca durante seu uso comum pelos usuários, simulando uma interação que visa fornecer respostas completas e relevantes a partir de consultas realizadas (Figura \ref{fig:geracao-respostas}).
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{Imagens/geracao-respostas.png}
     \caption{Recuperação de documentos do Banco Vetorial}
     \label{fig:geracao-respostas}
 \end{figure}
 
-\begin{table}
+Havendo sido concluídas todas essas etapas, foi possível obter, para cada pergunta gerada sinteticamente, uma estrutura de dados como a apresentada na Tabela \ref{tab:dados-sinteticos}. Esses dados gerados possibilitam não somente a abordagem de mitigação dos problemas apontados, como também a realização de uma avaliação preliminar também automatizada, com foco nas duas etapas de geração das respostas: a recuperação de documentos por similaridade, junto ao banco vetorial, e a elaboração do texto final da resposta feita pelo Llama, com base no teor dos documentos selecionados.
+
+\begin{table}[H]
     \caption{Estrutura dos dados sintéticos gerados para cada fragmento}
     \centering
     \begin{tabular}{ l p{10cm} }
@@ -279,7 +281,7 @@ Com as perguntas e os documentos correspondentes à sua semelhança disponíveis
          \textbf{Informação} & \textbf{Descrição} \\  
          \hline
          Id & Identificador do fragmento usado para gerar a pergunta \\
-         Pergunta & Pergunta gerada pelo Llama com base no fragmento \\
+         Pergunta & Pergunta gerada pelo GPT-4 com base no fragmento \\
          Recorte & Trecho do fragmento que o Llama identificou como resposta curta \\
          Fragmentos & Lista de fragmentos relevantes recuperados do banco de vetores \\
          Resposta Llama & Resposta gerada pelo Llama com base na pergunta e nos fragmentos relevantes \\
@@ -289,8 +291,6 @@ Com as perguntas e os documentos correspondentes à sua semelhança disponíveis
     Fonte: O autor (2024)
     \label{tab:dados-sinteticos}
 \end{table}
-
-Havendo sido concluídas todas essas etapas, foi possível obter, para cada pergunta gerada sinteticamente, uma estrutura de dados como a apresentada na Tabela \ref{tab:dados-sinteticos}. Esses dados gerados possibilitam não somente a abordagem de mitigação dos problemas apontados, como também a realização de uma avaliação preliminar também automatizada, com foco nas duas etapas de geração das respostas: a recuperação de documentos por similaridade, junto ao banco vetorial, e a elaboração do texto final da resposta feita pelo Llama, com base no teor dos documentos selecionados.
 
 \subsection{Recuperação de Documentos (\textit{Retrieval})}
 \label{subsec:Metodologia.4.1}
@@ -307,7 +307,7 @@ A avaliação da qualidade das respostas geradas pelo \ac{LLM} é um aspecto fun
 
 Embora a similaridade entre a pergunta e a resposta seja uma métrica viável, demonstra-se insuficiente para avaliar a qualidade da resposta em um nível mais profundo. A análise de proximidade semântica da resposta em relação à pergunta não garante que a resposta abranja de forma adequada o contexto e o conteúdo desejado pelo próprio fato de que uma resposta, por definição, deve conter informações inexistentes na pergunta. Portanto, a avaliação deve ir além da correspondência superficial e considerar o quão bem a resposta aborda e resolve a questão apresentada.
 
-Para avaliar a qualidade das respostas em termos de satisfação da pergunta, ferramentas como o BERTScore, proposto por \citeonline{BERTScore:1}, abordado na Seção \ref{sec:Teorico.7}, se mostram úteis. Sua aplicação em sistemas de \ac{RAG} oferece uma maneira objetiva de quantificar o desempenho dos \ac{LLM}s no que tange à satisfatoriedade de suas respostas às perguntas. Essa métrica considera a semelhança semântica e permite identificar se uma resposta contém informações relevantes e está alinhada com o que foi solicitado pela pergunta. A utilização do BERTScore, portanto, contribui para a validação da qualidade da resposta gerada, não apenas em termos de similaridade de palavras, mas em relação à precisão e completude, características essenciais para a construção de sistemas de perguntas e respostas de alta qualidade. Como resultado, se alcança uma medida mais robusta de como a resposta aborda de maneira contextualizada a pergunta, indo além da análise de correspondência lexical.
+Para avaliar a qualidade das respostas em termos de satisfação da pergunta, ferramentas como o BERTScore, proposto por \citeonline{BERTScore:1}, abordado na Seção \ref{sec:Teorico.7}, se mostram úteis. Sua aplicação em sistemas de \ac{RAG} oferece uma maneira objetiva de quantificar o desempenho dos \ac{LLM}s no que tange à satisfatoriedade de suas respostas às perguntas. Essa métrica considera a semelhança semântica e permite identificar se uma resposta contém informações relevantes e está alinhada com o que foi solicitado pela pergunta. Assim, como métrica de avaliação da resposta final gerada utilizamos o BERTScore, dado que este contribui para a validação da qualidade da resposta gerada, não apenas em termos de similaridade de palavras, mas em relação à precisão e completude, características essenciais para a construção de sistemas de perguntas e respostas de alta qualidade. Como resultado, se alcança uma medida mais robusta de como a resposta aborda de maneira contextualizada a pergunta, indo além da análise de correspondência lexical.
 
 \begin{comment}
     \subsection{Interação com usuário}
