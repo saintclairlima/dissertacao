@@ -48,7 +48,7 @@ As consultas em uma coleção são realizadas por meio de se informar listas de 
 
 Quando da realização de uma consulta ao banco vetorial, em uma coleção específica, a mesma função de geração de \textit{embeddings} utilizada para gerar as representações vetoriais armazenadas é executada sobre o texto/documento fornecido como critério de busca, resultando, similarmente, em uma representação em formato de vetor de alta dimensionalidade. O Chroma DB, então, realiza a busca dentre os documentos vetorizados já armazenados por instâncias semanticamente mais semelhantes, utilizando a métrica de similaridade definida na criação da coleção, recuperando os documentos resultantes da busca.
 
-\subsection{Modelo da função de \textit{embeddings}}
+\subsection{Modelo da função de geração de \textit{embeddings}}
 \label{subsec:Assistente.1.2}
 
 Considerando a possibilidade oferecida pelo banco vetorial de se fornecer uma função de geração de \textit{embeddings} personalizada, sopesamos a utilização de diferentes modelos, considerando seu desempenho para fins de cálculo de similaridade -- levando em conta, especificamente, os resultados sobre a amostra de dados utilizada neste estudo (ver Seção \ref{sec:Metodologia.1}, que trata da definição dos dados deste estudo).
@@ -56,12 +56,12 @@ Considerando a possibilidade oferecida pelo banco vetorial de se fornecer uma fu
 %AFAZER: preparar uma transição melhor que essa abaixo
 Após alguma exploração preliminar, elencamos alguns modelos para comparação, os quais são introduzidos a seguir. 
 
-\subsubsection{Instructor}
+\subsubsection{instructor-xl}
 \label{subsec:Assistente.1.2.1}
 
 Dentre os modelos avaliados, o que mais chamou atenção foi o \textit{instructor-xl} dada a sua proposta de flexibilidade. Trata-se de um modelo desenvolvido pela equipe de pesquisa de Processamento de Linguagem Natural (NLP) da Universidade de Hong Kong, incluindo a participação de pesquisadores de outras instituições, como \textit{University of Washington}, Meta AI e \textit{Allen Institute for AI}, publicado em 2023 \cite{Instructor:1}. O modelo selecionado pertence à série de modelos INSTRUCTOR, que são projetados para gerar \textit{embeddings} de texto de alta qualidade e se baseiam na arquitetura Transformer, assim como modelos de estado da arte, como \ac{BERT} e \ac{GPT}.
 
-No trabalho de  \citeonline{Instructor:2}, os seus publicadores o definem como \textit{“One Embedder [for] Any Task”} (Um Gerador de \textit{Embeddings} para Qualquer Tarefa) e como
+No trabalho de  \citeonline{Instructor:2}, os seus publicadores o definem como \textit{``One Embedder [for] Any Task''} (Um Gerador de \textit{Embeddings} para Qualquer Tarefa) e como
 
 \begin{citacao}
     \textit{an instruction-finetuned text embedding model that can generate text embeddings tailored to any task (e.g., classification, retrieval, clustering, text evaluation, etc.) and domains (e.g., science, finance, etc.) by simply providing the task instruction, without any finetuning.} \footnote{Um modelo de geração de \textit{embeddings} textuais com \textit{fine-tuning} feito a partir de uma instrução, capaz de gerar \textit{embeddings} de texto otimizados para qualquer tarefa (tais como, classificação, recuperação, agrupamento, avaliação de texto, etc.) e quaisquer domínios (quais sejam ciência, finanças, etc.) simplesmente fornecendo a instrução da tarefa, sem necessidade de \textit{fine-tuning} tradicional. (Tradução nossa)}
@@ -70,10 +70,10 @@ No trabalho de  \citeonline{Instructor:2}, os seus publicadores o definem como \
 Os INSTRUCTORs são, portanto, modelos de criação de \textit{embeddings} textuais de forma adaptativa. Em vez de gerar \textit{embeddings} baseando-se unicamente nos parâmetros alcançados em seu treinamento, ele lança mão de instruções em linguagem natural fornecidas no momento de sua execução, as quais devem descrever as tarefas em que os \textit{embeddings} serão utilizados. Ao utilizar as instruções como elementos ``direcionadores'' do processo de geração de \textit{embeddings}, pretende-se que o resultado final seja otimizado para as tarefas definidas, fazendo as vezes de um ``ajuste fino''. Essa abordagem demonstra, segundo os seus desenvolvedores, bom desempenho em não somente ``compreender'' texto em um sentido mais aberto e genérico, sendo capaz, também, de interpretá-lo com uma visão direcionada a aplicações e casos de uso particulares.
 
 Desta forma, as representações vetoriais geradas são otimizadas para tarefas específicas (como classificação, recuperação de informações, agrupamento, avaliação semântica, entre outras) e/ou domínios diferentes sem a necessidade de refinamento do modelo nos moldes tradicionais de \textit{finetuning}, tornando-o adaptável e mais relevante para diversas aplicações.
-A versão do modelo que escolhemos testar para possível uso no Assistente de Busca, especificamente, é a \textit{instructor-xl}, sendo a variante dentre a família de modelos INSTRUCTOR com maior tamanho, otimizada para desempenho e equilíbrio entre precisão e eficiência em aplicações de processamento de linguagem natural.
+A versão do modelo que escolhemos testar para possível uso no Assistente de Busca, especificamente, é a \textit{instructor-xl}, sendo a variante dentre a família de modelos INSTRUCTOR com maior tamanho, otimizada para desempenho e equilíbrio entre precisão e eficiência em aplicações de processamento de linguagem natural, podendo ser utilizada por meio do \textit{framework} \textit{sentence-transformer}, disponibilizado pelo \textit{HuggingFace}, como \textit{hkunlp/instructor-xl}.
 
 \subsubsection{ada-002}
-\label{subsec:Assistente.1.2.1}
+\label{subsec:Assistente.1.2.2}
 
 Outro modelo selecionado por ser promissor foi o ada-002, desenvolvido e oferecido como um serviço pela OpenAi desde o final do ano de 2022. A página de apresentação do modelo o descreve como a unificação de cinco modelos anteriores (\textit{text-similarity}, \textit{text-search-query}, \textit{text-search-doc}, \textit{code-search-text} and \textit{code-search-code}) em um único modelo aprimorado, alcançando melhores resultados em busca textual, similaridade de frases e \textit{benchmarking} de busca em código. \cite{ADA:1}
 
@@ -81,8 +81,56 @@ Um dos pontos positivos apontados na página é o fato de utilizar uma forma com
 
 Como ponto negativo há o custo atrelado a cada requisição feita à API, tanto para gerar os \textit{embeddings} dos documentos quanto, posteriormente, para gerar os \textit{embeddings} de cada consulta feita ao banco de vetores, enquanto houver utilização da aplicação.
 
+\subsubsection{GTE}
+\label{subsec:Assistente.1.2.3}
+Desenvolvida pela \textit{Aliyun} ou \textit{Alibaba Cloud}, uma das subsidiárias do conglomerado chinês Alibaba Group voltada para o mercado de computação em nuvem, a série de modelos \textit{GTE-Multilingual} (mGTE) -- uma reformulação do \textit{General Text Embedding} (GTE) -- foi apresentada em novembro de 2024. A empresa aponta que o conjunto de modelos
+
+\begin{citacao}
+    \textit{offers high performance, long-context handling, multilingual support, and elastic embedding, significantly improving retrieval and ranking efficiency (...) [being, therefore,] suitable for a wide range of advanced \ac{RAG} applications}. \cite{GTE:1}
+    \footnote{oferece um alto desempenho, tratamento de contextos longos, suporte multi-idiomas e \textit{embeddings} com tamanho ajustável, aprimorando significativamente a eficiência na recuperação e re-rankeamento/reclassificação, (...) [sendo, portanto,] adequadas ao uso em uma ampla gama de aplicações avançadas de \ac{RAG}. (Tradução nossa)}
+\end{citacao}
+
+O conjunto inclui ``modelos base, modelos de \textit{embeddings} e de \textit{ranking}'' \cite{GTE:1}, com resultados promissores particularmente para tarefas de recuperação de documentos, sendo amplamente utilizados como modelos de referência por organizações como a PostgresML \cite{GTE:2}. Dado que em sua própria documentação e material de divulgação dos modelos o mGTE é referido simplesmente como GTE, adotaremos aqui a mesma nomenclatura.
+
+Assim como com o \textit{instructor-xl}, também é possível utilizar o GTE com o \textit{sentence-transformer}, como \textit{Alibaba-NLP/gte-multilingual-base}.
+
+\subsubsection{BGE-M3}
+\label{subsec:Assistente.1.2.4}
+O BGE-M3 é um modelo desenvolvido por pesquisadores da \textit{Beijing Academy of Artificial Intelligence} -- BAAI (uma organização de pesquisa em inteligência artificial, sem fins lucrativos, também conhecida como \textit{Zhiyuan Institute}) e da \textit{University of Science and Technology of China}. Os autores o apontam como um modelo distinto dos demais em termos de versatilidade, considerando três frentes distintas: multilinguística, multifuncionalidade e multigranularidade.
+
+Apontam \citeonline{BGE:1} que o M3-Embedding foi capaz de abstrair um ``espaço semântico comum'' a todas as línguas sobre as quais foi feito o processo de treinamento, permitindo-lhe demonstrar competência na recuperação de conteúdo semanticamente semelhante com suporte a mais de 100 idiomas. Adicionalmente, dado que sua representação interna é feita sobre essa camada semântica abstrata compartilhada, é possível realizar recuperação de conteúdo interlinguístico.
+
+No que concerne a multifuncionalidade e multigranularidade,
+
+\begin{citacao}
+    \textit{[M3-Embedding] is able to generate versatile embeddings to support different retrieval functionalities, not just dense retrieval, but also sparse retrieval and multivector retrieval. Finally, M3-Embedding is learned to process different input granularities, spanning from short inputs like sentences and passages, to long documents of up to 8,192 input tokens.} \cite{BGE:1}
+    \footnote{[O M3-Embedding] é capaz de gerar \textit{embeddings} versáteis que viabilizam múltiplas funcionalidades de recuperação da informação, abrangendo não apenas a recuperação densa, mas também a recuperação esparsa e a recuperação por multivetores. Por fim, o M3-Embedding é treinado para lidar com diferentes granularidades de entrada, variando desde entradas curtas, como frases e excertos, até documentos extensos, com até 8.192 \textit{tokens} de entrada. (Tradução nossa)}
+\end{citacao}
+
+O modelo também é utilizável a partir do \textit{framework} do HuggingFace como \textit{BAAI/bge-m3}, tornando simples a sua utilização no projeto.
+
+\subsubsection{Outros Modelos}
+\label{subsec:Assistente.1.2.5}
+Durante o processo de escolha dos modelos a serem usados na função para gerar os \textit{embeddings} a serem utilizados no banco vetorial, apercebemo-nos de que a ferramenta Ollama (abordada na Seção \ref{subsec:Assistente.2.2}, de cujos detalhes de implementação trata a Seção \ref{sec:Metodologia.2}) possui a funcionalidade de utilização de modelos diversos para geração de \textit{embeddings}. Dado que já incluíramos \ac{LLM}s na ferramenta, decidimos incluí-los no conjunto de modelos a serem testados para geração de representações vetoriais na aplicação.
+
+Ademais, quando da análise exploratória de abordagens do problema objeto deste estudo, encontramos modelos treinados especificamente para utilização em aplicações de perguntas e respostas (\textit{Q\&A Systems}), de forma que, na fase de realização de testes de desempenho dos modelos, já estava um deles disponível nos dispositivos de execução do projeto. Sendo esse modelo específico capacitado à geração de \textit{embeddings}, optamos por também incluí-lo no rol de modelos a serem avaliados.
+
+É importante notar, todavia, que os \ac{LLM}s e o modelo com ajuste fino para Q\&A recém mencionados são otimizados para tarefas distintas da geração de representações vetoriais de texto, os \textit{embeddings} necessários para utilização no banco vetorial. Logo, é até esperado que alcancem resultados consideravelmente aquém dos alcançado por modelos como o ada-002, o instructor-xl, o GTE e o BGE-M3, com um foco maior na geração de \textit{embeddings} voltados à recuperação de conteúdo por similaridade semântica. A opção por sua inclusão em meio aos modelos especializados se restringe a fins de comparação e curiosidade.
+
+Temos, portanto, os seguintes modelos adicionais:
+
+\begin{itemize}
+    \item \textbf{llama3.1:latest}: modelo que será detalhado na Seção \ref{subsec:Assistente.2.1}, desenvolvido pela Meta AI. Trata-se de um \ac{LLM}, por natureza otimizado para geração de texto. Será utilizado por meio da ferramenta Ollama (Seção \ref{subsec:Assistente.2.2}).
+    \item \textbf{deepseek-r1:14b}: modelo destilado do DeepSeek-R1, da DeepSeek, baseado na arquitetura qwen2. Também se trata de um \ac{LLM}, sendo a geração de texto seu fim principal. Assim como no caso do llama3.1, lançaremos mão da ferramenta Ollama para utilizar o modelo.
+    \item \textbf{bert-base-cased-squad-v1.1-portuguese}: baseado no modelo BERTimbau Base (uma versão do BERT pré-treinada para português do Brasil, desenvolvida pela Neuralmind.ai), este modelo teve um ajuste fino para utilização em aplicações de perguntas e respostas (\textit{Q\&A Systems}) -- para isso utilizando uma versão em português do Stanford Question Answering Dataset (SQuAD). \cite{BERT_QA:1}
+\end{itemize}
+
+
 \section{Geração de Conteúdo}
 \label{sec:Assistente.2}
+%AFAZER: Avaliar se o text oaqui está adequado.
+% Mencionar outros modelos a serem acrescentados (Qwen, deepseek etc...)?
+O elemento crucial de uma ferramenta \ac{RAG} consiste na estrutura de geração do texto -- visto que a geração em si é o objetivo final de toda a aplicação. Isto posto, é necessário considerar um bom modelo que seja equilibrado em termos de qualidade do resultado e custo (tanto em termos financeiros quanto de recursos de infraestrutura) de implementação e manutenção, ao que nos propomos agora.
 
 \subsection{Llama}
 \label{subsec:Assistente.2.1}
@@ -116,17 +164,20 @@ O Llama 3.2 se intitula como um conjunto de modelos customizáveis com inteligê
     document-level understanding including charts and graphs, captioning of images, and visual grounding tasks such as directionally pinpointing objects in images based on natural language descriptions. \cite{Llama:6} \footnote{compreensão em nível de documento, incluindo gráficos e tabelas, descrição de imagens e tarefas de correspondência visual, como identificação direcional de objetos em imagens com base em descrições em linguagem natural. (Tradução nossa)}
 \end{citacao}
 
+%AFAZER: Adicionar texto am algum lugar que demonstre o motivo de utilizar o Llama3.1
+
 Conforme declarado pela própria Meta AI, o foco do Llama 3.2 se dá sobre a disponibilização de versões mais leves, ao custo de uma quantidade menor de parâmetros (3 milhões, na versão dita padrão, em vez de 405 da versão 3.1). Apesar do tamanho reduzido, o desempenho é ainda muito promissor para diversas tarefas de processamento de linguagem natural.
 
 Quando da escrita deste trabalho, a versão mais recente do Llama disponibilizada ao público é o Llama 3.3. Nas notas de lançamento, a Meta AI o descreve como um modelo de 70 bilhões de parâmetros que oferece um desempenho equiparável ao do Llama 3.1 em sua versão de 405 bilhões de parâmetros, ``permitindo que os desenvolvedores alcancem qualidade e desempenho superiores em aplicações baseadas em texto com uma fração do custo'' \cite{Llama:7, Llama:8}.
 
 \subsection{Ollama}
 \label{subsec:Assistente.2.2}
-Dentre as opções disponíveis de execução local de \ac{LLM}s, independente de infraestrutura de terceiros, o Ollama figura como ferramenta facilitadora, fornecendo meios de execução local de diversos modelos de linguagem (incluindo várias versões do Llama e outros modelos populares como Gemma, Mistral, Qwen e versões destiladas do DeepSeek). Trata-se de um \textit{framework} de código aberto e multiplataforma cujo desenvolvimento foi realizado por uma equipe da empresa Ollama Inc., baseado no llama.cpp -- uma biblioteca de alto desempenho escrita em C++ e otimizada para utilização de \ac{LLM}s.
+Dentre as opções disponíveis de execução local de \ac{LLM}s, independente de infraestrutura de terceiros, o Ollama figura como ferramenta facilitadora, fornecendo meios de execução local de diversos modelos de linguagem (incluindo várias versões do Llama e outros modelos populares como Gemma, Mistral, Qwen e DeepSeek). Trata-se de um \textit{framework} de código aberto e multiplataforma cujo desenvolvimento foi realizado por uma equipe da empresa Ollama Inc., baseado no llama.cpp -- uma biblioteca de alto desempenho escrita em C++ e otimizada para utilização de \ac{LLM}s.
 
 Tal ferramenta foi projetada com fins específicos de simplificar a implementação e operação de \ac{LLM}s sem a necessidade de infraestrutura em nuvem; o que permitiu o acesso e gerenciamento de modelos diversos em máquinas locais. Essa abordagem promove maior privacidade, ao evitar a necessidade de envio de dados a servidores de terceiros, além de reduzir os custos operacionais, eliminando as taxas inerentes à inferência baseada soluções disponibilizadas em nuvem. \cite{Ollama:1}
 
 A plataforma oferece suporte tanto para hardware de uso comum quanto para equipamentos de alto desempenho, provendo otimização do uso de GPUs durante a utilização de modelos de diferentes níveis de complexidade, incluindo aqueles com bilhões de parâmetros. A interação com o \ac{LLM} em si é mediada pelo Ollama, o qual fornece tanto uma interface de linha de comando -- a qual é executada na máquina em que a ferramenta está instalada -- quanto uma forma de interação programática, por meio de uma API REST, permitindo integração com aplicações de diversos tipos e usos.
 
+%AFAZER: Adicionar fechamento do capítulo
 Além disso, o Ollama dispõe de uma variedade de modelos que podem ser instalados de forma ágil e simplificada, permitindo acessá-los e utilizá-los de forma rápida e sem empecilhos, tanto para lhes fazer uso tal qual são disponibilizados, quanto para lhes aplicar ajustes específicos, buscando atender a domínios particulares.
 
