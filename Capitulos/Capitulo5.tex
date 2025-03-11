@@ -53,8 +53,7 @@ Quando da realização de uma consulta ao banco vetorial, em uma coleção espec
 
 Considerando a possibilidade oferecida pelo banco vetorial de se fornecer uma função de geração de \textit{embeddings} personalizada, sopesamos a utilização de diferentes modelos, considerando seu desempenho para fins de cálculo de similaridade -- levando em conta, especificamente, os resultados sobre a amostra de dados utilizada neste estudo (ver Seção \ref{sec:Metodologia.1}, que trata da definição dos dados deste estudo).
 
-%AFAZER: preparar uma transição melhor que essa abaixo
-Após alguma exploração preliminar, elencamos alguns modelos para comparação, os quais são introduzidos a seguir. 
+Após alguma exploração preliminar, elencamos alguns modelos para comparação, avaliação de desempenho e definição final para uso. Os modelos que consideramos mais promissores são introduzidos a seguir. 
 
 \subsubsection{instructor-xl}
 \label{subsec:Assistente.1.2.1}
@@ -111,7 +110,7 @@ O modelo também é utilizável a partir do \textit{framework} do HuggingFace co
 
 \subsubsection{Outros Modelos}
 \label{subsec:Assistente.1.2.5}
-Durante o processo de escolha dos modelos a serem usados na função para gerar os \textit{embeddings} a serem utilizados no banco vetorial, apercebemo-nos de que a ferramenta Ollama (abordada na Seção \ref{subsec:Assistente.2.2}, de cujos detalhes de implementação trata a Seção \ref{sec:Metodologia.2}) possui a funcionalidade de utilização de modelos diversos para geração de \textit{embeddings}. Dado que já incluíramos \ac{LLM}s na ferramenta, decidimos incluí-los no conjunto de modelos a serem testados para geração de representações vetoriais na aplicação.
+Durante o processo de escolha dos modelos a serem usados na função para gerar os \textit{embeddings} a serem utilizados no banco vetorial, apercebemo-nos de que a ferramenta Ollama (abordada na Seção \ref{subsec:Assistente.2.3}, de cujos detalhes de implementação trata a Seção \ref{sec:Metodologia.2}) possui a funcionalidade de utilização de modelos diversos para geração de \textit{embeddings}. Dado que já incluíramos \ac{LLM}s na ferramenta, decidimos incluí-los no conjunto de modelos a serem testados para geração de representações vetoriais na aplicação.
 
 Ademais, quando da análise exploratória de abordagens do problema objeto deste estudo, encontramos modelos treinados especificamente para utilização em aplicações de perguntas e respostas (\textit{Q\&A Systems}), de forma que, na fase de realização de testes de desempenho dos modelos, já estava um deles disponível nos dispositivos de execução do projeto. Sendo esse modelo específico capacitado à geração de \textit{embeddings}, optamos por também incluí-lo no rol de modelos a serem avaliados.
 
@@ -120,7 +119,7 @@ Ademais, quando da análise exploratória de abordagens do problema objeto deste
 Temos, portanto, os seguintes modelos adicionais:
 
 \begin{itemize}
-    \item \textbf{llama3.1:latest}: modelo que será detalhado na Seção \ref{subsec:Assistente.2.1}, desenvolvido pela Meta AI. Trata-se de um \ac{LLM}, por natureza otimizado para geração de texto. Será utilizado por meio da ferramenta Ollama (Seção \ref{subsec:Assistente.2.2}).
+    \item \textbf{llama3.1:latest}: modelo que será detalhado na Seção \ref{subsec:Assistente.2.1}, desenvolvido pela Meta AI. Trata-se de um \ac{LLM}, por natureza otimizado para geração de texto. Será utilizado por meio da ferramenta Ollama (Seção \ref{subsec:Assistente.2.3}).
     \item \textbf{deepseek-r1:14b}: modelo destilado do DeepSeek-R1, da DeepSeek, baseado na arquitetura qwen2. Também se trata de um \ac{LLM}, sendo a geração de texto seu fim principal. Assim como no caso do llama3.1, lançaremos mão da ferramenta Ollama para utilizar o modelo.
     \item \textbf{bert-base-cased-squad-v1.1-portuguese}: baseado no modelo BERTimbau Base (uma versão do BERT pré-treinada para português do Brasil, desenvolvida pela Neuralmind.ai), este modelo teve um ajuste fino para utilização em aplicações de perguntas e respostas (\textit{Q\&A Systems}) -- para isso utilizando uma versão em português do Stanford Question Answering Dataset (SQuAD). \cite{BERT_QA:1}
 \end{itemize}
@@ -128,9 +127,9 @@ Temos, portanto, os seguintes modelos adicionais:
 
 \section{Geração de Conteúdo}
 \label{sec:Assistente.2}
-%AFAZER: Avaliar se o text oaqui está adequado.
-% Mencionar outros modelos a serem acrescentados (Qwen, deepseek etc...)?
-O elemento crucial de uma ferramenta \ac{RAG} consiste na estrutura de geração do texto -- visto que a geração em si é o objetivo final de toda a aplicação. Isto posto, é necessário considerar um bom modelo que seja equilibrado em termos de qualidade do resultado e custo (tanto em termos financeiros quanto de recursos de infraestrutura) de implementação e manutenção, ao que nos propomos agora.
+O elemento crucial de uma ferramenta \ac{RAG} consiste na estrutura de geração do texto -- visto que a geração em si é o objetivo final de toda a aplicação. Isto posto, é necessário considerar um bom modelo que seja equilibrado em termos de qualidade do resultado e custo (tanto em termos financeiros quanto de recursos de infraestrutura) de implementação e manutenção. Para utilização no contexto da nossa proposta, optamos por avaliar duas famílias de modelos específicos: Llama e DeepSeek, dado que são de código aberto e utilização gratuita, possuem diversas versões (com variações de tamanho e requisitos mínimos) para se adaptar às capacidades de hardware disponíveis, bem como disponibilidade para utilização em ferramentas que simplificam o processo de utilização, como o Ollama (abordado na Seção \ref{subsec:Assistente.2.3}). Outras opções, como a utilização de modelos fechados, disponibilizados por meio de APIs, também seriam viáveis, mas, em detrimento delas, optamos por possibilidades que não envolvam custos.
+
+Fazemos, a seguir, uma breve apresentação de cada uma das famílias de modelos.
 
 \subsection{Llama}
 \label{subsec:Assistente.2.1}
@@ -164,20 +163,33 @@ O Llama 3.2 se intitula como um conjunto de modelos customizáveis com inteligê
     document-level understanding including charts and graphs, captioning of images, and visual grounding tasks such as directionally pinpointing objects in images based on natural language descriptions. \cite{Llama:6} \footnote{compreensão em nível de documento, incluindo gráficos e tabelas, descrição de imagens e tarefas de correspondência visual, como identificação direcional de objetos em imagens com base em descrições em linguagem natural. (Tradução nossa)}
 \end{citacao}
 
-%AFAZER: Adicionar texto am algum lugar que demonstre o motivo de utilizar o Llama3.1
-
 Conforme declarado pela própria Meta AI, o foco do Llama 3.2 se dá sobre a disponibilização de versões mais leves, ao custo de uma quantidade menor de parâmetros (3 milhões, na versão dita padrão, em vez de 405 da versão 3.1). Apesar do tamanho reduzido, o desempenho é ainda muito promissor para diversas tarefas de processamento de linguagem natural.
 
 Quando da escrita deste trabalho, a versão mais recente do Llama disponibilizada ao público é o Llama 3.3. Nas notas de lançamento, a Meta AI o descreve como um modelo de 70 bilhões de parâmetros que oferece um desempenho equiparável ao do Llama 3.1 em sua versão de 405 bilhões de parâmetros, ``permitindo que os desenvolvedores alcancem qualidade e desempenho superiores em aplicações baseadas em texto com uma fração do custo'' \cite{Llama:7, Llama:8}.
 
-\subsection{Ollama}
+\subsection{DeepSeek}
 \label{subsec:Assistente.2.2}
-Dentre as opções disponíveis de execução local de \ac{LLM}s, independente de infraestrutura de terceiros, o Ollama figura como ferramenta facilitadora, fornecendo meios de execução local de diversos modelos de linguagem (incluindo várias versões do Llama e outros modelos populares como Gemma, Mistral, Qwen e DeepSeek). Trata-se de um \textit{framework} de código aberto e multiplataforma cujo desenvolvimento foi realizado por uma equipe da empresa Ollama Inc., baseado no llama.cpp -- uma biblioteca de alto desempenho escrita em C++ e otimizada para utilização de \ac{LLM}s.
+A DeepSeek, fundada em 2023, se define como uma empresa chinesa dedicada a tornar a AGI uma realidade. Em sua página do HuggingFace, aponta como foco de sua abordagem o foco em resultados a longo prazo. \cite{DeepSeek:1}
+
+No final de 2024, a empresa publicou um relatório técnico que apresentava seu modelo DeepSeek-V3, o qual, junto com a publicação de seu modelo seguinte, o DeepSeek-R1, surpreendeu o mercado, demonstrando a viabilidade de se produzir e um \ac{LLM} poderoso, competitivo e aberto por uma fração do custo de modelos fechados. O relatório demonstra que o DeepSeek-V3 incorpora uma arquitetura baseada na abordagem denominada \textit{Mixture-of-Experts} (MoE/DeepSeekMoE), que consiste dividir o modelo em diversas partes menores, os ``\textit{experts}'', que são especializadas em certos tipos de dados de entrada ou de tarefas, sendo utilizados pelo modelo somente quando necessário, aumentando a otimização de recursos. Com isso, embora sua estrutura total compreenda um vasto número de parâmetros, apenas uma parte deles é ativada simultaneamente durante o processamento de cada palavra, o que proporciona maior eficiência computacional e redução de custos operacionais.
+
+Na publicação, a \citeonline{DeepSeek:2} detalha o modelo como
+
+\begin{citacao}
+    \textit{a large MoE language model with 671B total parameters and 37B activated parameters, trained on 14.8T tokens. In addition to the MLA and DeepSeekMoE architectures, it also pioneers an auxiliary-loss-free strategy for load balancing and sets a multi-token prediction training objective for stronger performance. (...) The post-training also makes a success in distilling the reasoning capability from the DeepSeek-R1 series of models.}
+    \footnote{um \ac{LLM} que utiliza \textit{Mixture of Experts}, o qual possui 671B parâmetros no total e 37B parâmetros ativados simultaneamente, treinado com base em 14.8T \textit{tokens}. Além das arquiteturas MLA e DeepSeekMoE, ele também é pioneiro no uso da estratégia \textit{auxiliary-loss-free} para balanceamento de carga e estabelece como objetivo do treinamento a previsão \textit{multi-token}, para uma performance mais robusta. (...) A fase de pós-treinamento também resulta em sucesso no sentido de fazer ``destilação'' da capacidade de raciocínio da série de modelos DeepSeek-R1. (Tradução nossa).}
+\end{citacao}
+
+Aponta, o relatório que as avaliações do DeepSeek-V3 asseguram-no como ``o mais robusto dentre os modelos de código aberto atualmente disponibilizados''\footnote{Tradução nossa de \textit{``the strongest open-source model currently available, and achieves performance comparable to leading closed-source models like GPT-4o and Claude-3.5-Sonnet''}, no texto original.}, mantendo, apesar disso, parcos custos para o processo de treinamento, exigindo apenas 2.788 milhões de horas de processamento em GPUs H800 para todo o processo. \cite{DeepSeek:2} Destarte, mostram-se o modelo DeepSeek-V3 e, por extensão, as versões destiladas tanto do próprio DeepSeek-V3 quanto do DeepSeek-R1 \cite{DeepSeek:3} como bons candidatos à utilização como gerador de texto para a aplicação proposta neste trabalho.
+
+\subsection{Ollama}
+\label{subsec:Assistente.2.3}
+Dentre as opções disponíveis de execução local de \ac{LLM}s, independente de infraestrutura de terceiros, o Ollama figura como ferramenta facilitadora, fornecendo meios de execução local de diversos modelos de linguagem (incluindo várias versões do Llama Gemma, Mistral, Qwen, DeepSeek e diversos modelos, tanto populares quanto mais de nicho). Trata-se de um \textit{framework} de código aberto e multiplataforma cujo desenvolvimento foi realizado por uma equipe da empresa Ollama Inc., baseado no llama.cpp -- uma biblioteca de alto desempenho escrita em C++ e otimizada para utilização de \ac{LLM}s.
 
 Tal ferramenta foi projetada com fins específicos de simplificar a implementação e operação de \ac{LLM}s sem a necessidade de infraestrutura em nuvem; o que permitiu o acesso e gerenciamento de modelos diversos em máquinas locais. Essa abordagem promove maior privacidade, ao evitar a necessidade de envio de dados a servidores de terceiros, além de reduzir os custos operacionais, eliminando as taxas inerentes à inferência baseada soluções disponibilizadas em nuvem. \cite{Ollama:1}
 
 A plataforma oferece suporte tanto para hardware de uso comum quanto para equipamentos de alto desempenho, provendo otimização do uso de GPUs durante a utilização de modelos de diferentes níveis de complexidade, incluindo aqueles com bilhões de parâmetros. A interação com o \ac{LLM} em si é mediada pelo Ollama, o qual fornece tanto uma interface de linha de comando -- a qual é executada na máquina em que a ferramenta está instalada -- quanto uma forma de interação programática, por meio de uma API REST, permitindo integração com aplicações de diversos tipos e usos.
 
-%AFAZER: Adicionar fechamento do capítulo
 Além disso, o Ollama dispõe de uma variedade de modelos que podem ser instalados de forma ágil e simplificada, permitindo acessá-los e utilizá-los de forma rápida e sem empecilhos, tanto para lhes fazer uso tal qual são disponibilizados, quanto para lhes aplicar ajustes específicos, buscando atender a domínios particulares.
 
+Este capítulo tratou de apresentar a visão geral da estrutura da aplicação objeto deste estudo, bem como os modelos e tecnologias utilizados, bem como de elencar os motivos das opções por cada uma das abordagens a serem utilizadas no processo. Todavia, é necessário descrever o detalhamento do processo de preparação, implementação e testes de cada um dos elementos componentes da solução proposta, expondo parâmetros de configuração e critérios de avaliação utilizados. Destarte, são esses os pontos que abordaremos no capítulo seguinte.

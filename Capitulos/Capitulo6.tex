@@ -170,11 +170,20 @@ Após a inclusão, os documentos são passíveis de serem recuperados em consult
 
 \section{Configuração do LLM}
 \label{sec:Metodologia.2}
-A configuração do Llama, visto que foi feita a opção pelo uso do Ollama como meio de simplificar o processo, se deu de forma direta. Os arquivos de instalação do Ollama foram obtidos e executados diretamente da sua página de download. \cite{Ollama:2} Após a instalação, foi realizada a inclusão do modelo Llama em sua versão 3.1 (versão de 8B parâmetros), propriamente dito, tornando-o disponível para utilização.
+A configuração dos modelos geradores de texto a serem testados e comparados, visto que foi feita a opção pelo uso do Ollama como meio de simplificar o processo, se deu de forma direta. Os arquivos de instalação do Ollama foram obtidos e executados diretamente da sua página de download. \cite{Ollama:2} Após a instalação, foi realizada a inclusão dos modelos selecionados (ver Seção \ref{sec:Assistente.2}), propriamente ditos, tornando-os disponíveis para utilização.
 
-O consumo da geração do modelo fica disponível por meio de uma API REST, a qual se encarrega de fazer o gerenciamento dos recursos disponíveis para a otimização do conteúdo. As requisições feitas à API apontam o modelo específico a ser utilizado (o Llama3.1, no caso deste estudo), o \textit{prompt} a ser utilizado pelo modelo, junto com um contexto (uma representação em \textit{embeddings} das interações anteriores com o modelo), também indicando se a resposta deve ser enviada \textit{token} a \textit{token}, à medida que é gerada, ou de forma inteiriça, com todo o conteúdo gerado sendo disponibilizado quando do término de sua produção pelo \ac{LLM}.
+Ao considerar as versões disponíveis dos modelos Llama e DeepSeek, levamos em consideração as limitações de recursos nas máquinas disponíveis, buscando dentre os modelos mais atuais opções robustas o suficiente para oferecer bons resultados, sem, contudo, necessitar de recursos para além dos disponíveis. Com isto, optamos pelas seguintes versões:
 
-De forma a direcionar o comportamento do Llama na geração das respostas, cada requisição feita à API utiliza um modelo de \textit{prompt} com uma estrutura e informações fixas, alterando somente a pergunta feita e o teor dos documentos em que a resposta deve se basear. O modelo é dividido em quatro seções:
+\begin{itemize}
+    \item \textbf{Llama:} llama3.1:latest (com 8B de parâmetros)
+    \item \textbf{DeepSeek:} deepseek-r1:14B (destilado a partir do DeepSeek-V2.5/V3 sobre o quen2)
+\end{itemize}
+
+Embora haja as versões mas recentes (Llama 3.2 e 3.3) ou mais robustas (DeepSeek-R1 com 70B), elas são disponibilizadas  ou em tamanhos muito pequenos (como o Llama3.2:1B), com resultados sub-ótimos para nossos recursos, ou em tamanhos demasiadamente grandes, extrapolando as limitações de \textit{hardware} disponível. 
+
+O consumo da geração do modelo fica disponível por meio de uma API REST, a qual se encarrega de fazer o gerenciamento dos recursos disponíveis para a otimização do conteúdo. As requisições feitas à API apontam o modelo específico a ser utilizado (o Llama3.1 ou o DeepSeek-R1, a serem comparados), o \textit{prompt} a ser utilizado pelo modelo, junto com um contexto (uma lista de mensagens trocadas entre o usuário e a API em interações anteriores), também indicando se a resposta deve ser enviada \textit{token} a \textit{token}, à medida que é gerada, ou de forma inteiriça, com todo o conteúdo gerado sendo disponibilizado quando do término de sua produção pelo \ac{LLM}.
+
+De forma a direcionar o comportamento dos \ac{LLM}s na geração das respostas, cada requisição feita à API utiliza um modelo de \textit{prompt} com uma estrutura e informações fixas, alterando somente a pergunta feita e o teor dos documentos em que a resposta deve se basear. O modelo é dividido em quatro seções:
 
 %AFAZER: Adicionar figura mostrando a estrutura dos dados enviados ao Ollama/Llama
 
@@ -188,33 +197,45 @@ De forma a direcionar o comportamento do Llama na geração das respostas, cada 
 \section{API de Gerenciamento de Fluxo}
 \label{sec:Metodologia.3}
 
-A integração de todos os serviços oferecidos pelas camadas mencionadas é realizada por uma API de gerenciamento de fluxo, que se encarrega de receber requisições de alguma interface de usuário, com as perguntas a serem utilizadas como critérios de consulta e acionar os serviços das outras camadas para a geração da resposta. Após receber os dados resultantes de cada um dos serviços nas fases intermediárias do processo inteiro, eles são formatados e preparados para serem direcionados ao elemento seguinte, até, finalmente, encaminhar à interface de usuário o produto final, na forma de uma resposta, com uma lista de documentos que lhe dão suporte.
+A integração de todos os serviços oferecidos pelas camadas mencionadas é realizada por uma API de gerenciamento de fluxo (utilizando a biblioteca FastAPI, na linguagem Python), que se encarrega de receber requisições de alguma interface de usuário, com as perguntas a serem utilizadas como critérios de consulta e acionar os serviços das outras camadas para a geração da resposta. Após receber os dados resultantes de cada um dos serviços nas fases intermediárias do processo inteiro, eles são formatados e preparados para serem direcionados ao elemento seguinte, até, finalmente, encaminhar à interface de usuário o produto final, na forma de uma resposta, com uma lista de documentos que lhe dão suporte.
 
 A Figura \ref{fig:diag-atividade-assist-busca} demonstra o fluxo inteiro do processo como um todo.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{Imagens/diagram.png}
     \caption{Diagrama de Atividades do Assistente de Busca}
     \label{fig:diag-atividade-assist-busca}
 \end{figure}
 
-Além de incluir a pergunta, a resposta e o conjunto de documentos que foram utilizados na composição do \textit{prompt} enviado ao \ac{LLM}, a API de Gerenciamento de Fluxo coleta dados a respeito do processo como um todo (tempo levado na execução de cada etapa, métricas utilizadas, dentre outros) e os inclui na resposta devolvida ao usuário. Também cabe a esse elemento garantir persistência de dados sobre cada uma das interações realizadas, permitindo que, a posteriori, sejam analisados e utilizados para refinamento do processo e da estrutura proposta.
+Além de incluir a pergunta, a resposta e o conjunto de documentos que foram utilizados na composição do \textit{prompt} enviado ao \ac{LLM}, a API de Gerenciamento de Fluxo coleta dados a respeito do processo como um todo (tempo levado na execução de cada etapa, métricas utilizadas, dentre outros) e os inclui na resposta devolvida ao usuário. Também cabe a esse elemento garantir persistência de dados sobre cada uma das interações realizadas, permitindo que, a posteriori, sejam analisados e utilizados para refinamento do processo e da estrutura proposta. Por conveniência e compatibilidade com as estruturas de armazenamento já existentes na Alern, os dados das interações serão salvos em bancos Relacionais.
 
 \section{Interface de Usuário}
 \label{sec:Metodologia.4}
 
-Dado o objetivo deste estudo, foi definida uma página \textit{web} como interface de usuário -- considerando sua simplicidade de desenvolvimento e implementação -- nos moldes de uma aplicação de envio/recebimento de mensagens de texto, como é o mais comum ao se desenhar uma ferramenta de \textit{chatbot}. A opção foi feita por manter uma interface limpa e minimalista, restringindo-se somente ao campo de envio de mensagens do usuário, bem como uma área superior com a exibição das mensagens enviadas e recebidas.
+Dado o objetivo deste estudo, foi definida uma página \textit{web} como interface de usuário -- considerando sua simplicidade de desenvolvimento e implementação -- nos moldes de uma aplicação de envio/recebimento de mensagens de texto, como é o mais comum ao se desenhar uma ferramenta de \textit{chatbot}, conforme visto na Figura \ref{fig:interface-assist-busca}.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{Imagens/interface_usuario.png}
-    \caption{Interface de Usuário do Assistente de Busca}
+    \caption{Interface de Usuário Inicial do Assistente de Busca}
     \label{fig:interface-assist-busca}
 \end{figure}
 
-A mecânica de consulta consiste apenas de uma solicitação realizada à API de gerenciamento do fluxo de informações, por meio de requisição HTTP, que envia a pergunta ou frase de consulta a ser utilizada como critérios de busca no banco vetorial, bem como um vetor de \textit{embeddings} contendo os dados das interações mais recentes, o qual será utilizado como informação do contexto, junto ao \ac{LLM}, de forma a manter um senso de continuidade no \textit{chat}.
+A opção foi feita por manter uma interface limpa e minimalista, restringindo-se somente ao campo de envio de mensagens do usuário, bem como uma área superior com a exibição das mensagens enviadas e recebidas. Para isso, utilizamos uma página HTML simples, sem utilização de qualquer \textit{framework} ou tecnologia mais elaborada, valendo-se de Javascript para estabelecer comunicação com a API, receber os resultados e alterar elementos na interface em si, à medida que o usuário interage com a ferramenta.
 
+Quando cada resposta é recebida, o usuário pode escolher avaliar a resposta recebida como satisfatória, como uma resposta ruim, ou ainda reportar a resposta como contendo conteúdo indevido -- mostrado na Figura \ref{fig:interface-assist-busca-resposta}. As avaliações dos usuários serão utilizadas para análise e como recursos para, eventualmente, criar um conjunto de dados que permita futuro refinamento dos modelos utilizados.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Imagens/interface_usuario_resposta.png}
+    \caption{Interface de Usuário do Assistente de Busca com Resposta}
+    \label{fig:interface-assist-busca-resposta}
+\end{figure}
+
+Optamos, para fins de simplicidade, manter uma abordagem em que as perguntas e respostas do usuário são voláteis, de forma que, para o usuário, não há continuidade sessões de uso. Cada sessão (marcada pelo carregamento da página de \textit{chat}) se inicia com um histórico limpo de interações, de forma que a persistência dos dados das interações é feita e mantida somente para fins de avaliação, sem ser retomada pelo usuário em qualquer momento futuro.
+
+A mecânica de consulta consiste apenas de uma solicitação realizada à API de gerenciamento do fluxo de informações, por meio de requisição HTTP, que envia a pergunta ou frase de consulta a ser utilizada como critérios de busca no banco vetorial, bem como um vetor de \textit{embeddings} contendo os dados das interações mais recentes, o qual será utilizado como informação do contexto, junto ao \ac{LLM}, de forma a manter um senso de continuidade no \textit{chat}.
 
 \section{Medição dos Resultados}
 \label{sec:Metodologia.5}
