@@ -17,16 +17,38 @@ Considerando a estrutura e os fluxos documentais e informacionais no âmbito da 
 
 O Assistente de Busca se utiliza da recuperação de documentos por similaridade semântica com a pergunta de entrada do usuário, combinada com a geração de conteúdo dinâmico por meio de um \ac{LLM}. Destarte, se caracteriza essa proposta, por definição, como um sistema de geração de resposta aumentada por recuperação de documentos -- \textit{Retrieval-Augmented Generation} (RAG). Sua implementação, especificamente, se utiliza de uma pilha de camadas, cada uma responsável pela realização de um dos procedimentos componentes da Geração Aumentada, integradas por um elemento gerenciador, responsável pelo controle do fluxo das tarefas e da informação.
 
-A Figura \ref{fig:arq-assist-busca} apresenta as partes componentes do Assistente de Busca, assim como a forma pela qual os dados as atravessam.
+A Figura \ref{fig:arq-assist-busca} apresenta as partes componentes do Assistente de Busca, assim como a forma pela qual os dados as atravessam. 
 
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{Imagens/arquitetura.png}
-    \caption{Arquitetura do Assistente de Buscas} 
+    \includegraphics[width=0.7\linewidth]{Imagens/arquitetura.png}
+    \caption{Arquitetura do Assistente de Busca}
+    Fonte: autoria própria
     \label{fig:arq-assist-busca}
 \end{figure}
 
-% AFAZER: Alterar figura
+Nesse contexto, as partes descritas na Figura \ref{fig:arq-assist-busca} correspondem ao seguinte:
+
+\begin{enumerate}
+    \item Interface de usuário: um aplicativo, página web ou semelhante por meio da qual o usuário interage com a API;
+    \item API Gerenciadora: comunica-se com a interface e faz a integração com o banco de vetores e com a ferramenta de execução do \ac{LLM};
+    \item Banco de Vetores: armazena os documentos base da aplicação e permite consultas por similaridade semântica;
+    \item Ferramenta de Execução de \ac{LLM}s: executa \ac{LLM}s, gerando respostas com base em \textit{prompts}.
+\end{enumerate}
+
+O fluxo de interações entre as partes componentes da aplicação se dá da seguinte forma:
+
+\begin{itemize}
+    \item A Interface de usuário recebe a consulta do usuário, no formato de uma pergunta ou comando de busca, e a envia à API da aplicação por meio de uma requisição HTTP;
+    \item A aplicação a consulta do usuário e o utiliza para fazem uma busca por documentos presentes no banco de vetores;
+    \item O banco de vetores utiliza uma função de geração de \textit{embeddings} para criar uma representação vetorial da consulta, e busca os \textit{n} documentos mais semanticamente semelhantes ao texto da consulta, retornando-os à aplicação;
+    \item A aplicação formata os documentos resultantes e os utiliza para gerar um \textit{prompt} que dá as instruções de geração da resposta, após o que o envia à ferramenta de execução de \ac{LLM}s;
+    \item A ferramenta de execução de \ac{LLM}s gera a resposta, direcionando o resultado à aplicação;
+    \item A aplicação redireciona a resposta do \ac{LLM} à interface de usuário, juntamente com uma versão formatada da lista de documentos que foi utilizada para a geração da resposta.
+\end{itemize}
+
+A seguir, abordamos cada um desses elementos de forma conceitual, sendo que um detalhamento maior de suas implementações e validações será feito no Capítulo \ref{cap:Metodologia}.
+
 
 \section{Banco Vetorial}
 \label{sec:Assistente.1}

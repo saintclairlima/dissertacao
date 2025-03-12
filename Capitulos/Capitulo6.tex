@@ -114,7 +114,8 @@ Como uma forma de evitar essa situação, a abordagem adotada foi, nos casos de 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\linewidth]{Imagens/fragmentacao-artigos.png}
-    \caption{Estratégia de Fragmentação de Artigos Extensos} 
+    \caption{Estratégia de Fragmentação de Artigos Extensos}
+    Fonte: autoria própria
     \label{fig:fragmentacao-artigos}
 \end{figure}
 
@@ -194,10 +195,10 @@ De forma a direcionar o comportamento dos \ac{LLM}s na geração das respostas, 
     \item Pergunta a ser respondida pelo \ac{LLM}.
 \end{itemize}
 
-\section{API de Gerenciamento de Fluxo}
+\section{API Gerenciadora de Fluxo}
 \label{sec:Metodologia.3}
 
-A integração de todos os serviços oferecidos pelas camadas mencionadas é realizada por uma API de gerenciamento de fluxo (utilizando a biblioteca FastAPI, na linguagem Python), que se encarrega de receber requisições de alguma interface de usuário, com as perguntas a serem utilizadas como critérios de consulta e acionar os serviços das outras camadas para a geração da resposta. Após receber os dados resultantes de cada um dos serviços nas fases intermediárias do processo inteiro, eles são formatados e preparados para serem direcionados ao elemento seguinte, até, finalmente, encaminhar à interface de usuário o produto final, na forma de uma resposta, com uma lista de documentos que lhe dão suporte.
+A integração de todos os serviços oferecidos pelas camadas mencionadas é realizada por uma API gerenciadora de fluxo (utilizando a biblioteca FastAPI, na linguagem Python), que se encarrega de receber requisições de alguma interface de usuário, com as perguntas a serem utilizadas como critérios de consulta e acionar os serviços das outras camadas para a geração da resposta. Após receber os dados resultantes de cada um dos serviços nas fases intermediárias do processo inteiro, eles são formatados e preparados para serem direcionados ao elemento seguinte, até, finalmente, encaminhar à interface de usuário o produto final, na forma de uma resposta, com uma lista de documentos que lhe dão suporte.
 
 A Figura \ref{fig:diag-atividade-assist-busca} demonstra o fluxo inteiro do processo como um todo.
 
@@ -205,10 +206,11 @@ A Figura \ref{fig:diag-atividade-assist-busca} demonstra o fluxo inteiro do proc
     \centering
     \includegraphics[width=1\linewidth]{Imagens/diagram.png}
     \caption{Diagrama de Atividades do Assistente de Busca}
+    Fonte: autoria própria
     \label{fig:diag-atividade-assist-busca}
 \end{figure}
 
-Além de incluir a pergunta, a resposta e o conjunto de documentos que foram utilizados na composição do \textit{prompt} enviado ao \ac{LLM}, a API de Gerenciamento de Fluxo coleta dados a respeito do processo como um todo (tempo levado na execução de cada etapa, métricas utilizadas, dentre outros) e os inclui na resposta devolvida ao usuário. Também cabe a esse elemento garantir persistência de dados sobre cada uma das interações realizadas, permitindo que, a posteriori, sejam analisados e utilizados para refinamento do processo e da estrutura proposta. Por conveniência e compatibilidade com as estruturas de armazenamento já existentes na Alern, os dados das interações serão salvos em bancos Relacionais.
+Além de incluir a pergunta, a resposta e o conjunto de documentos que foram utilizados na composição do \textit{prompt} enviado ao \ac{LLM}, a API Gerenciadora de Fluxo coleta dados a respeito do processo como um todo (tempo levado na execução de cada etapa, métricas utilizadas, dentre outros) e os inclui na resposta devolvida ao usuário. Também cabe a esse elemento garantir persistência de dados sobre cada uma das interações realizadas, permitindo que, a posteriori, sejam analisados e utilizados para refinamento do processo e da estrutura proposta. Por conveniência e compatibilidade com as estruturas de armazenamento já existentes na Alern, os dados das interações serão salvos em bancos Relacionais.
 
 \section{Interface de Usuário}
 \label{sec:Metodologia.4}
@@ -219,6 +221,7 @@ Dado o objetivo deste estudo, foi definida uma página \textit{web} como interfa
     \centering
     \includegraphics[width=0.5\linewidth]{Imagens/interface_usuario.png}
     \caption{Interface de Usuário Inicial do Assistente de Busca}
+    Fonte: autoria própria
     \label{fig:interface-assist-busca}
 \end{figure}
 
@@ -230,6 +233,7 @@ Quando cada resposta é recebida, o usuário pode escolher avaliar a resposta re
     \centering
     \includegraphics[width=0.5\linewidth]{Imagens/interface_usuario_resposta.png}
     \caption{Interface de Usuário do Assistente de Busca com Resposta}
+    Fonte: autoria própria
     \label{fig:interface-assist-busca-resposta}
 \end{figure}
 
@@ -271,6 +275,7 @@ O resultado gerado pelo GPT-4o foi analisado com fins de assegurar sua correçã
     \centering
     \includegraphics[width=0.5\linewidth]{Imagens/geracao-perguntas.png}
     \caption{Geração de pares pergunta-resposta por meio de LLM}
+    Fonte: autoria própria
     \label{fig:geracao-perguntas}
 \end{figure}
 
@@ -280,6 +285,7 @@ Após a geração do conjunto de perguntas ``sintéticas'' para cada fragmento, 
     \centering
     \includegraphics[width=0.5\linewidth]{Imagens/recuperacao-fragmentos.png}
     \caption{Recuperação de documentos do Banco Vetorial}
+    Fonte: autoria própria
     \label{fig:recuperacao-fragmentos}
 \end{figure}
 
@@ -289,6 +295,7 @@ Com as perguntas e os documentos correspondentes à sua semelhança disponíveis
     \centering
     \includegraphics[width=0.5\linewidth]{Imagens/geracao-respostas.png}
     \caption{Recuperação de documentos do Banco Vetorial}
+    Fonte: autoria própria
     \label{fig:geracao-respostas}
 \end{figure}
 
@@ -303,7 +310,7 @@ Havendo sido concluídas todas essas etapas, foi possível obter, para cada perg
          \hline
          Id & Identificador do fragmento usado para gerar a pergunta \\
          Pergunta & Pergunta gerada pelo GPT-4 com base no fragmento \\
-         Recorte & Trecho do fragmento que o Llama identificou como resposta curta \\
+         Resposta & Proposta de resposta do GPT-4 para a pergunta gerada \\
          Fragmentos & Lista de fragmentos relevantes recuperados do banco de vetores \\
          Resposta Llama & Resposta gerada pelo Llama com base na pergunta e nos fragmentos relevantes \\
          \hline
