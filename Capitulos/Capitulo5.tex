@@ -70,7 +70,7 @@ As consultas em uma coleção são realizadas por meio de se informar listas de 
 
 Quando da realização de uma consulta ao banco vetorial, em uma coleção específica, a mesma função de geração de \textit{embeddings} utilizada para gerar as representações vetoriais armazenadas é executada sobre o texto/documento fornecido como critério de busca, resultando, similarmente, em uma representação em formato de vetor de alta dimensionalidade. O Chroma DB, então, realiza a busca dentre os documentos vetorizados já armazenados por instâncias semanticamente mais semelhantes, utilizando a métrica de similaridade definida na criação da coleção, recuperando os documentos resultantes da busca.
 
-\subsection{Modelo da função de geração de \textit{embeddings}}
+\subsection{Modelos para a Função de Geração de \textit{Embeddings}}
 \label{subsec:Assistente.1.2}
 
 Considerando a possibilidade oferecida pelo banco vetorial de se fornecer uma função de geração de \textit{embeddings} personalizada, sopesamos a utilização de diferentes modelos, considerando seu desempenho para fins de cálculo de similaridade -- levando em conta, especificamente, os resultados sobre a amostra de dados utilizada neste estudo (ver Seção \ref{sec:Metodologia.1}, que trata da definição dos dados deste estudo).
