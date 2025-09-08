@@ -1,23 +1,37 @@
 \chapter{Utilização de Técnicas de Aprimoramento do Uso de LLMs}
 \label{cap:Literatura}
-% Query string do Scopus: ABS ( ( rag OR "Retrieval-augmented Generation" OR "Retrieval augmented Generation" ) AND ( chatbot OR assistant ) ) AND PUBYEAR > 2021 AND PUBYEAR < 2025 AND ( LIMIT-TO ( OA , "all" ) )
 
-Este Capítulo apresenta alguns trabalhos realizados que têm propostas semelhantes à deste estudo. A busca foi realizada através da base de dados de resumos e citações de literatura Scopus, utilizando como critérios de busca a presença de termos como “RAG”/“\textit{Retrieval-augmented Generation}”, e “\textit{chatbot}”, bem como o recorte temporal de publicação entre 2022 e 2024.
+Este Capítulo apresenta alguns trabalhos realizados que têm propostas semelhantes à deste estudo. A busca foi realizada através da base de dados de resumos e citações de literatura Scopus, buscando por publicações de acesso aberto, utilizando como critérios de busca a presença de termos como ``RAG''/``\textit{Retrieval-augmented Generation}'', e ``\textit{chatbot}''/``\textit{assistant}'', bem como o recorte temporal de publicação entre 2022 e 2024, conforme a seguinte \textit{string} de busca:
+
+\begin{quote}
+    {    
+    \footnotesize
+    \ttfamily
+    \raggedright
+    \sloppy    
+    ABS ( ( rag OR ``Retrieval-augmented Generation'' OR ``Retrieval augmented Generation'' ) \\
+    AND ( chatbot OR assistant ) ) \\
+    AND PUBYEAR > 2021 \\
+    AND PUBYEAR < 2025 \\
+    AND ( LIMIT-TO ( OA , ``all'' ) )
+    
+    }
+\end{quote}
 
 \section{Abordagens Semelhantes à Proposta}
 \label{sec:Literatura.1}
 
-\citeonline{Relacionados:1} desenvolveram assistente de IA generativa para fornecer compreensão dos resultados de testes farmacogenômicos (PGx) com foco em dados genéticos, utilizando o GPT-4 e um \textit{framework} \ac{RAG}. O assistente emprega diretrizes farmacogenômicas cuidadosamente selecionadas e gera respostas precisas e fáceis de entender para profissionais de saúde e pacientes.
+\citeonline{Relacionados:1} desenvolveram assistente de IA generativa para fornecer compreensão dos resultados de testes farmacogenômicos (PGx) com foco em dados genéticos, utilizando o GPT-4 como \ac{LLM} gerador de respostas e recuperação de documentos de referência, representados em banco vetorial, usando o modelo gerador de \textit{embeddings} da OpenAI, o \textit{text-embedding-ada-002}, compondo assim um \textit{framework} \ac{RAG}. O assistente utiliza uma base de conhecimento com informações sobre atendimento ao paciente, incluindo informações fundamentais, dosagem de medicamentos, orientações de cuidados e diretrizes farmacogenômicas cuidadosamente selecionadas e gera respostas precisas e fáceis de entender para profissionais de saúde e pacientes.
 
-Seu assistente de IA superou o ChatGPT 3.5 em precisão (85\% contra 58\%), relevância e uso de citações em consultas específicas de profissionais, alcançando uma pontuação de eficácia de 85\%. Também demonstrou potencial para fortalecer a comunicação com os pacientes. Os autores destacam que, embora seja necessário um refinamento adicional para interações voltadas aos pacientes, a abordagem é promissora em termos de acesso e interpretação de informações genéticas complexas.
+Seu assistente de IA superou o ChatGPT 3.5 em precisão (alcançando 85\%, contra 58\% do ChatGPT), relevância e uso de citações em consultas específicas de profissionais, alcançando uma pontuação de eficácia de 85\%. Também demonstrou potencial para fortalecer a comunicação com os pacientes. Os autores destacam que, embora seja necessário um refinamento adicional para interações voltadas aos pacientes, a abordagem é promissora em termos de acesso e interpretação de informações genéticas complexas.
 
-\citeonline{Relacionados:2} abordam os desafios enfrentados nas indústrias de máquinas-ferramenta avançadas, onde operadores novatos frequentemente enfrentam dificuldades devido à falta de familiaridade com a terminologia das máquinas e interfaces variadas, especialmente em situações de alarme. Propõem um assistente digital baseado em inteligência artificial generativa, lançando mão de \textit{fine-tuning}, RAG e engenharia de \textit{prompt} para aprimorar modelos de linguagem de uso geral (GPT-2, GPT-3 e Llama2).
+\citeonline{Relacionados:2} abordam os desafios enfrentados nas indústrias de máquinas-ferramenta avançadas, onde operadores novatos frequentemente enfrentam dificuldades devido à falta de familiaridade com a terminologia das máquinas e interfaces variadas, especialmente em situações de emergência. Propõem um assistente digital baseado em inteligência artificial generativa, lançando mão de \textit{fine-tuning}, RAG e engenharia de \textit{prompt} para aprimorar modelos de linguagem de uso geral (GPT-2, GPT-3 e Llama2).
 
-A solução demonstrou melhorias significativas no desempenho do sistema, aprimorando a precisão quantitativa de 51\% para 79\% e depois para 84\% nos modelos com \textit{fine-tuning} e RAG, respectivamente. Além disso, a avaliação qualitativa subiu de 21 para 25 no modelo com \ac{RAG}.
+A solução demonstrou melhorias significativas no desempenho do sistema, aprimorando a precisão quantitativa de 51\% para 79\% e depois para 84\% nos modelos com \textit{fine-tuning} e RAG, respectivamente. Além disso, a avaliação qualitativa, que incluiu a atribuição de notas de avaliação indo de 0 a 30, subiu de 21 pontos na abordagem com \textit{fine-tuning} para 25 pontos utilizando o modelo com \ac{RAG}.
 
-O estudo feito por \citeonline{Relacionados:3} trata da necessidade de agentes conversacionais de saúde específicos para fornecer informações médicas confiáveis a grupos diversos e multilíngues em situação de emergência. A solução proposta é um \textit{chatbot} multilíngue baseado em IA, otimizado para fornecer informações de saúde precisas. Esse sistema utiliza técnicas de \textit{fine-tuning} do GPT-3.5 Turbo e do Llama 3 refinando-os especificamente para o campo da saúde. Além disso, para validação das informações em casos de incertezas, inclui um módulo \ac{RAG}, combinado com \textit{data augmentation} por dados sintéticos.
+O estudo feito por \citeonline{Relacionados:3} trata da necessidade de agentes conversacionais de saúde específicos para fornecer informações médicas confiáveis a grupos diversos e multilíngues em situação de emergência. A solução proposta é um \textit{chatbot} multilíngue baseado em IA, otimizado para fornecer informações de saúde precisas. Esse sistema utiliza técnicas de \textit{fine-tuning} do GPT-3.5 Turbo e do Llama 3, refinando-os especificamente para o campo da saúde. Além disso, para validação das informações em casos de incertezas, inclui um módulo \ac{RAG}, combinado com \textit{data augmentation} por dados sintéticos, gerados com a ferramenta ChatGPT. O intuito dos dados sintéticos é reduzir a tendência de \ac{LLM}s de favorecer o alinhamento com um posicionamento assumido pelo usuário, em detrimento de informações verídicas, uma abordagem apontada por \citeonline{SYCOPHANCY:1}.
 
-A abordagem demonstrou aprimoramento da performance em 5\%. A avaliação de qualidade, baseada no ROUGE, precisão, \textit{F1-score} e BERTScore, mostrou que os dados sintéticos superaram ligeiramente os dados reais, e uma mistura equilibrada manteve um bom desempenho. A satisfação dos usuários em um teste de 50 respostas mostrou que 68\% estavam muito satisfeitos, enquanto 20\% estavam satisfeitos, indicando uma aprovação significativa dos usuários. Além disso, o módulo de verificação de fatos implementado validou eficazmente os dados sintéticos, apontando apenas 2 das 150 respostas como não possuindo evidências médicas.
+A abordagem demonstrou aprimoramento da performance, em termos de acurácia, em 5\%. A avaliação de qualidade, baseada no ROUGE, precisão, \textit{F1-score} e BERTScore, mostrou que a utilização de dados sintéticos levou a resultados que superaram ligeiramente os resultados obtidos utilizando apenas dados reais, reduzindo o efeito de confirmação; de forma que uma combinação equilibrada entre os dois tipos de dados rendeu um bom desempenho. A satisfação dos usuários em um teste de 50 respostas mostrou que 68\% estavam muito satisfeitos, enquanto 20\% estavam satisfeitos, indicando uma aprovação significativa dos usuários. Além disso, o módulo de verificação de fatos implementado validou eficazmente os dados sintéticos, apontando apenas 2 das 150 respostas como não possuindo evidências médicas.
 
 Avaliando formas de mitigar problemas no processo de adaptação de operadores de \textit{call centers} a novos projetos e consultas complexas, \citeonline{Relacionados:4} propõem o uso de assistentes virtuais baseados em \ac{LLM}s, utilizando \ac{RAG} em conjunto com o VERTEX AI, baseada na utilização do BERT para realização de buscas semânticas sobre documentos indexados.
 
@@ -25,9 +39,9 @@ Os testes realizados pelos autores apontaram uma taxa de 75\% de precisão nas r
 
 No contexto de utilização de \ac{LLM}s para aplicações clínicas, \citeonline{Relacionados:5} identificaram a existência de dificuldades, devido à falta de informações precisas e completas, as quais se propuseram a reduzir por meio da integração de uma abordagem que utiliza \ac{RAG}, desenvolvendo um \textit{chatbot} especializado em gastroenterologia clínica na China. O sistema se propõe a, utilizando diretrizes e literatura científica, fornecer recomendações precisas de diagnóstico e tratamento. Para otimizar os resultados, realizaram um \textit{fine-tuning} dos modelos de geração de \textit{embeddings} para recuperar as informações relevantes com maior eficácia.
 
-Os resultados apontaram que a abordagem híbrida superou outros modelos, como Llama2 e ChatGPT, com uma taxa de \textit{recall} de contexto de 95\%, precisão de 93,73\% e relevância de resposta de 92,28\%. Além disso, obteve uma melhoria de 20\% no desempenho após \textit{fine-tuning} do modelo de geração de \textit{embeddings}. Os pesquisadores indicam que avaliações humanas destacaram altos níveis de segurança, usabilidade e fluidez. Apesar de limitações, como a aplicação restrita à China, o estudo sugere a expansão futura para outros contextos clínicos e integração com registros médicos eletrônicos.
+As avaliações dos resultados foram feitas utilizando o \textit{framework} RAGAs, que utiliza os somatório das similaridades entre perguntas e respostas para calcular uma medida de relevância (\textit{answer relevancy}) do conteúdo gerado \cite{RAGAS:1}. Os resultados apontaram que a abordagem híbrida superou outros modelos -- como Llama2 e o gpt-3.5-turbo, via ChatGPT -- com uma taxa de \textit{recall} de contexto de 95\%, precisão de 93,73\% e relevância de resposta (\textit{answer relevancy}) de 92,28\%. Além disso, obteve uma melhoria de 20\% no desempenho após \textit{fine-tuning} do modelo de geração de \textit{embeddings}. Os pesquisadores indicam que avaliações humanas destacaram altos níveis de segurança, usabilidade e fluidez. Apesar de limitações, como a aplicação restrita à China, o estudo sugere a expansão futura para outros contextos clínicos e integração com registros médicos eletrônicos.
 
-O estudo feito por \citeonline{Relacionados:6} aborda essas limitações de \ac{LLM}s utilizando técnicas de \textit{fine-tuning}, como o QLoRA, que permite treinamento eficiente em memória limitada, combinadas com a utilização de \ac{RAG}, para fornecer respostas contextualizadas, integrando \textit{feedback} de usuários para refinar a performance. Introduz, também, o conceito de \textit{Quantized Influence Measure} (QIM) como um mecanismo inovador de aprimoramento na precisão durante a recuperação de informações feita pela \ac{RAG}.
+O estudo feito por \citeonline{Relacionados:6} aborda a utilização de técnicas de \textit{fine-tuning}, como o QLoRA, que permite treinamento eficiente em memória limitada, combinadas com a utilização de \ac{RAG}, para fornecer respostas contextualizadas, integrando \textit{feedback} de usuários para refinar a performance. Introduz, também, o conceito de \textit{Quantized Influence Measure} (QIM) como um mecanismo inovador de aprimoramento na precisão durante a recuperação de informações feita pela \ac{RAG}.
 
 Os resultados demonstrados pelos autores mostram que a combinação do \ac{LLM} com \ac{RAG} supera abordagens tradicionais, com métricas de precisão significativamente aprimoradas, especialmente com a introdução da QIM. Além disso, a integração de modelos \ac{LLM} sob ajuste fino com recuperação de documentos demonstrou alta precisão em diálogos, reduzindo ambiguidades e otimizando custos operacionais.
 
@@ -35,23 +49,73 @@ Os resultados demonstrados pelos autores mostram que a combinação do \ac{LLM} 
 
 Propuseram, portanto, \citeonline{Relacionados:7} um \textit{chatbot} odontológico customizado, integrando LangChain e \ac{RAG}, bem como \textit{fine-tuning} de \ac{LLM}s com LoRA e QLoRA. Os resultados mostraram que o \textit{chatbot} proporciona respostas precisas e que promovem o engajamento dos usuários, melhorando sua experiência e satisfação. Os autores destacam o potencial de melhorar o engajamento e a educação de pacientes no campo odontológico, além de oferecer insights \textit{valiosos} para o desenvolvimento de \textit{chatbots} personalizados.
 
-
 \citeonline{Relacionados:8} atacam o desafio de melhorar o desempenho de \ac{LLM}s em tarefas de psicoterapia, destacando que as instruções específicas existentes são frequentemente limitadas em quantidade, diversidade e expertise profissional, impactando negativamente a eficácia dos \ac{LLM}s nesse campo especializado.
 
-Para isso, sua abordagem se utilizou da criação de conteúdo gerado com base em transcrições de sessões terapêuticas de especialistas como base para a aplicação de \ac{RAG}, além de \textit{fine-tuning} do modelo utilizado e aprendizado por reforço com \textit{feedback} humano (RLHF). As avaliações, automáticas e humanas, demonstraram que os modelos ajustados superaram os padrões existentes, oferecendo maior qualidade linguística e alinhamento com o conhecimento psicoterapêutico.
+Para isso, sua abordagem se utilizou da criação de conteúdo gerado com base em transcrições de sessões terapêuticas de especialistas como base para a aplicação de \ac{RAG}, além de \textit{fine-tuning} do modelo utilizado e aprendizado por reforço com \textit{feedback} humano -- \ac{RLHF}. As avaliações, automáticas e humanas, demonstraram que os modelos ajustados superaram os padrões existentes, oferecendo maior qualidade linguística e alinhamento com o conhecimento psicoterapêutico.
 
 A iniciativa Scispace Copilot, apresentada em \citeonline{Relacionados:9} trata dos desafios enfrentados por pesquisadores que, no cenário acadêmico atual, buscam estar atualizados sobre publicações acadêmicas. Sobrecarga de informações, complexidade na compreensão, exigência de recursos adicionais para interpretação do conteúdo e barreiras linguísticas são algumas das dificuldades existentes. 
 
 Os autores desenvolveram um assistente de pesquisa baseado em \ac{IA} que utiliza \ac{RAG} geração de texto por \ac{LLM}s e suporte multilinguístico para promover acessibilidade global a artigos e publicações científicas. Os resultados incluem maior eficiência no consumo de pesquisas, acessibilidade ampliada em regiões como Ásia e África e melhor compreensão de conceitos complexos, graças a recursos como resumos e explicações detalhadas.
 
-
 Outra atuação no campo médico, dessa vez relacionado a osteoartrite (OA), foi a de \citeonline{Relacionados:10}. O artigo aborda os desafios enfrentados por \ac{LLM}s no domínio médico, particularmente na gestão de doenças complexas como a OA. \ac{LLM}s generalistas frequentemente não conseguem fornecer recomendações de tratamento personalizadas, que são cruciais em ambientes clínicos. Para superar as limitações de \ac{LLM}s generalistas em ambientes clínicos, os autores propõem uma abordagem especializada envolvendo um \textit{framework} de \textit{benchmark} específico para o domínio em questão e o desenvolvimento de um \ac{LLM} voltado para a gestão da OA. Essa abordagem integra \ac{RAG} e \textit{prompts} instrucionais para melhorar a aplicação clínica e a explicabilidade do modelo.
 
 Os resultados revelaram que \ac{LLM}s generalistas, como o GPT-3.5 e o GPT-4, foram menos eficazes ao tratar de OA, especialmente na entrega de planos de tratamento personalizados. Em contraste, o modelo desenvolvido demonstrou melhorias significativas no desempenho, destacando o valor de modelos personalizados para tarefas médicas específicas. O estudo ressalta a importância do uso de \ac{RAG} e engenharia de \textit{prompts} para criar \ac{LLM}s que possam melhor atender às necessidades de profissionais de saúde e pacientes.
 
-\citeonline{Relacionados:11} abordam desafios importantes no campo da pesquisa genômica, particularmente em relação à acessibilidade e usabilidade de anotações funcionais de variantes. Com esse fim, os autores desenvolveram uma interface de linguagem natural generativa que se utiliza de \ac{RAG} para melhorar a precisão e relevância das respostas. Utilizando a API do ChatGPT e integrando-se de forma eficiente ao banco de dados FAVOR, que oferece extensas anotações funcionais de variantes do genoma, a ferramenta demonstrou resultados promissores.
+\citeonline{Relacionados:11} abordam desafios importantes no campo da pesquisa genômica, particularmente em relação à acessibilidade e usabilidade de anotações funcionais de variantes (o processo de identificar e interpretar as alterações no genoma de um indivíduo). Com esse fim, os autores desenvolveram uma interface de linguagem natural generativa que se utiliza de \ac{RAG} para melhorar a precisão e relevância das respostas. Utilizando a API do ChatGPT e integrando-se de forma eficiente a dados do portal FAVOR, que oferece extensas anotações funcionais de variantes do genoma, a ferramenta demonstrou resultados promissores.
 
-A avaliação revelou um score de relevância de 0.865 e um score de precisão de 0.85, superando significativamente o modelo regular do GPT-4, que obteve scores de 0.5 e 0.595, respectivamente. Segundo os autores, a integração proporcionou uma experiência de usuário aprimorada, mostrando que a ferramenta é eficaz na melhoria das respostas para consultas relacionadas a variantes, embora ainda haja espaço para melhorias adicionais.
+A avaliação da ferramenta proposta (FAVOR-GPT) foi feita considerando o quão adequadamente a resposta se relacionava com a pergunta (relevância) e o quão factualmente correta a resposta era (acurácia), ambos variando de 0 a 1. Os resultados apontaram uma média de relevância de 0,865 e precisão de 0,85, superando significativamente o modelo regular do GPT-4, que obteve scores de 0,5 e 0,595, respectivamente. Segundo os autores, a integração proporcionou uma experiência de usuário aprimorada, mostrando que a ferramenta é eficaz na melhoria das respostas para consultas relacionadas a variantes, embora ainda haja espaço para melhorias adicionais.
+
+A Tabela \ref{tab:trabalhos-relacionados-tecnicas-utilizadas} apresenta um resumo das abordagens, técnicas e ferramentas utilizadas pelos trabalhos considerados.
+
+\begin{table}[H]
+    \caption{Técnicas e ferramentas utilizadas nos trabalhos revisados}
+    \centering
+    \begin{tabular}{ l|l|m{6.7cm} }
+        \hline
+        \textbf{Elemento} & \textbf{Técnica/Ferramenta} & \textbf{Trabalhos} \\  
+        \hline
+        \multirow{9}{*}{\ac{LLM}s} & ChatGLM2 & \citeonline{Relacionados:8} \\
+        \cline{2-3}
+          & GPT-2 & \citeonline{Relacionados:2} \\
+        \cline{2-3}
+          & GPT-3.5 & \citeonline{Relacionados:3}, \citeonline{Relacionados:10} \\
+        \cline{2-3}
+          & GPT-3.5-Turbo & \citeonline{Relacionados:5} \\
+        \cline{2-3}
+          & GPT-4 & \citeonline{Relacionados:1}, \citeonline{Relacionados:10}, \citeonline{Relacionados:11} \\
+        \cline{2-3}
+          & Llama2 & \citeonline{Relacionados:2}, \citeonline{Relacionados:6}, \citeonline{Relacionados:7}, \citeonline{Relacionados:8} \\
+        \cline{2-3}
+          & Llama3 & \citeonline{Relacionados:3} \\
+        \cline{2-3}
+          & Palm2 & \citeonline{Relacionados:4} \\
+        \cline{2-3}
+          & TinyLlama & \citeonline{Relacionados:7} \\
+        \hline
+        \multirow{3}{*}{ Outros modelos } & BERT & \citeonline{Relacionados:2} \\
+        \cline{2-3}
+          & GTE & \citeonline{Relacionados:5} \\
+        \cline{2-3}
+          & text-embedding-ada-002 & \citeonline{Relacionados:1} \\
+        \hline
+        \multirow{6}{*}{Abordagens} & Fine-tuning & \citeonline{Relacionados:2}, \citeonline{Relacionados:3}, \citeonline{Relacionados:5}, \citeonline{Relacionados:6}, \citeonline{Relacionados:7}, \citeonline{Relacionados:8} \\
+        \cline{2-3}
+           & LoRA & \citeonline{Relacionados:6}, \citeonline{Relacionados:7} \\
+        \cline{2-3}
+           & QIM & \citeonline{Relacionados:6} \\
+        \cline{2-3}
+           & QLoRA & \citeonline{Relacionados:6}, \citeonline{Relacionados:7} \\
+        \cline{2-3}
+           & RLHF & \citeonline{Relacionados:8} \\
+        \cline{2-3}
+           & Langchain & \citeonline{Relacionados:7} \\
+        \hline
+    \end{tabular}   
+    
+    Fonte: O autor (2025)
+    \label{tab:trabalhos-relacionados-tecnicas-utilizadas}
+\end{table}
+
 
 \section{Considerações sobre a Análise Feita}
 \label{sec:Literatura.2}
@@ -60,7 +124,7 @@ Ao se observar os trabalhos com abordagens semelhantes à proposta neste estudo,
 
 É ampla gama de desafios facilitados pelos estudos analisados, tais quais a interpretação de informações genéticas complexas, dificuldades de comunicação em diversos cenários que incluem informações especializadas de um domínio (como informações técnicas e médicas), desafios de adaptação a interfaces industriais e terminologias específicas, sobrecarga informacional no contexto acadêmico, e limitações em diagnósticos e tratamentos clínicos personalizados. A adaptação às necessidades multilíngues e regionais também é uma questão recorrente, especialmente em aplicações globais.
 
-Variadas técnicas de otimização do uso de \ac{LLM}s são aplicadas nos trabalhos avaliados, como engenharia de \textit{prompts} e métodos de \textit{fine-tuning} (como LoRA e QLoRA), aprendizado por reforço com \textit{feedback} humano (RLHF) e a criação de \textit{benchmarks} personalizados são utilizados para otimizar o desempenho. Todavia, de forma transversal, a RAG emerge como técnica central para integrar fontes externas de informação ao processo de geração de respostas, reduzindo alucinações e melhorando a precisão. 
+Variadas técnicas de otimização do uso de \ac{LLM}s são aplicadas nos trabalhos avaliados, como engenharia de \textit{prompts} e métodos de \textit{fine-tuning} (como LoRA e QLoRA), aprendizado por reforço com \textit{feedback} humano \ac{RLHF} e a criação de \textit{benchmarks} personalizados são utilizados para otimizar o desempenho. Todavia, de forma transversal, a RAG emerge como técnica central para integrar fontes externas de informação ao processo de geração de respostas, reduzindo alucinações e melhorando a precisão. 
 
 Como formas de potencializar o desempenho do processo de recuperação de conteúdo -- parte essencial da \ac{RAG} --, destacam-se o treinamento refinado de \textit{embeddings} para recuperação semântica, o uso de \textit{frameworks} como Vertex AI, e a integração de módulos de verificação de fatos para garantir a confiabilidade das respostas. Além disso, métodos inovadores como a \textit{Quantized Influence Measure} (QIM) e ferramentas como LangChain e a aplicação de \textit{data augmentation} destacam-se por melhorar a precisão na recuperação de informações contextuais. Como consequência, são obtidos resultados expressivos, manifestados em melhorias significativas em métricas de precisão, \textit{recall} e relevância, superando \ac{LLM}s generalistas como GPT-3.5 e GPT-4.
 
