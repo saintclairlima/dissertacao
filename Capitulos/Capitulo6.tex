@@ -1,7 +1,7 @@
 \chapter{Metodologia}
 \label{cap:Metodologia}
 
-Neste Capítulo, abordaremos a definição de todos os elementos componentes da solução proposta, bem como os critérios utilizados nas tomadas de decisão quanto a recortes de dados de entrada e seu tratamento e preparação, modelos utilizados, critérios de avaliação e afins. Começamos, na Seção \ref{sec:Metodologia.1}, apontando a forma de preparação dos dados a serem consultados e usados como base para a geração final das respostas (sua seleção, tratamento, preparação e persistência no banco vetorial). A Seção \ref{sec:Metodologia.2} trata das decisões tomadas para realizar a melhor  configuração para o banco vetorial. As Seções \ref{sec:Metodologia.3} e \ref{sec:Metodologia.4} abordam, respectivamente, (1) a configuração do ambiente de execução do \ac{LLM} e (2) sua integração com os dados recuperados do banco vetorial -- efetivamente definindo a estrutura \ac{RAG}. A exposição da aplicação ao usuário, por meio de uma interface web simples é descrita na Seção \ref{sec:Metodologia.5}, ao passo que as medições dos resultados e avaliações são apresentadas na Seção \ref{sec:Metodologia.6}.
+Dado que no Capítulo \ref{cap:Assistente} tratamos de apontar \textit{o que será desenvolvido}, neste capítulo buscamos expor \textit{os meios que usaremos} para alcançar o que nos propomos. Abordaremos, portanto, a definição de todos os elementos componentes da solução proposta, bem como os critérios utilizados nas tomadas de decisão quanto a recortes de dados de entrada e seu tratamento e preparação, modelos utilizados, critérios de avaliação e afins. Começamos, na Seção \ref{sec:Metodologia.1}, apontando a forma de preparação dos dados a serem consultados e usados como base para a geração final das respostas (sua seleção, tratamento, preparação e persistência no banco vetorial). A Seção \ref{sec:Metodologia.2} trata das decisões tomadas para realizar a melhor  configuração para o banco vetorial. As Seções \ref{sec:Metodologia.3} e \ref{sec:Metodologia.4} abordam, respectivamente, (1) a configuração do ambiente de execução do \ac{LLM} e (2) sua integração com os dados recuperados do banco vetorial -- efetivamente definindo a estrutura \ac{RAG}. A exposição da aplicação ao usuário, por meio de uma interface web simples é descrita na Seção \ref{sec:Metodologia.5}, ao passo que as medições dos resultados e avaliações são apresentadas na Seção \ref{sec:Metodologia.6}.
 
 \section{Definição do Conjunto de Dados}
 \label{sec:Metodologia.1}
@@ -37,7 +37,7 @@ os seguintes:
     \centering
     \begin{tabular}{ c c c c }
         \hline
-        \textbf{Doc.} & \textbf{palavras} & \textbf{\textit{tokens}} & \textbf{artigos} \\  
+        \textbf{Documento} & \textbf{palavras} & \textbf{\textit{tokens}} & \textbf{artigos} \\  
         \hline
         1 & 15.228 & 23.079 & 245 \\
         2 & 43.579 & 65.850 & 376 \\
@@ -62,29 +62,37 @@ os seguintes:
 
 \begin{table}
     \caption{Quantitativos Palavras e \textit{Tokens} por Artigo em cada Documento}
-    \centering
-    \begin{tabular}{ c c c c c }
-        \hline
-        \textbf{Doc.} & \textbf{pals./art.} & \textbf{tokens/art.} & \textbf{arts. 300+ pals} & \textbf{arts. 500+ tokens} \\  
-        \hline
-        1 & 62,2 & 94,2 & 2 & 7 \\
-        2 & 115,9 & 175,1 & 33 & 58 \\
-        3 & 93,0 & 171,0 & 1 & 1 \\
-        4 & 84,7 & 126,1 & 1 & 1 \\
-        5 & 102,9 & 150,1 & 2 & 6 \\
-        6 & 112,4 & 166,4 & 1 & 3 \\
-        7 & 73,0 & 108,3 & 0 & 0 \\
-        8 & 106,4 & 153,8 & 2 & 6 \\
-        9 & 113,8 & 171,8 & 1 & 3 \\
-        10 & 61,7 & 93,0 & 0 & 0 \\
-        11 & 75,64 & 114,76 & 0 & 0 \\
-        12 & ** & ** & ** & ** \\
-        \hline
-    \end{tabular}   
+    {
+        \centering
+        \begin{tabular}{ c c c c c }
+            \hline
+            \textbf{Documento} & \textbf{pals./art.} & \textbf{tokens/art.} & \textbf{arts. 300+ pals} & \textbf{arts. 500+ tokens} \\  
+            \hline
+            1 & 62,2 & 94,2 & 2 & 7 \\
+            2 & 115,9 & 175,1 & 33 & 58 \\
+            3 & 93,0 & 171,0 & 1 & 1 \\
+            4 & 84,7 & 126,1 & 1 & 1 \\
+            5 & 102,9 & 150,1 & 2 & 6 \\
+            6 & 112,4 & 166,4 & 1 & 3 \\
+            7 & 73,0 & 108,3 & 0 & 0 \\
+            8 & 106,4 & 153,8 & 2 & 6 \\
+            9 & 113,8 & 171,8 & 1 & 3 \\
+            10 & 61,7 & 93,0 & 0 & 0 \\
+            11 & 75,64 & 114,76 & 0 & 0 \\
+            12 & ** & ** & ** & ** \\
+            \hline
+        \end{tabular}
+    }
 
-    \small \textbf{**Nota}: texto não articulado.
+    \small \textbf{**Nota}: texto não articulado.\\
+    \small \textbf{pals./art.}: Média do número de palavras por artigo \\
+    \small \textbf{tokens/art.}: Média do número de \textit{tokens} por artigo \\
+    \small \textbf{arts. 300+ pals}: Número de artigos com mais de 300 palavras \\
+    \small \textbf{arts. 500+ tokens}: Número de artigos com mais de 500 \textit{tokens} \\
     
-    Fonte: O autor (2025)
+    {\centering
+        Fonte: O autor (2025)\par
+    }
     \label{tab:descricao-documentos-2}
 \end{table}
 
@@ -99,7 +107,7 @@ A primeira se dá pelo motivo de que, pela própria dinâmica da atividade legis
 A segunda se dá quando uma peça normativa de abrangência maior prevê algo, enquanto um ato normativo de alcance específico preveem, paradoxalmente, coisas distintas. Um caso específico, para fins de demonstração, é o fato de o Regime Jurídico dos servidores públicos civis do Estado do Rio Grande do Norte determina que:
 
 \begin{citacao}
-    A gratificação natalina, devida a ocupante de cargo efetivo ou em comissão, corresponde a 1/12 (um doze avos) da remuneração a que fizer jus no mês de dezembro, por mês de exercício no respectivo ano. \cite{RegimeJuridico:RN}
+    A gratificação natalina, devida a ocupante de cargo efetivo ou em comissão, corresponde a 1/12 (um doze avos) da remuneração a que fizer jus no mês de dezembro, por mês de exercício no respectivo ano \cite{RegimeJuridico:RN}.
 \end{citacao}
 
 
@@ -108,7 +116,7 @@ Assim, enquanto no âmbito mais amplo do Estado do RN a gratificação natalina 
     Fica determinado que os valores percebidos a título de auxílio-alimentação e auxílio de assistência à saúde, por se tratarem de vantagens pecuniárias que compõem a remuneração do servidor, serão incluídos na base de cálculo do terço constitucional de férias e da gratificação natalina (13º salário) dos servidores e, naquilo que couber, dos membros da Assembleia Legislativa do Estado do Rio Grande do Norte.
 \end{citacao}
 
-Como ambos os documentos estão disponíveis no banco vetorial, uma busca por ``Os valores recebidos como auxílio-alimentação compõem a base de cálculo para a gratificação natalina?'' pode resultar no retorno de ambos os fragmentos, provendo ao \ac{LLM} informações conflitantes, visto que não foi fornecido um contexto na pergunta. Embora seja possível uma abordagem mais efetiva e elegante para a resolução deste problema (como uma organização hierárquica -- em termos de abrangência -- dos documentos), no escopo deste estudo, limitamo-nos a informar ao \ac{LLM}, junto com o texto do fragmento, o seu título e autor, que por si só já delimitam o âmbito em que a peça normativa se aplica.
+Como ambos os documentos estão disponíveis no banco vetorial, uma busca por ``Os valores recebidos como auxílio-alimentação compõem a base de cálculo para a gratificação natalina?'' pode resultar no retorno de ambos os fragmentos, provendo ao \ac{LLM} informações conflitantes, visto que não foi fornecido um contexto na pergunta. Embora seja possível uma abordagem mais efetiva para a resolução deste problema (como uma organização hierárquica -- em termos de abrangência -- dos documentos), no escopo deste estudo, limitamo-nos a informar ao \ac{LLM}, junto com o texto do fragmento, o seu título e autor, que por si só já delimitam o âmbito em que a peça normativa se aplica.
 
 \subsection{Tratamento dos Dados Selecionados}
 \label{subsec:Metodologia.1.1}
@@ -120,14 +128,14 @@ Feita a coleta dos arquivos com os textos dos documentos elencados para a compos
 
 Um dos aspectos que deve ser levado em consideração é a garantia de que o tamanho de seu conteúdo seja adequado às limitações das ferramentas de geração de representação vetorial do texto. Ignorar essas características de cada modelo pode levar à perda de informação quando da geração dos \textit{embeddings} dos documentos, dado que os modelos truncam parte do conteúdo sobre o qual operarão, nos casos em que o número máximo de \textit{tokens} que conseguem processar é extrapolado. A divisão ou particionamento do conteúdo textual dos documentos é a parte central desse processo.
 
-Considerando que diversos modelos selecionados para avaliação na inclusão das funções de geração de \textit{embeddings} neste trabalho (ver Tabela \ref{tab:num-maximo-tokens} na Seção \ref{subsubsec:Metodologia.2.1.6}) têm uma limitação no número de \textit{tokens} de entrada para geração da representação em vetores (em geral 512 \textit{tokens}), visto que se baseiam na arquitetura Transformers, \cite{Instructor:3}, a escolha feita foi pela fragmentação de cada um dos documentos em porções de texto com um número máximo de 300 palavras. Com isso, cada fragmento de um documento seria tratado pelo Chroma DB como um documento por si só, ficando sua relação de pertencimento registrada nos metadados, para casos de eventuais  buscas pelo documento como um todo. Dessa forma, ao serem \textit{tokenizados} os fragmentos dos documentos no conjunto, as representações vetoriais resultantes ficam dimensionadas de forma a respeitar a limitação de tamanho da entrada recebida pelo modelo utilizado, eliminando a necessidade de supressão de informações por truncamento dos \textit{tokens} excedentes.
+Considerando que diversos modelos selecionados para avaliação na inclusão das funções de geração de \textit{embeddings} neste trabalho (ver Tabela \ref{tab:num-maximo-tokens} na Seção \ref{subsubsec:Metodologia.2.1.6}) têm uma limitação no número de \textit{tokens} de entrada para geração da representação em vetores (em geral 512 \textit{tokens}), visto que se baseiam na arquitetura \textit{Transformer}, \cite{Instructor:3}, a escolha feita foi pela fragmentação de cada um dos documentos em porções de texto com um número máximo de 300 palavras. Com isso, cada fragmento de um documento seria tratado pelo Chroma DB como um documento por si só, ficando sua relação de pertencimento registrada nos metadados, para casos de eventuais  buscas pelo documento como um todo. Dessa forma, ao serem \textit{tokenizados} os fragmentos dos documentos no conjunto, as representações vetoriais resultantes ficam dimensionadas de forma a respeitar a limitação de tamanho da entrada recebida pelo modelo utilizado, eliminando a necessidade de supressão de informações por truncamento dos \textit{tokens} excedentes.
 
 A fragmentação do volume do texto de fato é desejável e otimiza o processo de recuperação de documentos (fragmentos menores permitem maior granularidade no cálculo da semelhança semântica com o \textit{input} do usuário), além de reduzir o tamanho geral do \textit{prompt} a ser fornecido ao \ac{LLM} para geração do conteúdo sintético a responder a pergunta feita, visto que este incluirá o conteúdo dos fragmentos recuperados. Todavia, a divisão do conteúdo considerando meramente o tamanho de cada fragmento pode implicar em dispersão de contexto, colocando uma parte de uma ideia em um fragmento, isolando-a de sua parte complementar alocada em outro, de forma que a ideia completa se perde no instante da recuperação de documentos, podendo não ser identificada pela busca semântica de similaridade.
 
 \subsubsection{Manutenção do Contexto}
 \label{subsubsec:Metodologia.1.1.2}
 
-Portanto, é igualmente crucial mitigar a fragmentação e dispersão do contexto dos dados, evitando que informações correlacionadas -- e contíguas, no texto original -- se encontrem espalhadas ao longo de diversos fragmentos ao final do processo de divisão dos documentos em pedaços menores. Para isso é importante compreender que o sentido, o significado e a semântica comunicados residem não somente o conteúdo textual, nas palavras expressas do texto, senão também no que se infere a partir do que os precedeu, seja a nível textual ou estrutural.
+Considerando o exposto na Seção anterior, é igualmente crucial mitigar a fragmentação e dispersão do contexto dos dados, evitando que informações correlacionadas -- e contíguas, no texto original -- se encontrem espalhadas ao longo de diversos fragmentos ao final do processo de divisão dos documentos em pedaços menores. Para isso é importante compreender que o sentido, o significado e a semântica comunicados residem não somente o conteúdo textual, nas palavras expressas do texto, senão também no que se infere a partir do que os precedeu, seja a nível textual ou estrutural.
 
 Assim, realizar a divisão do documento garantindo que os pontos de quebra aconteçam entre uma frase e outra -- depois de um ponto final/interrogação/exclamação -- garante que ideias não sejam quebradas no nível da frase, reduzindo em parte a fratura de contexto que se realiza considerando meramente o número de palavras/\textit{tokens} do fragmento final. Igualmente, a garantia de que a quebra acontece em um ponto que divide duas unidades com um grau maior de completude de uma ideia avança na direção de se obter fragmentos semanticamente autocontidos, com menor dependência de conteúdo conseguinte ou, ainda mais, precedente. Com efeito, o contexto precedente possui impacto maior sobre a completude de uma partição do documento do que aquele que a sucede.
 
@@ -177,7 +185,7 @@ Considere, por exemplo, o texto seguinte organizado hierarquicamente:
       \item \texttt{set OLLAMA\_MAX\_LOADED\_MODELS=5}
       \item \texttt{set OLLAMA\_DEBUG=`true'}
     \end{itemize}
-  }%
+  }
 }
 
 Ignorando o comprimento diminuto de cada uma das seções -- tomando-as como mais longas -- vemos que temos duas seções com informações diferentes de como instalar o Ollama. O que as torna coerentes não é o conteúdo de cada uma, mas o ponto da hierarquia da estrutura textual em que ambas se localizam. Destarte, é necessário ``injetar'' no texto dos fragmentos que compõem ambas essas seções informações sobre sua posição na estrutura hierárquica do documento.
@@ -187,7 +195,7 @@ O mesmo princípio se aplica a documentos articulados, como peças legislativas,
 \subsubsection{Documentos Articulados}
 \label{subsubsec:Metodologia.1.1.3}
 
-Diante do exposto, como uma abordagem para minimizar essa dispersão contextual, o processo de segmentação dos documentos se utilizou da estrutura intrínseca de cada um deles (divisão em artigos, parágrafos, alíneas e afins, nos casos de documentos articulados), de forma que os fragmentos ficaram orientados à divisão por artigo, dado que cada artigo é uma unidade autocontida, semanticamente coerente, sendo, no grosso dos exemplos, independente dos outros artigos, salvo quando de citação e referência. Mais claramente, cada documento foi segmentado de tal sorte que cada artigo compõe um fragmento. Apesar disso, conforme se vê na Tabela \ref{tab:descricao-documentos-2} ainda há, no corpus selecionado, 43 artigos cujo teor textual ultrapassa o número de 300 palavras (via de regra por conter um grande número de parágrafos, incisos e alíneas), incorrendo no mesmo problema que ora é abordado, exceto que em um número muito menor de ocorrências, dada a raridade de artigos longos no conjunto de dados em questão.
+Diante do exposto, como uma abordagem para minimizar essa dispersão contextual, o processo de segmentação dos documentos se utilizou da estrutura intrínseca de cada um deles (divisão em artigos, parágrafos, alíneas e afins, nos casos de documentos articulados), de forma que os fragmentos ficaram orientados à divisão por artigo, dado que cada artigo é uma unidade autocontida, semanticamente coerente, sendo, no grosso dos exemplos, independente dos outros artigos, salvo quando de citação e referência. Mais claramente, cada documento foi segmentado de tal sorte que cada artigo compõe um fragmento. Apesar disso, conforme se vê na Tabela \ref{tab:descricao-documentos-2}, ainda há, no corpus selecionado, 43 artigos cujo teor textual ultrapassa o número de 300 palavras (via de regra por conter um grande número de parágrafos, incisos e alíneas), incorrendo no mesmo problema que ora é abordado, exceto que em um número muito menor de ocorrências, dada a raridade de artigos longos no conjunto de dados em questão.
 
 Como uma forma de evitar essa situação, a abordagem adotada foi, nos casos de artigos mais extensos, secionar adicionalmente o artigo, em suas partes menores (caput, parágrafos, incisos e alíneas) e agrupá-las de forma que cada um desses agrupamentos consista de uma combinação do caput e parágrafos/incisos/alíneas cujo comprimento total não ultrapasse o limite escolhido de 300 palavras, conforme a Figura \ref{fig:fragmentacao-artigos}. Assim, embora essa fragmentação automatizada -- independente de divisão feita sob análise caso a caso -- não resolva o problema em sua completude, ao se garantir que cada um desses segmentos mantenha o contexto geral do artigo, condensado no caput, mitiga-se uma fragmentação extrema da ideia geral do artigo, obtendo-se uma coesão maior do que haveria no caso da divisão com base somente no número de palavras.
 
@@ -203,29 +211,34 @@ O resultado final do quantitativo de fragmentos por documento articulado está d
 
 \begin{table}[H]
     \caption{Quantitativos de artigos e Fragmentos por Documento}
-    \centering
-    \begin{tabular}{ l c c c }
-        \hline
-        \textbf{Documento} & \textbf{Artigos} & \textbf{300+} & \textbf{Fragmentos} \\  
-        \hline
-        1. Lei Complementar Estadual Nº 122/1994 & 245 & 2 & 248 \\
-        2. Resolução Nº 031/2021 – Alern & 376 & 33 & 420 \\
-        3. Resolução Nº 075/2024 – Alern & 7 & 1 & 8 \\
-        4. Resolução Nº 078/2024 – Alern & 21 & 1 & 22 \\
-        5. Resolução Nº 106/2018 – Alern & 46 & 2 & 48 \\
-        6. Resolução Nº 2388/2019 – Alern & 14 & 1 & 15 \\
-        7. Resolução Nº 077/2024 – Alern & 7 & 0 & 7 \\
-        8. Resolução Nº 089/2017 – Alern & 41 & 2 & 44 \\
-        9. Resolução Nº 618/2022 – Alern & 9 & 1 & 10 \\
-        10. Resolução Nº 064/2022 – Alern & 7 & 0 & 7 \\
-        11. Resolução Nº 133/2025 - Alern & 25 & 0 & 25 \\
-        12. Manual de Processo Legislativo & ** & ** & 244 \\
-        \hline
-    \end{tabular}   
-    
-    Fonte: O autor (2025)
+    {
+        \centering
+        \begin{tabular}{ l c c c }
+            \hline
+            \textbf{Documento} & \textbf{Artigos} & \textbf{300+} & \textbf{Fragmentos} \\  
+            \hline
+            1. Lei Complementar Estadual Nº 122/1994 & 245 & 2 & 248 \\
+            2. Resolução Nº 031/2021 – Alern & 376 & 33 & 420 \\
+            3. Resolução Nº 075/2024 – Alern & 7 & 1 & 8 \\
+            4. Resolução Nº 078/2024 – Alern & 21 & 1 & 22 \\
+            5. Resolução Nº 106/2018 – Alern & 46 & 2 & 48 \\
+            6. Resolução Nº 2388/2019 – Alern & 14 & 1 & 15 \\
+            7. Resolução Nº 077/2024 – Alern & 7 & 0 & 7 \\
+            8. Resolução Nº 089/2017 – Alern & 41 & 2 & 44 \\
+            9. Resolução Nº 618/2022 – Alern & 9 & 1 & 10 \\
+            10. Resolução Nº 064/2022 – Alern & 7 & 0 & 7 \\
+            11. Resolução Nº 133/2025 - Alern & 25 & 0 & 25 \\
+            12. Manual de Processo Legislativo & ** & ** & 244 \\
+            \hline
+        \end{tabular}
+    }
 
-    \textbf{**Nota}: O Manual de Processo Legislativo não é articulado (ver Seção \ref{subsubsec:Metodologia.1.1.4})
+    \small \textbf{**Nota}: O Manual de Processo Legislativo não é articulado (ver Seção \ref{subsubsec:Metodologia.1.1.4}) \\
+    \small \textbf{300+}: Número de artigos com mais de 300 palavras \\
+    
+    {\centering
+        Fonte: O autor (2025)\par
+    }
     \label{tab:descricao-fragmentos-1}
 \end{table}
 
@@ -269,7 +282,7 @@ Assim, se aplicássemos essa abordagem sobre o exemplo de texto hierárquico que
     }
     \end{quote}
 
-Dessa forma, mantivemos incorporados ao conteúdo textual da seção indicadores explícitos que sinalizam a posição do fragmento dentro da estrutura geral do documento, aplicando algum grau de redução da dispersão de informação e perda de dados contextuais.
+Dessa forma, mantivemos indicadores explícitos que sinalizam a posição do fragmento dentro da estrutura geral do documento incorporados ao conteúdo textual da seção, aplicando algum grau de redução da dispersão de informação e perda de dados contextuais.
 
 \section{Definindo o Banco Vetorial}
 \label{sec:Metodologia.2}
@@ -282,7 +295,7 @@ A Seção \ref{subsec:Assistente.1.2} apresentou a possibilidade de fornecer ao 
 \subsubsection{instructor-xl}
 \label{subsubsec:Metodologia.2.1.1}
 
-Dentre os modelos avaliados, o que mais chamou atenção foi o \textit{instructor-xl} dada a sua proposta de flexibilidade. Trata-se de um modelo desenvolvido pela equipe de pesquisa de Processamento de Linguagem Natural (NLP) da Universidade de Hong Kong, incluindo a participação de pesquisadores de outras instituições, como \textit{University of Washington}, Meta AI e \textit{Allen Institute for AI}, publicado em 2023 \cite{Instructor:1}. O modelo selecionado pertence à série de modelos INSTRUCTOR, que são projetados para gerar \textit{embeddings} de texto de alta qualidade e se baseiam na arquitetura Transformer, assim como modelos de estado da arte, como \ac{BERT} e \ac{GPT}.
+Dentre os modelos avaliados, o que mais chamou atenção foi o \textit{instructor-xl} dada a sua proposta de flexibilidade. Trata-se de um modelo desenvolvido pela equipe de pesquisa de Processamento de Linguagem Natural (NLP) da Universidade de Hong Kong, incluindo a participação de pesquisadores de outras instituições, como \textit{University of Washington}, Meta AI e \textit{Allen Institute for AI}, publicado em 2023 \cite{Instructor:1}. O modelo selecionado pertence à série de modelos INSTRUCTOR, que são projetados para gerar \textit{embeddings} de texto de alta qualidade e se baseiam na arquitetura \textit{Transformer}, assim como modelos de estado da arte, como \ac{BERT} e \ac{GPT}.
 
 No trabalho de  \citeonline{Instructor:2}, os seus publicadores o definem como \textit{``One Embedder [for] Any Task''} (Um Gerador de \textit{Embeddings} para Qualquer Tarefa) e como
 
@@ -292,27 +305,26 @@ No trabalho de  \citeonline{Instructor:2}, os seus publicadores o definem como \
 
 Os INSTRUCTORs são, portanto, modelos de criação de \textit{embeddings} textuais de forma adaptativa. Em vez de gerar \textit{embeddings} baseando-se unicamente nos parâmetros alcançados em seu treinamento, ele lança mão de instruções em linguagem natural fornecidas no momento de sua execução, as quais devem descrever as tarefas em que os \textit{embeddings} serão utilizados. Ao utilizar as instruções como elementos ``direcionadores'' do processo de geração de \textit{embeddings}, pretende-se que o resultado final seja otimizado para as tarefas definidas, fazendo as vezes de um ``ajuste fino''. Essa abordagem demonstra, segundo os seus desenvolvedores, bom desempenho em não somente ``compreender'' texto em um sentido mais aberto e genérico, sendo capaz, também, de interpretá-lo com uma visão direcionada a aplicações e casos de uso particulares.
 
-Desta forma, as representações vetoriais geradas são otimizadas para tarefas específicas (como classificação, recuperação de informações, agrupamento, avaliação semântica, entre outras) e/ou domínios diferentes sem a necessidade de refinamento do modelo nos moldes tradicionais de \textit{finetuning}, tornando-o adaptável e mais relevante para diversas aplicações.
-A versão do modelo que escolhemos testar para possível uso no Assistente de Busca, especificamente, é a \textit{instructor-xl}, sendo a variante dentre a família de modelos INSTRUCTOR com maior tamanho, otimizada para desempenho e equilíbrio entre precisão e eficiência em aplicações de processamento de linguagem natural, podendo ser utilizada por meio do \textit{framework} \textit{sentence-transformer}, disponibilizado pelo \textit{HuggingFace}, como \textit{hkunlp/instructor-xl}.
+Desta forma, as representações vetoriais geradas são otimizadas para tarefas específicas (como classificação, recuperação de informações, agrupamento, avaliação semântica, entre outras) e/ou domínios diferentes, sem a necessidade de refinamento do modelo nos moldes tradicionais de \textit{finetuning}, tornando-o adaptável e mais relevante para diversas aplicações.
+A versão do modelo que escolhemos testar para possível uso no Assistente de Busca, especificamente, é a \textit{instructor-xl}, sendo a variante dentre a família de modelos INSTRUCTOR com maior tamanho, otimizada para desempenho e equilíbrio entre precisão e eficiência em aplicações de \ac{PLN}, podendo ser utilizada por meio do \textit{framework} \textit{sentence-transformer}, disponibilizado pelo \textit{HuggingFace}, como \textit{hkunlp/instructor-xl}.
 
 \subsubsection{text-embedding-ada-002}
 \label{subsubsec:Metodologia.2.1.2}
 
-Outro modelo selecionado por ser promissor foi o \textit{text-embedding-ada-002}, desenvolvido e oferecido como um serviço pela OpenAi desde o final do ano de 2022. A página de apresentação do modelo o descreve como a unificação de cinco modelos anteriores (\textit{text-similarity}, \textit{text-search-query}, \textit{text-search-doc}, \textit{code-search-text} and \textit{code-search-code}) em um único modelo aprimorado, alcançando melhores resultados em busca textual, similaridade de frases e \textit{benchmarking} de busca em código. \cite{ADA:1}
+Outro modelo selecionado por ser promissor foi o \textit{text-embedding-ada-002}, desenvolvido e oferecido como um serviço pela OpenAi desde o final do ano de 2022. A página de apresentação do modelo o descreve como a unificação de cinco modelos anteriores (\textit{text-similarity}, \textit{text-search-query}, \textit{text-search-doc}, \textit{code-search-text} and \textit{code-search-code}) em um único modelo aprimorado, alcançando melhores resultados em busca textual, similaridade de frases e \textit{benchmarking} de busca em código \cite{ADA:1}.
 
 Um dos pontos positivos apontados na página é o fato de utilizar uma forma compacta de representação em \textit{embeddings} (apenas 1.536 dimensões), apresentando melhor custo-benefício para utilização em bancos vetoriais, a despeito do suporte a um contexto maior. A isso adiciona-se o fato de ser menos computacionalmente custoso de se utilizar, dado que o processamento é delegado à API da OpenAI, enviando o texto a ser processado, via requisição HTTP e recebendo os \textit{embeddings} como resposta.
 
 Como ponto negativo há o custo atrelado a cada requisição feita à API, tanto para gerar os \textit{embeddings} dos documentos quanto, posteriormente, para gerar os \textit{embeddings} de cada consulta feita ao banco de vetores, enquanto houver utilização da aplicação.
 
-Embora não seja o modelo mais recente, dado que outros modelos mais eficientes e comparativamente baratos hajam sido lançados pela OpenAi, o posicionamento da empresa é de que o \textit{ada-002} não está sendo declarado como obsoleto (\textit{deprecated}) de forma que, embora recomendem o modelo mais novo (ver a Seção \ref{subsubsec:Metodologia.2.1.3}), os clientes podem continuar usando o \textit{ada-002}.\footnote{``We are not deprecating text-embedding-ada-002, so while we recommend the newer model, customers are welcome to continue using the previous generation model'' \cite{3_large:1}.}
-
+Embora não seja o modelo mais recente, dado que outros modelos mais eficientes e comparativamente baratos hajam sido lançados pela OpenAi, o posicionamento da empresa é de que o \textit{ada-002} não está sendo declarado como obsoleto (\textit{deprecated}) de forma que, embora recomendem o \textit{text-embedding-3-large}, seu modelo mais novo (ver a Seção \ref{subsubsec:Metodologia.2.1.3}), os clientes podem continuar usando o \textit{ada-002}.\footnote{``We are not deprecating text-embedding-ada-002, so while we recommend the newer model, customers are welcome to continue using the previous generation model'' \cite{3_large:1}.}
 
 \subsubsection{text-embedding-3-large}
 \label{subsubsec:Metodologia.2.1.3}
 
 Lançado em janeiro de 2024, o modelo \textit{text-embedding-3-large}, juntamente com o \textit{text-embedding-3-small}, representa uma nova geração de modelos de vetorização textual desenvolvidos pela OpenAI, caracterizando-se por sua maior capacidade e desempenho superior em tarefas de representação semântica. Este modelo é capaz de gerar \textit{embeddings} com até 3.072 dimensões, o que possibilita uma codificação mais rica e detalhada de textos em espaços vetoriais de alta dimensionalidade.
 
-O modelo \textit{text-embedding-3-large} apresenta desempenho substancialmente superior ao \textit{text-embedding-ada-002}, com destaque para os ganhos observados nos benchmarks MIRACL (de 31,4\% para 54,9\%) e MTEB (de 61,0\% para 64,6\%), indicando avanços consistentes na qualidade dos \textit{embeddings} em tarefas de recuperação de informações, similaridade semântica, classificação e ranqueamento.
+O modelo \textit{text-embedding-3-large} apresenta desempenho substancialmente superior ao \textit{text-embedding-ada-002}, com destaque para os ganhos observados nos \textit{benchmarks} MIRACL (de 31,4\% para 54,9\%) e MTEB (de 61,0\% para 64,6\%), indicando avanços consistentes na qualidade dos \textit{embeddings} em tarefas de recuperação de informações, similaridade semântica, classificação e ranqueamento.
 
 A adoção do \textit{text-embedding-3-large} é, portanto, recomendada para aplicações que exigem representações vetoriais de alta fidelidade, particularmente em contextos multilíngues e domínios que demandam precisão semântica elevada.
 
@@ -322,7 +334,7 @@ A adoção do \textit{text-embedding-3-large} é, portanto, recomendada para apl
 Desenvolvida pela \textit{Aliyun} ou \textit{Alibaba Cloud}, uma das subsidiárias do conglomerado chinês Alibaba Group voltada para o mercado de computação em nuvem, a série de modelos \textit{GTE-Multilingual} (\textit{mGTE}) -- uma reformulação do \textit{General Text Embedding} (\textit{GTE}) -- foi apresentada em novembro de 2024. A empresa aponta que o conjunto de modelos
 
 \begin{citacao}
-    \textit{offers high performance, long-context handling, multilingual support, and elastic embedding, significantly improving retrieval and ranking efficiency (...) [being, therefore,] suitable for a wide range of advanced \ac{RAG} applications}. \cite{GTE:1}
+    \textit{offers high performance, long-context handling, multilingual support, and elastic embedding, significantly improving retrieval and ranking efficiency (...) [being, therefore,] suitable for a wide range of advanced \ac{RAG} applications} \cite{GTE:1}.
     \footnote{oferece um alto desempenho, tratamento de contextos longos, suporte multi-idiomas e \textit{embeddings} com tamanho ajustável, aprimorando significativamente a eficiência na recuperação e re-rankeamento/reclassificação, (...) [sendo, portanto,] adequadas ao uso em uma ampla gama de aplicações avançadas de \ac{RAG}. (Tradução nossa)}
 \end{citacao}
 
@@ -358,29 +370,29 @@ Temos, portanto, os seguintes modelos adicionais:
 \begin{itemize}
     \item \textbf{Llama3.1:latest}: modelo que detalhado na Seção \ref{subsec:Assistente.2.1}, desenvolvido pela Meta AI. Trata-se de um \ac{LLM}, por natureza otimizado para geração de texto. Será utilizado por meio da ferramenta Ollama (Seção \ref{subsec:Assistente.2.3}).
     \item \textbf{DeepSeek-r1:7b}: modelo destilado do \textit{DeepSeek-r1}, da DeepSeek, baseado na arquitetura \textit{qwen2}, detalhado na Seção \ref{subsec:Assistente.2.2} Também se trata de um \ac{LLM}, sendo a geração de texto seu fim principal. Assim como no caso do \textit{Llama3.1}, lançaremos mão da ferramenta Ollama para utilizar o modelo.
-    \item \textbf{bert-base-cased-squad-v1.1-portuguese} (\textit{BERT-QA}): baseado no modelo \textit{BERTimbau Base} (uma versão do \textit{BERT} pré-treinada para português do Brasil, desenvolvida pela Neuralmind.ai), este modelo teve um ajuste fino para utilização em aplicações de perguntas e respostas (\textit{Q\&A Systems}) -- para isso utilizando uma versão em português do \textit{Stanford Question Answering Dataset} (\textit{SQuAD}). \cite{BERT_QA:1}
+    \item \textbf{bert-base-cased-squad-v1.1-portuguese} (\textit{BERT-QA}): baseado no modelo \textit{BERTimbau Base} (uma versão do \textit{BERT} pré-treinada para português do Brasil, desenvolvida pela Neuralmind.ai), este modelo teve um ajuste fino para utilização em aplicações de perguntas e respostas (\textit{Q\&A Systems}) -- para isso utilizando uma versão em português do \textit{Stanford Question Answering Dataset} (\textit{SQuAD}) \cite{BERT_QA:1}.
 \end{itemize}
 
 \subsubsection{Limitações de Tamanho de Entrada}
 \label{subsubsec:Metodologia.2.1.7}
 
-Modelos de geração de \textit{embeddings} possuem restrições quanto ao número máximo de \textit{tokens} os quais são capazes de processar por cada entrada de texto a ser vetorizado, uma limitação que afeta diretamente o volume de texto sobre o qual o modelo pode ser aplicado. Conhecer a capacidade de cada modelo é essencial para definir estratégias de segmentação de documentos, especialmente diante da possibilidade de tratamento de textos longos.
+Modelos de geração de \textit{embeddings} possuem restrições quanto ao número máximo de \textit{tokens} que são capazes de processar por cada entrada de texto a ser vetorizado, uma limitação que afeta diretamente o volume de texto sobre o qual o modelo pode ser aplicado. Conhecer a capacidade de cada modelo é essencial para definir estratégias de segmentação de documentos, especialmente diante da possibilidade de tratamento de textos longos.
 
-A Tabela~\ref{tab:num-maximo-tokens} apresenta o número máximo de \textit{tokens} suportado pelos modelos apresentados na Seção anterior. Modelos baseados na arquitetura \textit{BERT} ou variantes similares (como \textit{GTE}, \textit{BGE-m3}, \textit{instructor-xl} e \textit{BERT-QA}) geralmente suportam até 512 \textit{tokens}, o que exige particionamento cuidadoso de textos longos. Por outro lado, modelos mais recentes e robustos, como os da família \textit{Llama} e \textit{DeepSeek}, além dos modelos proprietários da OpenAI (\textit{ada-002} e \textit{3-large}), oferecem suporte para entradas significativamente maiores, com capacidade próxima ou superior a 8.000 \textit{tokens}.
+A Tabela~\ref{tab:num-maximo-tokens} apresenta o número máximo de \textit{tokens} suportado pelos modelos apresentados na seção anterior. Modelos baseados na arquitetura \textit{BERT} ou variantes similares (como \textit{GTE}, \textit{BGE-m3}, \textit{instructor-xl} e \textit{BERT-QA}) geralmente suportam até 512 \textit{tokens}, o que exige particionamento cuidadoso de textos longos. Por outro lado, modelos mais recentes e robustos, como os da família \textit{Llama} e \textit{DeepSeek}, além dos modelos proprietários da OpenAI (\textit{ada-002} e \textit{3-large}), oferecem suporte para entradas significativamente maiores, com capacidade próxima ou superior a 8.000 \textit{tokens}.
 
 \begin{table}[H]
-    \caption{Quantitativos de artigos e Fragmentos por Documento}
+    \caption{Especificações dos Modelos de \textit{Embeddings}}
     \centering
-    \begin{tabular}{ l c c }
+    \begin{tabular}{ l r r }
         \hline
-        \textbf{Modelo} & \textbf{Num. Max \textit{Tokens}} & \textbf{Tamanho do Vetor} \\  
+        \textbf{Modelo} & \textbf{Número Máximo de \textit{Tokens}} & \textbf{Tamanho do Vetor} \\  
         \hline
-        \textit{GTE} & 512 & 768 \\
-        \textit{BGE-m3} & 512 & 1.024 \\
+        \textit{GTE} & 8.192 & 768 \\
+        \textit{BGE-m3} & 8.192 & 1.024 \\
         \textit{instructor-xl} & 512 & 768 \\
-        \textit{BERT-QA} & 512 & 768\\
-        \textit{Llama3.1} & $\geq 8192$ & 4.096 \\
-        \textit{DeepSeek-r1:7b} & $\approx 8192$ & 3.584 \\
+        \textit{BERT-QA} & 512 & 768 \\
+        \textit{Llama3.1} & $\geq 130.000$ & 4.096 \\
+        \textit{DeepSeek-r1:7b} & $\approx 32.768$ & 3.584 \\
         \textit{ada-002} (OpenAI) & 8.191 & 1.536 \\
         \textit{3-large} (OpenAI) & 8.191 & 3.072 \\
         \hline
@@ -396,7 +408,7 @@ Além da qualidade das representações geradas pelos modelos, suas limitações
 \subsection{Exploração Inicial da Qualidade dos \textit{Embeddings} Gerados}
 \label{subsec:Metodologia.2.2}
 
-Como uma forma de realizar uma exploração inicial da qualidade dos \textit{embeddings} gerados por cada um dos modelos, buscamos utilizá-los para gerar representações vetoriais de um conjunto de documentos textuais de naturezas variadas, cujos \textit{embeddings} nos servirão como recurso para realizar as avaliações.
+Como uma forma de realizar uma exploração inicial da qualidade dos \textit{embeddings} gerados por cada um dos modelos, os utilizaremos para gerar representações vetoriais de um conjunto de documentos textuais de naturezas variadas, cujos \textit{embeddings} nos servirão como recurso para realizar as avaliações.
 
 O conjunto de dados em questão utiliza uma seleção de excertos textuais com conteúdo pertinente a diversas áreas e temas:
 
@@ -411,96 +423,20 @@ O conjunto de dados em questão utiliza uma seleção de excertos textuais com c
     \item \textbf{\texttt{regimento\_alern.txt}}: texto completo do Regimento Interno da Alern.
 \end{enumerate}
 
-Os documentos passaram por uma fragmentação simples, sendo divididos em conjuntos de orações completas, os quais se limitaram ao comprimento máximo de 500 palavras, após o que foram vetorizados utilizando cada um dos modelos de geração de \textit{embeddings} apresentados na Seção \ref{subsec:Metodologia.2.1}, sendo o resultado armazenado para realização das análises a que nos propomos. Essa exploração consiste em utilizar os \textit{embeddings} para (1) utilizar como dados de treinamento para um classificador simples -- de forma a considerar a eficiência dos modelos em capturar as especificidades semânticas de cada um dos temas abordados pelos documentos; e (2) realizar particionamento do conjunto de dados em \textit{clusters} -- como forma de avaliar o quão bem cada modelo consegue capturar a similitude/discrepância entre fragmentos de documentos abordando temas diversos.
+Os documentos serão fragmentados de forma simples, sendo divididos em conjuntos de orações completas, limitados ao comprimento máximo de 500 palavras, após o que serão vetorizados utilizando cada um dos modelos de geração de \textit{embeddings} apresentados na Seção \ref{subsec:Metodologia.2.1}, sendo o resultado armazenado para realização das análises a que nos propomos. Essa exploração consiste em utilizar os \textit{embeddings} para (1) utilizar como dados de treinamento para um classificador simples -- de forma a considerar a eficiência dos modelos em capturar as especificidades semânticas de cada um dos temas abordados pelos documentos; e (2) realizar particionamento do conjunto de dados em \textit{clusters} -- como forma de avaliar o quão bem cada modelo consegue capturar a similitude/discrepância entre fragmentos de documentos abordando temas diversos.
 
-Adicionalmente, realizaremos a comparação dos \textit{embeddings} gerados em dois contextos:
+Adicionalmente, realizaremos a comparação dos \textit{embeddings} gerados em dois contextos, cada um correspondendo a um dos seguintes conjuntos de documentos:
 
 \begin{itemize}
-    \item \textbf{Dataset 1} — análise de um conjunto de documentos com \textit{estilos, formas e conteúdos distintos}, utilizando os arquivos: \texttt{apocrifo.txt}, \texttt{cabala.txt}, \texttt{comunismo.txt}, \texttt{culinaria.txt}, \texttt{fisica.txt}, \texttt{historia.txt} e \texttt{regimento\_al.txt};
-    \item \textbf{Dataset 2} — justaposição de documentos com \textit{estilos e formas semelhantes, porém com conteúdo diverso}, utilizando os arquivos: \texttt{regimento\_al.txt} e \texttt{cod\_penal.txt}.
+    \item \textbf{Conjunto de documentos 1} — análise de um conjunto de documentos com \textit{estilos, formas e conteúdos distintos}, utilizando os arquivos: \texttt{apocrifo.txt}, \texttt{cabala.txt}, \texttt{comunismo.txt}, \texttt{culinaria.txt}, \texttt{fisica.txt}, \texttt{historia.txt} e \texttt{regimento\_al.txt};
+    \item \textbf{Conjunto de documentos 2} — justaposição de documentos com \textit{estilos e formas semelhantes, porém com conteúdo diverso}, utilizando os arquivos: \texttt{regimento\_al.txt} e \texttt{cod\_penal.txt}.
 \end{itemize}
 
-Com o objetivo de obter uma intuição visual mais clara acerca da similaridade ou dissimilaridade entre os arquivos utilizados em cada conjunto de dados, realizamos uma representação gráfica dos \textit{embeddings} gerados por cada modelo. Para isso, aplicamos uma técnica de redução de dimensionalidade, uma vez que os \textit{embeddings} operam em espaços vetoriais de alta dimensão, o que inviabiliza sua visualização direta. A técnica escolhida foi \textit{\ac{TSNE}}, que preserva, de forma eficaz, tanto a estrutura local quanto a estrutura global dos dados em espaços de menor dimensão. Assim, ao projetarmos os vetores em um espaço bidimensional, conseguimos observar visualmente como os documentos se agrupam ou se separam com base em suas características semânticas. Essa representação imagética permite uma análise exploratória complementar, possibilitando identificar padrões de proximidade, dispersão ou sobreposição entre os documentos. As Figuras~\ref{fig:embeddings-1} e~\ref{fig:embeddings-2} ilustram, respectivamente, os resultados obtidos para o Dataset~1 e o Dataset~2, evidenciando as distinções na organização espacial dos conteúdos analisados.
+Com o objetivo de obter uma intuição visual mais clara acerca da similaridade ou dissimilaridade entre os arquivos utilizados em cada conjunto de dados, realizaremos uma representação gráfica dos \textit{embeddings} gerados por cada modelo. Para isso, aplicaremos uma técnica de redução de dimensionalidade, uma vez que os \textit{embeddings} operam em espaços vetoriais de alta dimensão, o que inviabiliza sua visualização direta. A técnica escolhida foi \textit{\ac{TSNE}} \cite{TSNE}, que preserva, de forma eficaz, tanto a estrutura local quanto a estrutura global dos dados em espaços de menor dimensão. Assim, ao projetarmos os vetores em um espaço bidimensional, conseguimos observar visualmente como os documentos se agrupam ou se separam com base em suas características semânticas. Essa representação imagética permite uma análise exploratória complementar, possibilitando identificar padrões de proximidade, dispersão ou sobreposição entre as diversas representações dos documentos por \textit{embeddings}.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.74\linewidth]{Imagens/embeddings_1.png}
-    \caption{Representação em baixa dimensão do dataset 1}
-    Fonte: autoria própria
-    \label{fig:embeddings-1}
-\end{figure}
+Para a avaliar (somente de forma exploratória, sem intuito de otimização) o comportamento dos modelos sobre dados com estilos distintos com classificação, empregaremos um classificador simples, utilizando o algoritmo \textit{Random Forest} -- por meio da classe \texttt{RandomForestClassifier} disponível na biblioteca \texttt{sklearn.ensemble}, instanciada com seus valores padrão e usando \texttt{n\_estimators=100}. Após o treinamento, a avaliação do desempenho preditivo do classificador será realizada utilizando duas métricas: acurácia e coeficiente de correlação de Matthews (MCC), bem como F1-Score Macro e Ponderado.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.74\linewidth]{Imagens/embeddings_2.png}
-    \caption{Representação em baixa dimensão do dataset 2}
-    Fonte: autoria própria
-    \label{fig:embeddings-2}
-\end{figure}
-
-
-Para a avaliar o comportamento dos modelos sobre dados com estilos distintos com classificação, foi empregado o algoritmo \textit{Random Forest} -- por meio da classe \texttt{RandomForestClassifier} disponível na biblioteca \texttt{sklearn.ensemble}. Após o treinamento, a avaliação do desempenho preditivo do classificador foi realizada utilizando duas métricas: acurácia e coeficiente de correlação de Matthews (MCC).
-
-A acurácia é definida como a proporção de previsões corretas (tanto de positivos quanto de negativos) em relação ao total de exemplos avaliados, sendo uma métrica intuitiva e amplamente utilizada, especialmente em cenários com classes balanceadas. No entanto, como sua interpretação pode ser enganosa em contextos em que há uma disparidade muito grande entre os números de instâncias em cada classe, também foi utilizada, como forma de contornar essa limitação, o \ac{MCC}, uma medida mais robusta de qualidade do modelo, especialmente recomendada em cenários com distribuições desbalanceadas de classes. O \ac{MCC} leva em consideração todas as quatro componentes da matriz de confusão (verdadeiros positivos, verdadeiros negativos, falsos positivos e falsos negativos), e produz um valor entre –1 e +1, de forma que +1 indica uma predição perfeita, 0 indica desempenho equivalente ao acaso e –1 indica uma total discordância entre predições e rótulos verdadeiros.
-
-A inclusão do \ac{MCC} na avaliação permite uma análise mais abrangente e confiável do desempenho do modelo, complementando os valores expressos pela acurácia.
-
-A Tabela \ref{tab:scores-classificacao-1} apresenta os resultados da classificação feita sobre Dataset~1, composto por documentos com estilos, formas e conteúdos distintos, ao passo que os resultados da classificação feita sobre o Dataset~2, cujo conteúdo é dois documentos que diferem somente no conteúdo, estão dispostos na Tabela \ref{tab:scores-classificacao-1}.
-
-\begin{table}[H]
-    \centering    
-    \begin{minipage}{0.48\textwidth}
-        \caption{Resultados do Dataset 1}
-        \centering
-        \begin{tabular}{ l c c }
-            \hline
-            \textbf{Modelo} & \textbf{Acurácia} & \textbf{MCC} \\  
-            \hline
-            \textit{GTE} & 1,00 & 1,00 \\
-            \textit{BGE-m3}  & 1,00 & 1,00 \\
-            \textit{instructor-xl} & 1,00 & 1,00 \\
-            \textit{BERT-QA} & 0,98 & 0,98 \\
-            \textit{Llama3.1} & 1,00 & 1,00 \\
-            \textit{DeepSeek-r1}  & 0,94 & 0,92 \\
-            \textit{ada-002} (OpenAI) & 1,00 & 1,00 \\
-            \textit{3-large} (OpenAI) & 1,00 & 1,00 \\
-            \hline
-        \end{tabular}           
-        \vspace{2mm}
-        \small Fonte: O autor (2025)
-        \label{tab:scores-classificacao-1}
-    \end{minipage}    
-    \hfill    
-    \begin{minipage}{0.48\textwidth}
-        \caption{Resultados do Dataset 2}
-        \centering
-        \begin{tabular}{ l c c }
-            \hline
-            \textbf{Modelo} & \textbf{Acurácia} & \textbf{MCC} \\  
-            \hline
-            \textit{GTE} & 0,99 & 0,97 \\
-            \textit{BGE-m3} & 0,99 & 0,99 \\
-            \textit{instructor-xl} & 0,99 & 0,99 \\
-            \textit{BERT-QA} & 0,99 & 0,99 \\
-            \textit{Llama3.1} & 0,99 & 0,99 \\
-            \textit{DeepSeek-r1 }& 0,94 & 0,89 \\
-            \textit{ada-002} (OpenAI) & 0,99 & 0,99 \\
-            \textit{3-large} (OpenAI) & 1,00 & 1,00 \\
-            \hline
-        \end{tabular}       
-        \vspace{2mm}
-        \small Fonte: O autor (2025)
-        \label{tab:scores-classificacao-2}
-    \end{minipage}
-    
-\end{table}
-
-Os resultados obtidos tanto para o Dataset~1 quanto para o Dataset~2 indicam capacidade preditiva equivalente entre os modelos avaliados, com exceção do \textit{DeepSeek-r1}, que apresentou desempenho significativamente inferior em comparação aos demais.
-
-
-
-
-De forma a avaliar o comportamento dos modelos sobre textos com mesmo estilo, mas conteúdo diverso usando \textit{clustering} sobre as representações vetoriais geradas, foram utilizados os algoritmos de particionamento \textit{K-Means}, implementado pela função \texttt{KMeans} do módulo \texttt{sklearn.cluster}, e \textit{DBScan}, com implementação por \texttt{sklearn.cluster.DBSCAN}. Neste experimento, como aprioristicamente sabemos a quantidade de partições (documentos com temas bem definidos) foi fixado o valor de \textit{k} em \textit{7} para o Dataset~1 e \textit{2} para o Dataset~2.
+De forma a avaliar o comportamento dos modelos sobre textos com mesmo estilo, mas conteúdo diverso usando \textit{clustering} sobre as representações vetoriais geradas, utilizaremos os algoritmos de particionamento \textit{K-Means}, implementado pela função \texttt{KMeans} do módulo \texttt{sklearn.cluster}, e DBSCAN, com implementação por \texttt{sklearn.cluster.DBSCAN}. Neste experimento, como aprioristicamente sabemos a quantidade de partições (documentos com temas bem definidos) o valor de \textit{k} será fixado em \textit{7} para o Conjunto de Documentos 1 e \textit{2} para o Conjunto de Documentos 2.
 
 Para avaliar a qualidade das partições, foram utilizadas duas métricas internas:
 
@@ -512,216 +448,7 @@ Para avaliar a qualidade das partições, foram utilizadas duas métricas intern
 
 Assim, aferindo a coesão intra-partição e a separação inter-partições, é possível comparar de forma objetiva a capacidade de organização semântica dos diferentes modelos de \textit{embedding}. A coesão serve como um indicador representativo do quão bem cada modelo consegue identificar assuntos de um tema específico (similarmente ao que a etapa de classificação realizada anteriormente sugere), ao passo que a separação pode ser usada como uma medida substituta para avaliar o quanto o modelo gera \textit{embeddings} que confundem assuntos distintos como correlatos.
 
-As Tabelas \ref{tab:kmeans-dataset1-sem-reducao} a \ref{tab:dbscan-dataset2-sem-reducao} apresentam os resultados da aplicação tanto do \textit{K-Means} quanto do \textit{DBScan} sobre as representações vetoriais geradas pelos modelos de \textit{embeddings} sendo avaliados, sem fazer neles quaisquer tipos de alteração. Assim sendo, são vetores de alta dimensionalidade, variando de acordo com o modelo (\textit{GTE}: 768 dimensões, \textit{BGE-m3}: 1.024 dimensões, \textit{instructor-xl}: 768 dimensões, \textit{BERT-QA}: 768 dimensões, \textit{Llama3.1}: 4.096 dimensões, \textit{DeepSeek-r1}: 3.584 dimensões, \textit{ada-002}: 1.536 dimensões e \textit{3-large}: 3.072 dimensões.
-
-Quanto às As Tabelas \ref{tab:kmeans-dataset1-com-reducao} a \ref{tab:dbscan-dataset2-com-reducao}, nelas são expostos os resultados da aplicação dos algoritmos de particionamento sobre a versão com dimensionalidade reduzida de cada conjunto de \textit{embeddings}, com \textit{3} dimensões, geradas pelo uso de \ac{TSNE}, as quais foram utilizadas para gerar as Figuras \ref{fig:embeddings-1} e \ref{fig:embeddings-2}, já apresentadas. 
-
-\begin{table}
-    \centering
-    % Primeira linha
-    \begin{minipage}{0.48\textwidth}
-        \caption{Kmeans -- Dataset 1}
-        \centering
-        \begin{tabular}{ l c c }
-            \hline
-            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
-            \hline
-            \textit{GTE} & 0,08 & 3,50 \\
-            \textit{BGE-m3} & 0,08 & 3,44 \\
-            \textit{instructor-xl} & 0,10 & 3,03 \\
-            \textit{BERT-QA} & 0,15 & 2,26 \\
-            \textit{Llama3.1} & 0,14 & 2,30 \\
-            \textit{DeepSeek-r1} & 0,08 & 2,44 \\
-            \textit{ada-002} (OpenAI) & 0,09 & 3,07 \\
-            \textit{3-large} (OpenAI) & 0,17 & 2,24 \\
-            \hline
-        \end{tabular}
-        \vspace{2mm}
-        \small Fonte: O autor (2025)
-        \label{tab:kmeans-dataset1-sem-reducao}
-    \end{minipage}
-    \hfill
-    \begin{minipage}{0.48\textwidth}
-        \caption{Kmeans -- Dataset 2}
-        \centering
-        \begin{tabular}{ l c c }
-            \hline
-            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
-            \hline
-            \textit{GTE} & 0,04 & 4,03 \\
-            \textit{BGE-m3} & 0,06 & 3,97 \\
-            \textit{instructor-xl} & 0,05 & 3,74 \\
-            \textit{BERT-QA} & 0,09 & 2,81 \\
-            \textit{Llama3.1} & 0,14 & 2,15 \\
-            \textit{DeepSeek-r1} & 0,11 & 2,28 \\
-            \textit{ada-002} (OpenAI) & 0,04 & 4,00 \\
-            \textit{3-large} (OpenAI) & 0,05 & 3,90 \\
-            \hline
-        \end{tabular}
-        \vspace{2mm}
-        \small Fonte: O autor (2025)
-        \label{tab:kmeans-dataset2-sem-reducao}
-    \end{minipage}
-
-    \vspace{5mm} % espaço entre as linhas
-
-    % Segunda linha
-    \begin{minipage}{0.48\textwidth}
-        \caption{DBScan -- Dataset 1}
-        \centering
-        \begin{tabular}{ l c c }
-            \hline
-            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
-            \hline
-            \textit{GTE} & ** & ** \\
-            \textit{BGE-m3} & ** & ** \\
-            \textit{instructor-xl} & 0,17 & 1,99 \\
-            \textit{BERT-QA} & ** & ** \\
-            \textit{Llama3.1} & 0,26 & 1,61 \\
-            \textit{DeepSeek-r1} & ** & ** \\
-            \textit{ada-002} (OpenAI) & 0,18 & 2,35 \\
-            \textit{3-large} (OpenAI) & ** & ** \\
-            \hline
-        \end{tabular}
-        \vspace{2mm}
-        \small Fonte: O autor (2025)
-        \label{tab:dbscan-dataset1-sem-reducao}
-    \end{minipage}
-    \hfill
-    \begin{minipage}{0.48\textwidth}
-        \caption{DBScan -- Dataset 2}
-        \centering
-        \begin{tabular}{ l c c }
-            \hline
-            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
-            \hline
-            \textit{GTE} & ** & ** \\
-            \textit{BGE-m3} & ** & ** \\
-            \textit{instructor-xl} & ** & ** \\
-            \textit{BERT-QA} & ** & ** \\
-            \textit{Llama3.1} & 0,30 & 1,25 \\
-            \textit{DeepSeek-r1} & 0,39 & 1,21 \\
-            \textit{ada-002} (OpenAI) & ** & ** \\
-            \textit{3-large} (OpenAI) & ** & ** \\
-            \hline
-        \end{tabular}
-        \vspace{2mm}
-        \small Fonte: O autor (2025)
-        \label{tab:dbscan-dataset2-sem-reducao}
-    \end{minipage}
-    
-    \vspace{-2mm}
-    \begin{center}
-        \small \textbf{Nota}: Valores marcados com \textbf{**} indicam que o DBScan não encontrou ao menos 2 \textit{clusters}.
-    \end{center}
-\end{table}
-
-% CLUSTERING
-\begin{table}
-    \centering
-    % Primeira linha
-    \begin{minipage}{0.48\textwidth}
-        \caption{Kmeans -- Dataset 1 -- 3D}
-        \centering
-        \begin{tabular}{ l c c }
-            \hline
-            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
-            \hline
-            \textit{GTE} & 0,65 & 0,53 \\
-            \textit{BGE-m3} & 0,49 & 1,27 \\
-            \textit{instructor-xl} & 0,59 & 0,66 \\
-            \textit{BERT-QA} & 0,74 & 0,40 \\
-            \textit{Llama3.1} & 0,58 & 0,69 \\
-            \textit{DeepSeek-r1} & 0,59 & 0,43 \\
-            \textit{ada-002} (OpenAI) & 0,45 & 0,99 \\
-            \textit{3-large} (OpenAI) & 0,60 & 0,60 \\
-            \hline
-        \end{tabular}
-        \vspace{2mm}
-        \small Fonte: O autor (2025)
-        \label{tab:kmeans-dataset1-com-reducao}
-    \end{minipage}
-    \hfill
-    \begin{minipage}{0.48\textwidth}
-        \caption{Kmeans -- Dataset 2 -- 3D}
-        \centering
-        \begin{tabular}{ l c c }
-            \hline
-            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
-            \hline
-            \textit{GTE} & 0,89 & 0,16 \\
-            \textit{BGE-m3} & 0,90 & 0,15 \\
-            \textit{instructor-xl} & 0,87 & 0,18 \\
-            \textit{BERT-QA} & 0,85 & 0,22 \\
-            \textit{Llama3.1} & 0,40 & 0,86 \\
-            \textit{DeepSeek-r1} & 0,58 & 0,48 \\
-            \textit{ada-002} (OpenAI) & 0,90 & 0,14 \\
-            \textit{3-large} (OpenAI) & 0,87 & 0,20 \\
-            \hline
-        \end{tabular}
-        \vspace{2mm}
-        \small Fonte: O autor (2025)
-        \label{tab:kmeans-dataset2-com-reducao}
-    \end{minipage}
-
-    \vspace{5mm} % espaço entre as linhas
-
-    % Segunda linha
-    \begin{minipage}{0.48\textwidth}
-        \caption{DBScan -- Dataset 1 -- 3D}
-        \centering
-        \begin{tabular}{ l c c }
-            \hline
-            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
-            \textit{GTE} & 0,85 & 0,26 \\
-            \textit{BGE-m3} & 0,54 & 0,35 \\
-            \textit{instructor-xl} & 0,84 & 0,27 \\
-            \textit{BERT-QA} & 0,75 & 0,43 \\
-            \textit{Llama3.1} & 0,74 & 0,36 \\
-            \textit{DeepSeek-r1} & 0,46 & 0,49 \\
-            \textit{ada-002} (OpenAI) & 0,90 & 0,13 \\
-            \textit{3-large} (OpenAI) & 0,91 & 0,11 \\
-            \hline
-        \end{tabular}
-        \vspace{2mm}
-        \small Fonte: O autor (2025)
-        \label{tab:dbscan-dataset1-com-reducao}
-    \end{minipage}
-    \hfill
-    \begin{minipage}{0.48\textwidth}
-        \caption{DBScan -- Dataset 2 -- 3D}
-        \centering
-        \begin{tabular}{ l c c }
-            \hline
-            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
-            \hline
-            \textit{GTE} & 0,89 & 0,16 \\
-            \textit{BGE-m3} & 0,48 & 0,64 \\
-            \textit{instructor-xl} & 0,87 & 0,18 \\
-            \textit{BERT-QA} & 0,85 & 0,22 \\
-            \textit{Llama3.1} & 0,68 & 0,46 \\
-            \textit{DeepSeek-r1} & 0,66 & 0,37 \\
-            \textit{ada-002} (OpenAI) & 0,90 & 0,14 \\
-            \textit{3-large} (OpenAI) & 0,18 & 0,83 \\
-            \hline
-        \end{tabular}
-        \vspace{2mm}
-        \small Fonte: O autor (2025)
-        \label{tab:dbscan-dataset2-com-reducao}
-    \end{minipage}
-\end{table}
-
-A análise do arranjo estrutural dos \textit{embeddings} em alta dimensionalidade mostra que, embora alguns modelos apresentem separabilidade e coesão sensivelmente melhores que os outros modelos em certos casos, a complexidade do espaço vetorial dificulta a avaliação precisa da qualidade dos agrupamentos. Modelos como \textit{Llama3.1} e \textit{DeepSeek-r1} exibem organização estrutural mais clara, principalmente para algoritmos baseados em densidade, enquanto outros, como \textit{GTE} e \textit{BGE-m3}, têm dificuldades em formar \textit{clusters} significativos. A alta dimensionalidade gera dispersão e heterogeneidade que comprometem a obtenção de métricas consistentes e interpretáveis.
-
-Nesse sentido, a redução de dimensionalidade se revela uma ferramenta eficaz para melhorar a avaliação dos \textit{embeddings}. Ao representar os vetores em espaços de menor dimensão, torna-se possível evidenciar estruturas latentes e identificar agrupamentos semanticamente mais coerentes, o que se reflete em melhorias nas métricas de \textit{Silhouette} e \textit{Davies-Bouldin}. Assim, a redução dimensional facilita uma análise mais clara e robusta da qualidade dos \textit{embeddings}, além de apoiar a seleção dos modelos mais adequados para tarefas que dependem da organização semântica dos dados.
-
-A avaliação estrutural das representações vetoriais com dimensionalidade reduzida evidencia uma melhora significativa nas métricas de agrupamento para a maioria dos modelos, com índices de \textit{Silhouette} próximos ou superiores a \textit{0,85} e valores de DB inferiores a \textit{0,30} para os melhores casos, como \textit{GTE}, \textit{BGE-m3}, \textit{ada-002} e \textit{instructor-xl}. Esses resultados indicam que, nessa representação compacta, os \textit{embeddings} desses modelos apresentam agrupamentos mais coesos e melhor separados, refletindo uma organização semântica mais clara e consistente, em relação aos demais.
-
-Por outro lado, modelos como \textit{Llama3.1} e \textit{DeepSeek-r1}, que foram um pouco melhores em alta dimensionalidade, apresentaram queda expressiva na qualidade dos agrupamentos após o ``achatamento dimensional'', com \textit{Silhouette} reduzidos e aumento dos índices DB. Em suma, a redução dimensional torna mais evidentes os agrupamentos formados por \textit{embeddings} semanticamente mais compactos, favorecendo a avaliação e comparação dos modelos, enquanto revela limitações daqueles cujas representações dependem de espaços vetoriais mais complexos e dispersos.
-
 Consideradas essas intuições iniciais sobre os modelos de \textit{embeddings}, serão feitas avaliações sobre seu desempenho no contexto de recuperação de conteúdo por meio das aferições de resultados com outros conjuntos de dados e por meio de outros métodos e métricas. Esse processo será executado conforme disposto na Seção \ref{sec:Metodologia.6}, em especial na Seção \ref{subsec:Metodologia.6.1}, com os resultados expostos na Seção \ref{subsec:Resultados.2.1}.
-
-
 
 \subsection{Ingestão de Dados no Banco Vetorial}
 \label{subsec:Metodologia.2.3}
@@ -730,14 +457,14 @@ A inclusão dos documentos no banco vetorial, o Chroma DB, em forma de seus frag
 
 A estrutura final de cada uma das entradas no Chroma DB se configura como se segue:
 \begin{itemize}
-    \item id: identificador único da entrada (fragmento)
-    \item page\_content: texto original do fragmento
-    \item metadata: metadados com informações relevantes a respeito do fragmento, bem como do documento como um todo, incluindo:
+    \item \texttt{id}: identificador único da entrada (fragmento)
+    \item \texttt{page\_content}: texto original do fragmento
+    \item \texttt{metadata}: metadados com informações relevantes a respeito do fragmento, bem como do documento como um todo, incluindo:
     \begin{itemize}
-        \item título: O título do documento original
-        \item subtítulo: O número do artigo e indicador nos casos de subdivisão de conteúdo
-        \item autor: Entidade/sujeito autor do documento
-        \item fonte: Link para o arquivo de origem do documento
+        \item \texttt{título}: O título do documento original
+        \item \texttt{subtítulo}: O número do artigo e indicador nos casos de subdivisão de conteúdo
+        \item \texttt{autor}: Entidade/sujeito autor do documento
+        \item \texttt{fonte}: Link para o arquivo de origem do documento
     \end{itemize}
 \end{itemize}
 
@@ -752,13 +479,13 @@ A etapa principal da inclusão de documentos em um banco vetorial consiste na ge
         \hline
         \textbf{Coleção} & \textbf{Modelo Utilizado} \\  
         \hline
-        documentos\_rh\_bge\_m3 & BAAI/BGE-m3 \\
-        documentos\_rh\_openai & text-embedding-ada-002 \\
-        documentos\_rh\_alibaba & Alibaba-NLP/gte-multilingual-base \\
-        documentos\_rh\_instructor & hkunlp/instructor-xl \\
-        documentos\_rh\_bert\_pt & pierreguillou/bert-base-cased-squad-v1.1-portuguese \\
-        documentos\_rh\_deepseek & deepseek-r1:7b \\
-        documentos\_rh\_llama & Llama3.1 \\
+        \texttt{documentos\_rh\_bge\_m3} & \textit{BAAI/BGE-m3} \\
+        \texttt{documentos\_rh\_openai} & \textit{text-embedding-ada-002} \\
+        \texttt{documentos\_rh\_alibaba} & \textit{Alibaba-NLP/gte-multilingual-base} \\
+        \texttt{documentos\_rh\_instructor} & \textit{hkunlp/instructor-xl} \\
+        \texttt{documentos\_rh\_bert\_pt} & \textit{pierreguillou/bert-base-cased-squad-v1.1-portuguese} \\
+        \texttt{documentos\_rh\_deepseek} & \textit{deepseek-r1:7b} \\
+        \texttt{documentos\_rh\_llama} & \textit{Llama3.1} \\
         \hline
     \end{tabular}   
     
@@ -770,7 +497,7 @@ Após a inclusão, os documentos são passíveis de serem recuperados em consult
 
 \section{Configuração do LLM}
 \label{sec:Metodologia.3}
-A configuração dos modelos geradores de texto a serem testados e comparados, visto que foi feita a opção pelo uso do Ollama como meio de simplificar o processo, se deu de forma direta. Os arquivos de instalação do Ollama foram obtidos e executados diretamente da sua página de download. \cite{Ollama:2} Após a instalação, foi realizada a inclusão dos modelos selecionados (ver Seção \ref{sec:Assistente.2}), propriamente ditos, tornando-os disponíveis para utilização.
+A configuração dos modelos geradores de texto a serem testados e comparados, visto que foi feita a opção pelo uso do Ollama como meio de simplificar o processo, se deu de forma direta. Os arquivos de instalação do Ollama foram obtidos e executados diretamente da sua página de download \cite{Ollama:2}. Após a instalação, foi realizada a inclusão dos modelos selecionados (ver Seção \ref{sec:Assistente.2}), propriamente ditos, tornando-os disponíveis para utilização.
 
 Ao considerar as versões disponíveis dos modelos \textit{Llama} e \textit{DeepSeek}, levamos em consideração as limitações de recursos nas máquinas disponíveis, buscando dentre os modelos mais atuais opções robustas o suficiente para oferecer bons resultados, sem, contudo, necessitar de recursos para além dos disponíveis. Com isto, optamos pelas seguintes versões:
 
@@ -781,7 +508,7 @@ Ao considerar as versões disponíveis dos modelos \textit{Llama} e \textit{Deep
 
 Embora haja as versões mas recentes (\textit{Llama} 3.2 e 3.3) ou mais robustas (\textit{DeepSeek-r1} com 70B), elas são disponibilizadas  ou em tamanhos muito pequenos (tais como o \textit{Llama3.2:1b}), com resultados sub-ótimos para nossos recursos, ou em tamanhos demasiadamente grandes, extrapolando as limitações de \textit{hardware} disponível. 
 
-O Ollama disponibiliza a geração de respostas do modelo por meio de uma API REST, se encarregando de fazer o gerenciamento dos recursos disponíveis para a otimização processo. As requisições feitas à API apontam o modelo específico a ser utilizado (no caso de nossos testes, o \textit{Llama3.1} ou o \textit{DeepSeek-R1}); uma mensagem de sistema, que se encarrega de estabelecer a forma que o modelo deve seguir para gerar as respostas;  um o histórico de mensagens trocadas entre o usuário e a API em interações anteriores; e o \textit{prompt} em si, o qual contém tanto o conteúdo recuperado do banco vetorial, quanto a consulta do usuário. Ademais, acrescenta-se a configuração que determina se a resposta deve ser enviada \textit{token} a \textit{token}, à medida que é gerada, ou de forma inteiriça, com todo o conteúdo gerado sendo disponibilizado quando do término de sua produção pelo \ac{LLM}.
+O Ollama disponibiliza a geração de respostas do modelo por meio de uma API REST, se encarregando de fazer o gerenciamento dos recursos disponíveis para a otimização do processo. As requisições feitas à API apontam o modelo específico a ser utilizado (no caso de nossos testes, o \textit{Llama3.1} ou o \textit{DeepSeek-R1}); uma mensagem de sistema, que se encarrega de estabelecer a forma que o modelo deve seguir para gerar as respostas;  o histórico de mensagens trocadas entre o usuário e a API em interações anteriores; e o \textit{prompt} em si, o qual contém tanto o conteúdo recuperado do banco vetorial, quanto a consulta do usuário. Ademais, acrescenta-se a configuração que determina se a resposta deve ser enviada \textit{token} a \textit{token}, à medida que é gerada, ou de forma inteiriça, com todo o conteúdo gerado sendo disponibilizado quando do término de sua produção pelo \ac{LLM}.
 
 \begin{figure}[H]
     \centering
@@ -792,7 +519,7 @@ O Ollama disponibiliza a geração de respostas do modelo por meio de uma API RE
 \end{figure}
 
 
-De forma a direcionar o comportamento dos \ac{LLM}s na geração das respostas, cada requisição feita à API utiliza uma mensagem de sistema fixa, bem como um modelo de \textit{prompt} com uma estrutura pré-definida, alterando somente a pergunta feita e o teor dos documentos em que a resposta deve se basear. Assim, tal como é visível na Figura \ref{fig:pilha-mensagem-ollama}, os dados enviados à API têm a seguinte estrutura:
+De forma a direcionar o comportamento dos \ac{LLM}s na geração das respostas, cada requisição feita à API utiliza uma mensagem de sistema fixa, bem como um modelo de \textit{prompt} com uma estrutura pré-definida (ver Figura \ref{fig:pilha-mensagem-ollama}), alterando somente a pergunta feita e o teor dos documentos em que a resposta deve se basear. Assim, os dados enviados à API têm a seguinte estrutura:
 
 \begin{itemize}
     \item \textbf{Papel do \ac{LLM}}: Definição do papel que o modelo deve assumir, cujo teor é  
@@ -802,9 +529,9 @@ De forma a direcionar o comportamento dos \ac{LLM}s na geração das respostas, 
         \ttfamily
         \raggedright
         \sloppy
-        ``ALERN e ALRN significam Assembleia Legislativa do Estado do Rio Grande do Norte.
+        ``Alern e ALRN significam Assembleia Legislativa do Estado do Rio Grande do Norte.
         
-        Você é um assistente que responde a dúvidas de servidores da ALRN sobre o regimento interno da ALRN, o regime jurídico dos servidores estaduais do RN, bem como resoluções da ALRN.
+        Você é um assistente que responde a dúvidas de servidores da Alern sobre o regimento interno da Alern, o regime jurídico dos servidores estaduais do RN, bem como resoluções da Alern.
         
         Assuma um tom formal, porém caloroso, com gentileza nas respostas.
         
@@ -837,7 +564,7 @@ De forma a direcionar o comportamento dos \ac{LLM}s na geração das respostas, 
         
         Se você não souber a resposta, assuma um tom gentil e diga que não tem \\ informações suficientes para responder.
         
-        Caso a pergunta seja sobre temas que não envolvam busca de informação na documentação da ALERN, educadamente se recure a responder. Em nenhuma circunstância escreva texto que incite violência ou comportamento criminoso e inadequado.'';
+        Caso a pergunta seja sobre temas que não envolvam busca de informação na documentação da Alern, educadamente se recure a responder. Em nenhuma circunstância escreva texto que incite violência ou comportamento criminoso e inadequado.'';
         \end{minipage}
         }
         \end{quote}
@@ -896,7 +623,7 @@ Quando cada resposta é recebida, o usuário pode escolher avaliar a resposta re
     \label{fig:interface-assist-busca-resposta}
 \end{figure}
 
-Optamos, para fins de simplicidade, manter uma abordagem em que as perguntas e respostas do usuário são voláteis, de forma que, para o usuário, não há continuidade sessões de uso. Cada sessão (marcada pelo carregamento da página de \textit{chat}) se inicia com um histórico limpo de interações, de forma que a persistência dos dados das interações é feita e mantida somente para fins de avaliação, sem ser retomada pelo usuário em qualquer momento futuro.
+Optamos, para fins de simplicidade, manter uma abordagem em que as perguntas e respostas do usuário são voláteis, de forma que, para o usuário, não há continuidade entre as sessões de uso. Cada sessão (marcada pelo carregamento da página de \textit{chat}) se inicia com um histórico limpo de interações, de forma que a persistência dos dados das interações é feita e mantida somente para fins de avaliação, sem ser retomada pelo usuário em qualquer momento futuro.
 
 A mecânica de consulta consiste apenas de uma solicitação realizada à API de gerenciamento do fluxo de informações, por meio de requisição HTTP, que envia a pergunta ou frase de consulta a ser utilizada como critérios de busca no banco vetorial, bem como um vetor de \textit{embeddings} contendo os dados das interações mais recentes, o qual será utilizado como informação do contexto, junto ao \ac{LLM}, de forma a manter um senso de continuidade no \textit{chat}.
 
@@ -906,7 +633,7 @@ Considerando a natureza da tarefa a que se propõe a aplicação objeto deste es
 
 Ainda assim, uma das formas de avaliação do desempenho do Assistente de Busca como um todo a que pretendemos é do tipo qualitativa, baseando-se no parecer dado por especialistas nas matérias de que trata o corpus documental que foi selecionado para o desenvolvimento e testes. O grupo de especialistas inclui, dentre outros, servidores atuantes na \ac{CDHO}, da Assembleia Legislativa do Rio Grande do Norte, dado que a prática diária de suas atividades os torna familiarizados com os meandros das Resoluções e definições regimentais contidas na seleção de documentos abordada neste estudo.
 
-Assim, interagiriam os especialistas com a interface de usuário, inserindo perguntas sobre aspectos relevantes cobertos pelos atos normativos no conjunto de documentos selecionados. As interações dos especialistas não serão guiadas ou direcionadas, de forma que as perguntas feitas sejam orgânicas e o mais próximo possível do tipo de uso que o Assistente de Busca terá após sua implementação e disponibilização. Observarão, os avaliadores, as respostas geradas, aferindo quantitativamente a sua exatidão e fornecendo eles mesmos um texto breve com o teor do que deveria ser a resposta ideal.
+Assim, interagiriam os especialistas com a interface de usuário, inserindo perguntas sobre aspectos relevantes cobertos pelos atos normativos no conjunto de documentos selecionados. As interações dos especialistas não serão guiadas ou direcionadas, de forma que as perguntas feitas sejam orgânicas e o mais próximo possível do tipo de uso que o Assistente de Busca terá após sua implementação e disponibilização. Os avaliadores observarão as respostas geradas, aferindo quantitativamente a sua exatidão e fornecendo eles mesmos um texto breve com o teor do que deveria ser a resposta ideal.
 
 Os dados coletados da interação serão armazenados para análise posterior, e, a depender da quantidade de dados coletados, utilizados para eventual refinamento e ajuste fino dos modelos que servem de base para as camadas da ferramenta.
 
@@ -1078,7 +805,7 @@ O conjunto de textos da terceira abordagem é composto por mais de mil notícias
 \begin{table}[H]
     \caption{Descrição do dataset de notícias}
     \centering
-    \begin{tabular}{ l l }
+    \begin{tabular}{ l r }
         \hline
         \bfseries Característica & \bfseries Valor \\
         \hline
@@ -1099,4 +826,39 @@ A avaliação da qualidade das respostas geradas pelo \ac{LLM} é um aspecto fun
 
 Embora a similaridade entre a pergunta e a resposta seja uma métrica viável, demonstra-se insuficiente para avaliar a qualidade da resposta em um nível mais profundo. A análise de proximidade semântica da resposta em relação à pergunta não garante que a resposta abranja de forma adequada o contexto e o conteúdo desejado pelo próprio fato de que uma resposta, por definição, deve conter informações inexistentes na pergunta. Portanto, a avaliação deve ir além da correspondência superficial e considerar o quão bem a resposta aborda e resolve a questão apresentada.
 
+\subsubsection{Avaliação Automatizada}
+\label{subsubsec:Metodologia.6.3.1}
 Para avaliar a qualidade das respostas em termos de satisfação da pergunta, ferramentas como o BERTScore, proposto por \citeonline{BERTScore:1}, abordado na Seção \ref{sec:Teorico.7}, se mostram úteis. Sua aplicação em sistemas de \ac{RAG} oferece uma maneira objetiva de quantificar o desempenho dos \ac{LLM}s no que tange à satisfatoriedade de suas respostas às perguntas. Essa métrica considera a semelhança semântica e permite identificar se uma resposta contém informações relevantes e está alinhada com o que foi solicitado pela pergunta. Assim, como métrica de avaliação da resposta final gerada utilizamos o BERTScore sobre a resposta, gerada para cada uma das perguntas sintéticas disponíveis, em relação à sua respectiva resposta de referência (ver Seção \ref{subsec:Metodologia.6.1}), dado que este contribui para a validação da qualidade da resposta gerada, não apenas em termos de similaridade de palavras, mas em relação à precisão e completude, características essenciais para a construção de sistemas de perguntas e respostas de alta qualidade. Como resultado, se alcança uma medida mais robusta de como a resposta aborda de maneira contextualizada a pergunta, indo além da análise de correspondência lexical.
+
+Cabe pontuar, contudo, que o BERTScore servirá tão somente como uma ferramenta quantitativa de avaliação das respostas, motivo pelo qual utilizaremos avaliação humana para dar conta de aspectos mais qualitativos das respostas.
+
+\subsubsection{Avaliação Humana}
+\label{subsubsec:Metodologia.6.3.2}
+A avaliação humana da qualidade das respostas geradas se debruçará sobre dois aspectos do produto final da aplicação \ac{RAG}: as características estruturais do texto gerado e o conteúdo gerado, em si.
+
+Inicialmente, será conduzida uma investigação exploratória sobre o material produzido pelos modelos, com o objetivo de obter uma visão panorâmica e destacar eventuais irregularidades evidentes, perceptíveis sem necessidade de exame detalhado. Entre esses aspectos, serão observados o comprimento das respostas, a lógica de suas construções textuais, a uniformidade no uso do idioma, bem como outras possíveis anomalias que possam surgir no decorrer da análise.
+
+Após isso, uma análise mais estruturada e sistemática será feita das respostas, baseando-se em perguntas orgânicas -- feitas por avaliadores humanos, em vez de perguntas sintéticas. Para isso, contaremos com a ajuda de servidores da \ac{Alern}, aos quais será solicitado que elaborem perguntas que possam ser respondidas através de conteúdo presente nos documentos integrantes do nosso conjunto de dados, juntamente com suas respectivas respostas. As perguntas serão utilizadas para gerar respostas, seguindo todo o fluxo da aplicação \ac{RAG} (recuperação de documentos, formatação do conteúdo, injeção do resultado para criação de um \textit{prompt} e sua submissão à API da ferramenta de execução de \ac{LLM}s, para geração da resposta). Ao todo, 4 servidores colaborarão para esta parte do processo, gerando um total de 20 perguntas.
+
+Após isso, as respostas serão apresentadas aos avaliadores, os quais receberão direcionamento para avaliar as respostas sob os seguintes critérios:
+
+\begin{itemize}
+    \item Corretude: avalia o quão correta a resposta está, tanto em termos de não apresentar informações falsas, quanto em termos de responder a pergunta;
+    \item Coerência: avalia o quanto o teor da resposta (correta ou não) está escrito de forma coerente -- apresenta sentido coerente, incluindo mostrar consistência no idioma utilizado;
+    \item Gramática e Ortografia: avalia se as palavras utilizadas estão corretamente grafadas e se as frases têm escrita gramaticalmente correta;
+    \item Adequação: avalia se o nível de escrita apresenta vocabulário adequado à compreensão do usuário comum, conforme definido nas diretrizes passadas via \textit{prompt}.
+\end{itemize}
+
+Para cada um dos critérios, o avaliador deverá atribuir um valor de 0 nos casos em que a pergunta gerada tiver um desempenho ``ruim'', 1 para um desempenho ``aceitável'' ou 2 para um desempenho ``bom'' / plenamente satisfatório. Para cada um dos modelos utilizados, será calculado o somatório dos pontos em cada um dos critérios e a porcentagem da pontuação máxima possível de ser alcançada.
+
+Os resultados das avaliações humanas serão, após o processo, compilados e quantificados, de forma a permitir uma melhor compreensão da qualidade dos resultados gerados pela ferramenta.
+
+
+\subsection{Nota Sobre a Estrutura Utilizada para os Experimentos}
+\label{subsec:Metodologia.6.4}
+
+Os experimentos de testes descritos neste estudo foram implementados por meio de \textit{scripts} desenvolvidos na linguagem de programação Python e armazenados em um \href{https://github.com/saintclairlima/assistente-busca}{repositório público no GitHub} \cite{REPOSITORIO:1}, tanto para fins de transparência, quanto para fins de agilizar e simplificar o processo de execução, independente do local e da máquina utilizada. Devido à indisponibilidade de \textit{hardware} local adequado para a execução dos testes -- especialmente considerando a alta demanda computacional associada à utilização de modelos de \ac{LLM}s em execução paralela com uma instância do Ollama com o \textit{Llama3.1:8b} e o \textit{DeepSeek-r1:7b} -- optou-se por clonar o repositório em instâncias do Google Colab para a condução dos experimentos. Essa abordagem garantiu acesso a recursos computacionais menos limitados, mitigando as restrições do ambiente local.
+
+O ambiente de execução no Google Colab foi configurado com uma GPU NVIDIA Tesla T4, que dispõe de 16 GB de memória dedicada, sendo a configuração padrão de utilização gratuita da plataforma \cite{HARDWARE:1, HARDWARE:2}. Essa arquitetura foi fundamental para permitir a execução eficiente de modelos pesados, assegurando um desempenho adequado tanto para o processo de recuperação de documentos do banco vetorial, quanto para a execução do modelo \textit{Llama} para gerar as respostas. A integração entre os recursos oferecidos pelo Google Colab e as capacidades do Ollama foi configurada de forma a maximizar a compatibilidade e o desempenho dos experimentos.
+
+Por meio dessa infraestrutura, foi possível realizar os testes necessários sem comprometer a validade dos resultados, assegurando que a execução dos experimentos fosse realizada de maneira confiável e reprodutível. Adicionalmente, a utilização do repositório GitHub \cite{REPOSITORIO:1} como plataforma para versionamento e controle do código contribuiu para a transparência e rastreabilidade das implementações, elementos essenciais em um contexto de pesquisa científica.

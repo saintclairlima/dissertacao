@@ -1,6 +1,8 @@
 \chapter{Resultados}
 \label{cap:Resultados}
 
+Considerando que os Capítulos \ref{cap:Assistente} e \ref{cap:Metodologia} trataram de definir especificamente o objeto deste estudo e os métodos para o alcançar (respectivamente o \textit{o que} e o \textit{como} de nossa proposta), este capítulo é direcionado no sentido de apresentar os efetivos resultados obtidos durante os experimentos realizados.
+
 \section{Aspectos a Serem Avaliados}
 \label{sec:Resultados.1}
 O processo de aferição de qualidade de texto gerado por \ac{LLM}s, em sua totalidade pode ser feito tanto por avaliadores humanos -- com um maior grau de refinamento ao custo de tempo e recursos -- quanto por ferramentas automatizadas (ver Seções \ref{sec:Teorico.7} e \ref{sec:Metodologia.6}). Contrariamente, a aplicação de métricas qualitativas de uma estrutura caracterizada como uma abordagem \ac{RAG} inclui elementos intermediários ao seu resultado final cuja avaliação é necessária para se compreender a qualidade total do processo, bem como entender o quanto cada uma das partes intermediárias da geração está contribuindo para isso. Dentre os aspectos que carecem de análise, temos:
@@ -23,8 +25,289 @@ As métricas de tempo de performance também serão analisadas de forma separada
 
 A recuperação de fragmentos de documentos, como visto na Seção \ref{subsec:Metodologia.6.2}, foi avaliada automaticamente, utilizando perguntas sintéticas geradas a partir do conteúdo de fragmentos específicos de documentos. Tais perguntas foram utilizadas para fazer consultas ao banco vetorial, com o fim de avaliar a qualidade do conteúdo resultante. De forma a viabilizar esse processo de aferição do processo de recuperação foi necessário configurar o banco de vetores com os elementos a serem testados. Apresentamos abaixo o processo de configuração, bem como o processo de testes em si.
 
+\subsubsection{Resultados da Exploração Inicial dos Modelos de \textit{Embedding}}
+\label{subsubsec:Resultados.2.1.1}
+
+De forma a se obter uma intuição inicial sobre a distribuição espacial dos \textit{embeddings} gerados pelos modelos sendo considerados, tal qual descrito na Seção \ref{subsec:Metodologia.2.2}, utilizamos um conjunto de documentos adicional para explorar as características de suas saídas. Nesse exercício, buscamos entender a forma da dispersão dos documentos em um espaço de dimensionalidade reduzida, bem como avaliar o quanto os modelos dão conta de (1) capturar especificidades semânticas de temas distintos nos documentos (por meio de uma tarefa de classificação) e de (2) discriminar similitude/discrepância entre fragmentos abordando temas diversos.
+
+As Figuras~\ref{fig:embeddings-1} e~\ref{fig:embeddings-2} ilustram, respectivamente, as projeções bidimensionais obtidas para as representações vetoriais do Conjunto de documentos~1 e do Conjunto de documentos~2, evidenciando as distinções na organização espacial dos conteúdos analisados.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.74\linewidth]{Imagens/embeddings_1.png}
+    \caption{Representação em baixa dimensão do conjunto de documentos 1}
+    Fonte: autoria própria
+    \label{fig:embeddings-1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.74\linewidth]{Imagens/embeddings_2.png}
+    \caption{Representação em baixa dimensão do conjunto de documentos 2}
+    Fonte: autoria própria
+    \label{fig:embeddings-2}
+\end{figure}
+
+
+No que se refere à tarefa de classificação realizada sobre os \textit{embeddings} gerados, a Tabela \ref{tab:scores-classificacao-1} apresenta os resultados obtidos com o Conjunto de Documentos 1, composto por documentos com estilos, formas e conteúdos distintos, ao passo que os resultados da classificação feita sobre o Conjunto de Documentos 2, cujo conteúdo é dois documentos que diferem somente no conteúdo, estão dispostos na Tabela \ref{tab:scores-classificacao-2}.
+
+\begin{table}[H]
+    \caption{Especificações dos Modelos de \textit{Embeddings}}
+    \centering
+    \begin{tabular}{ l r r r r }
+        \hline 
+        \textbf{Modelo} & \textbf{Acurácia} & \textbf{MCC} & \textbf{F1 Macro} & \textbf{F1 Ponderado} \\
+        \hline
+        \textit{GTE} & 1,00 & 1,00 & 1,00 & 1,00 \\
+        \textit{BGE-m3} & 1,00 & 1,00 & 1,00 & 1,00 \\
+        \textit{instructor-xl} & 1,00 & 1,00 & 1,00 & 1,00 \\
+        \textit{BERT-QA} & 0,98 & 0,98 & 0,98 & 0,98 \\
+        \textit{Llama3.1} & 1,00 & 1,00 & 1,00 & 1,00 \\
+        \textit{DeepSeek-r1} & 0,94 & 0,92 & 0,92 & 0,93 \\
+        \textit{ada-002 (OpenAI)} & 1,00 & 1,00 & 1,00 & 1,00 \\
+        \textit{3-large (OpenAI)} & 1,00 & 1,00 & 1,00 & 1,00 \\
+        \hline
+    \end{tabular}
+    
+    Fonte: O autor (2025)
+    \label{tab:scores-classificacao-1}
+\end{table}
+
+\begin{table}[H]
+    \caption{Especificações dos Modelos de \textit{Embeddings}}
+    \centering
+    \begin{tabular}{ l r r r r }
+        \hline 
+        \textbf{Modelo} & \textbf{Acurácia} & \textbf{MCC} & \textbf{F1 Macro} & \textbf{F1 Ponderado} \\
+        \hline
+        \textit{GTE} & 0,99 & 0,97 & 0,99 & 0,99 \\
+        \textit{BGE}-m3 & 0,99 & 0,99 & 0,99 & 0,99 \\
+        \textit{instructor-xl} & 0,99 & 0,99 & 0,99 & 0,99 \\
+        \textit{BERT-QA} & 0,99 & 0,99 & 0,99 & 0,99 \\
+        \textit{Llama3.1} & 0,99 & 0,99 & 0,99 & 0,99 \\
+        \textit{DeepSeek-r1} & 0,94 & 0,89 & 0,94 & 0,94 \\
+        \textit{ada-002 (OpenAI)} & 0,99 & 0,99 & 0,99 & 0,99 \\
+        \textit{3-large (OpenAI)} & 1,00 & 1,00 & 1,00 & 1,00 \\
+        \hline
+    \end{tabular}
+    
+    Fonte: O autor (2025)
+    \label{tab:scores-classificacao-2}
+\end{table}
+
+Os resultados obtidos tanto para o Conjunto de Documentos 1 quanto para o Conjunto de Documentos 2 indicam capacidade preditiva equivalente quando utilizados os \textit{embeddings} de todos os modelos avaliados, com exceção do \textit{DeepSeek-r1}, que apresentou desempenho sensivelmente inferior -- 5 pontos percentuais -- em comparação aos demais.
+
+Ao utilizar a tarefa de \textit{clustering} para avaliar a discriminação de semelhança entre fragmentos, os resultados entre os modelos teve resultados que reforçam o que se apontou no exercício de classificação.
+
+As Tabelas \ref{tab:kmeans-conjunto-documentos1-sem-reducao} a \ref{tab:dbscan-conjunto-documentos2-sem-reducao} apresentam os resultados da aplicação tanto do \textit{K-Means} quanto do DBSCAN sobre as representações vetoriais geradas pelos modelos de \textit{embeddings} sendo avaliados, sem fazer neles quaisquer tipos de alteração. Assim sendo, são vetores de alta dimensionalidade, variando de acordo com o modelo (\textit{GTE}: 768 dimensões, \textit{BGE-m3}: 1.024 dimensões, \textit{instructor-xl}: 768 dimensões, \textit{BERT-QA}: 768 dimensões, \textit{Llama3.1}: 4.096 dimensões, \textit{DeepSeek-r1}: 3.584 dimensões, \textit{ada-002}: 1.536 dimensões e \textit{3-large}: 3.072 dimensões.
+
+Quanto às Tabelas \ref{tab:kmeans-conjunto-documentos1-com-reducao} a \ref{tab:dbscan-conjunto-documentos2-com-reducao}, nelas são expostos os resultados da aplicação dos algoritmos de particionamento sobre a versão com dimensionalidade reduzida de cada conjunto de \textit{embeddings}, com \textit{3} dimensões, geradas pelo uso de \ac{TSNE}, as quais foram utilizadas para gerar as Figuras \ref{fig:embeddings-1} e \ref{fig:embeddings-2}, já apresentadas. 
+
+\begin{table}[H]
+    \centering
+    % Primeira linha
+    \begin{minipage}{0.48\textwidth}
+        \caption{\textit{K-Means} -- Conjunto 1}
+        \centering
+        \begin{tabular}{ l r r }
+            \hline
+            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
+            \hline
+            \textit{GTE} & 0,08 & 3,50 \\
+            \textit{BGE-m3} & 0,08 & 3,44 \\
+            \textit{instructor-xl} & 0,10 & 3,03 \\
+            \textit{BERT-QA} & 0,15 & 2,26 \\
+            \textit{Llama3.1} & 0,14 & 2,30 \\
+            \textit{DeepSeek-r1} & 0,08 & 2,44 \\
+            \textit{ada-002} (OpenAI) & 0,09 & 3,07 \\
+            \textit{3-large} (OpenAI) & 0,17 & 2,24 \\
+            \hline
+        \end{tabular}
+        \vspace{2mm}
+        \small Fonte: O autor (2025)
+        \label{tab:kmeans-conjunto-documentos1-sem-reducao}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \caption{\textit{K-Means} -- Conjunto 2}
+        \centering
+        \begin{tabular}{ l r r }
+            \hline
+            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
+            \hline
+            \textit{GTE} & 0,04 & 4,03 \\
+            \textit{BGE-m3} & 0,06 & 3,97 \\
+            \textit{instructor-xl} & 0,05 & 3,74 \\
+            \textit{BERT-QA} & 0,09 & 2,81 \\
+            \textit{Llama3.1} & 0,14 & 2,15 \\
+            \textit{DeepSeek-r1} & 0,11 & 2,28 \\
+            \textit{ada-002} (OpenAI) & 0,04 & 4,00 \\
+            \textit{3-large} (OpenAI) & 0,05 & 3,90 \\
+            \hline
+        \end{tabular}
+        \vspace{2mm}
+        \small Fonte: O autor (2025)
+        \label{tab:kmeans-conjunto-documentos2-sem-reducao}
+    \end{minipage}
+
+    \vspace{5mm} % espaço entre as linhas
+
+    % Segunda linha
+    \begin{minipage}{0.48\textwidth}
+        \caption{DBSCAN -- Conjunto 1}
+        \centering
+        \begin{tabular}{ l r r }
+            \hline
+            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
+            \hline
+            \textit{GTE} & ** & ** \\
+            \textit{BGE-m3} & ** & ** \\
+            \textit{instructor-xl} & 0,17 & 1,99 \\
+            \textit{BERT-QA} & ** & ** \\
+            \textit{Llama3.1} & 0,26 & 1,61 \\
+            \textit{DeepSeek-r1} & ** & ** \\
+            \textit{ada-002} (OpenAI) & 0,18 & 2,35 \\
+            \textit{3-large} (OpenAI) & ** & ** \\
+            \hline
+        \end{tabular}
+        \vspace{2mm}
+        \small Fonte: O autor (2025)
+        \label{tab:dbscan-conjunto-documentos1-sem-reducao}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \caption{DBSCAN -- Conjunto 2}
+        \centering
+        \begin{tabular}{ l r r }
+            \hline
+            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
+            \hline
+            \textit{GTE} & ** & ** \\
+            \textit{BGE-m3} & ** & ** \\
+            \textit{instructor-xl} & ** & ** \\
+            \textit{BERT-QA} & ** & ** \\
+            \textit{Llama3.1} & 0,30 & 1,25 \\
+            \textit{DeepSeek-r1} & 0,39 & 1,21 \\
+            \textit{ada-002} (OpenAI) & ** & ** \\
+            \textit{3-large} (OpenAI) & ** & ** \\
+            \hline
+        \end{tabular}
+        \vspace{2mm}
+        \small Fonte: O autor (2025)
+        \label{tab:dbscan-conjunto-documentos2-sem-reducao}
+    \end{minipage}
+    
+    \vspace{-2mm}
+    \begin{center}
+        \small \textbf{Nota}: Valores marcados com \textbf{**} indicam que o DBSCAN não encontrou ao menos 2 \textit{clusters}.
+    \end{center}
+\end{table}
+
+% CLUSTERING
+\begin{table}[H]
+    \centering
+    % Primeira linha
+    \begin{minipage}{0.48\textwidth}
+        \caption{\textit{K-Means} -- Conjunto 1 -- 3D}
+        \centering
+        \begin{tabular}{ l r r }
+            \hline
+            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
+            \hline
+            \textit{GTE} & 0,65 & 0,53 \\
+            \textit{BGE-m3} & 0,49 & 1,27 \\
+            \textit{instructor-xl} & 0,59 & 0,66 \\
+            \textit{BERT-QA} & 0,74 & 0,40 \\
+            \textit{Llama3.1} & 0,58 & 0,69 \\
+            \textit{DeepSeek-r1} & 0,59 & 0,43 \\
+            \textit{ada-002} (OpenAI) & 0,45 & 0,99 \\
+            \textit{3-large} (OpenAI) & 0,60 & 0,60 \\
+            \hline
+        \end{tabular}
+        \vspace{2mm}
+        \small Fonte: O autor (2025)
+        \label{tab:kmeans-conjunto-documentos1-com-reducao}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \caption{\textit{K-Means} -- Conjunto 2 -- 3D}
+        \centering
+        \begin{tabular}{ l r r }
+            \hline
+            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
+            \hline
+            \textit{GTE} & 0,89 & 0,16 \\
+            \textit{BGE-m3} & 0,90 & 0,15 \\
+            \textit{instructor-xl} & 0,87 & 0,18 \\
+            \textit{BERT-QA} & 0,85 & 0,22 \\
+            \textit{Llama3.1} & 0,40 & 0,86 \\
+            \textit{DeepSeek-r1} & 0,58 & 0,48 \\
+            \textit{ada-002} (OpenAI) & 0,90 & 0,14 \\
+            \textit{3-large} (OpenAI) & 0,87 & 0,20 \\
+            \hline
+        \end{tabular}
+        \vspace{2mm}
+        \small Fonte: O autor (2025)
+        \label{tab:kmeans-conjunto-documentos2-com-reducao}
+    \end{minipage}
+
+    \vspace{5mm} % espaço entre as linhas
+
+    % Segunda linha
+    \begin{minipage}{0.48\textwidth}
+        \caption{DBSCAN -- Conjunto 1 -- 3D}
+        \centering
+        \begin{tabular}{ l r r }
+            \hline
+            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
+            \textit{GTE} & 0,85 & 0,26 \\
+            \textit{BGE-m3} & 0,54 & 0,35 \\
+            \textit{instructor-xl} & 0,84 & 0,27 \\
+            \textit{BERT-QA} & 0,75 & 0,43 \\
+            \textit{Llama3.1} & 0,74 & 0,36 \\
+            \textit{DeepSeek-r1} & 0,46 & 0,49 \\
+            \textit{ada-002} (OpenAI) & 0,90 & 0,13 \\
+            \textit{3-large} (OpenAI) & 0,91 & 0,11 \\
+            \hline
+        \end{tabular}
+        \vspace{2mm}
+        \small Fonte: O autor (2025)
+        \label{tab:dbscan-conjunto-documentos1-com-reducao}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \caption{DBSCAN -- Conjunto 2 -- 3D}
+        \centering
+        \begin{tabular}{ l r r }
+            \hline
+            \textbf{Modelo} & \textbf{Silhouette} & \textbf{DB} \\  
+            \hline
+            \textit{GTE} & 0,89 & 0,16 \\
+            \textit{BGE-m3} & 0,48 & 0,64 \\
+            \textit{instructor-xl} & 0,87 & 0,18 \\
+            \textit{BERT-QA} & 0,85 & 0,22 \\
+            \textit{Llama3.1} & 0,68 & 0,46 \\
+            \textit{DeepSeek-r1} & 0,66 & 0,37 \\
+            \textit{ada-002} (OpenAI) & 0,90 & 0,14 \\
+            \textit{3-large} (OpenAI) & 0,18 & 0,83 \\
+            \hline
+        \end{tabular}
+        \vspace{2mm}
+        \small Fonte: O autor (2025)
+        \label{tab:dbscan-conjunto-documentos2-com-reducao}
+    \end{minipage}
+\end{table}
+
+A análise do arranjo estrutural dos \textit{embeddings} em alta dimensionalidade mostra que, embora alguns modelos apresentem separabilidade e coesão sensivelmente melhores que os outros modelos em certos casos, a complexidade do espaço vetorial dificulta a avaliação precisa da qualidade dos agrupamentos. Modelos como \textit{Llama3.1} e \textit{DeepSeek-r1} exibem organização estrutural mais clara, principalmente para algoritmos baseados em densidade, enquanto outros, como \textit{GTE} e \textit{BGE-m3}, têm dificuldades em formar \textit{clusters} significativos. A alta dimensionalidade gera dispersão e heterogeneidade que comprometem a obtenção de métricas consistentes e interpretáveis.
+
+Nesse sentido, a redução de dimensionalidade se revela uma ferramenta eficaz para melhorar a avaliação dos \textit{embeddings}. Ao representar os vetores em espaços de menor dimensão, torna-se possível evidenciar estruturas latentes e identificar agrupamentos semanticamente mais coerentes, o que se reflete em melhorias nas métricas de \textit{Silhouette} e \textit{Davies-Bouldin}. Assim, a redução dimensional facilita uma análise mais clara e robusta da qualidade dos \textit{embeddings}, além de apoiar a seleção dos modelos mais adequados para tarefas que dependem da organização semântica dos dados.
+
+A avaliação estrutural das representações vetoriais com dimensionalidade reduzida evidencia uma melhora significativa nas métricas de agrupamento para a maioria dos modelos, com índices de \textit{Silhouette} próximos ou superiores a \textit{0,85} e valores de DB inferiores a \textit{0,30} para os melhores casos, como \textit{GTE}, \textit{BGE-m3}, \textit{ada-002} e \textit{instructor-xl}. Esses resultados indicam que, nessa representação compacta, os \textit{embeddings} desses modelos apresentam agrupamentos mais coesos e melhor separados, refletindo uma organização semântica mais clara e consistente, em relação aos demais.
+
+Por outro lado, modelos como \textit{Llama3.1} e \textit{DeepSeek-r1}, que foram um pouco melhores em alta dimensionalidade, apresentaram queda expressiva na qualidade dos agrupamentos após o ``achatamento dimensional'', com \textit{Silhouette} reduzidos e aumento dos índices DB. Em suma, a redução dimensional torna mais evidentes os agrupamentos formados por \textit{embeddings} semanticamente mais compactos, favorecendo a avaliação e comparação dos modelos, enquanto revela limitações daqueles cujas representações dependem de espaços vetoriais mais complexos e dispersos.
+
 \subsubsection{Banco de Vetores Gerado}
-\label{subsec:Resultados.2.1.1}
+\label{subsubsec:Resultados.2.1.2}
 Conforme apontado na Seção \ref{subsec:Metodologia.2.3}, para cada um dos modelos a serem avaliados -- \textit{BGE-m3}, \textit{ada-002}, \textit{3-large} \textit{GTE}, \textit{instructor-xl}, \textit{Bert-QA}, \textit{Llama3.1} e \textit{DeepSeek-r1} -- foi criada uma coleção no banco de vetores, com o intuito de avaliar quão bem cada um deles performa em termos de recuperação.
 
 Destarte, mais especificamente, populamos um banco vetorial no Chroma DB com base em um conjunto de documentos segmentados em partes de, no máximo, 300 palavras, seguindo o procedimento descrito na Seção \ref{subsec:Metodologia.1.1}. Foi criada uma coleção para cada um dos modelos de geração de \textit{embeddings} utilizados. Ao final do processo, cada uma das coleções tinha uma representação distinta dos 1.098 fragmentos resultantes do secionamento dos documentos.
@@ -89,7 +372,7 @@ Ao final, portanto, além das coleções geradas com os modelos, conforme listad
 
 
 \subsubsection{Recuperação de Documentos Articulados e sem Sobreposição Temática}
-\label{subsec:Resultados.2.1.2}
+\label{subsubsec:Resultados.2.1.3}
 
 Abordamos nesta Seção os resultados da primeira categoria de avaliações mencionadas ao final da Seção \ref{subsec:Metodologia.6.2}, a saber, como os modelos se comportam quando da recuperação de conteúdo restrito aos documentos articulados e monotemáticos -- conjunto em que cada documento aborda um tema particular, sem muita sobreposição de tópicos entre si.
 
@@ -106,7 +389,7 @@ Possuindo o modelo \textit{instructor-xl} sua peculiaridade de utilização de i
 \begin{table}[H]
     \caption{Instructor - Ocorrência de posição do fragmento original entre os recuperados}
     \centering
-    \begin{tabular}{ c c c c }
+    \begin{tabular}{ c r r r }
         \hline
         \textbf{Posição do fragmento original} & \textbf{Sem Instrução} & \textbf{Português} & \textbf{Inglês} \\  
         \hline
@@ -133,7 +416,7 @@ Para melhor análise, consideremos a porcentagem de vezes em que o fragmento ori
 \begin{table}[H]
     \caption{Instructor - Porcentagem de presença do fragmento original}
     \centering
-    \begin{tabular}{ l c c c }
+    \begin{tabular}{ l r r r }
         \hline
           & \textbf{Sem Instrução} & \textbf{Português} & \textbf{Inglês} \\  
         \hline
@@ -156,7 +439,7 @@ Com essa definição feita, comparamos os resultados alcançados por todos os mo
 \begin{table}[H]
     \caption{Ocorrência de posição do fragmento original na recuperação - documentos sem sobreposição temática}
     \centering
-    \begin{tabular}{ l c c c c c c c c c c c }
+    \begin{tabular}{ l r r r r r r r r r r r }
         \hline
             & \multicolumn{11}{c}{\textbf{Posição do fragmento original nos resultados}} \\
         \textbf{Modelo} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} & \textbf{Ausente} \\  
@@ -179,7 +462,7 @@ Com essa definição feita, comparamos os resultados alcançados por todos os mo
 \begin{table}[H]
     \caption{Taxa de Recuperação do fragmento original - documentos sem sobreposição temática}
     \centering
-    \begin{tabular}{ l c c c }
+    \begin{tabular}{ l r r r }
         \hline
         \textbf{Modelos} & \textbf{Recuperados} & \textbf{Falhas} & \textbf{Taxa de Recuperação} \\
         \hline
@@ -200,12 +483,12 @@ Com essa definição feita, comparamos os resultados alcançados por todos os mo
 
 Como já esperado (ver Seção \ref{subsubsec:Metodologia.2.1.6}), os modelos mais generalistas (\textit{BERT-QA}, \textit{DeepSeek-r1} e \textit{Llama}) tiveram resultados de baixíssima qualidade, falhando em recuperar o fragmento original em 89,35\%, 96,98\% e 97,25\% dos casos, respectivamente. No outro extremo do espectro, temos o modelo \textit{3-large} da OpenAi, com recuperação do fragmento original em 93,34\% dos casos, seguido pelo também excelente desempenho do \textit{BGE-m3}, com taxa de recuperação do fragmento original de 93,26\% -- resultado mais robusto, a propósito, que o modelo fechado da OpenAI, o \textit{ada-002} (apresentando uma taxa de sucesso de recuperação de 91,13\%).
 
-Adicionalmente, observando o que resultou dos cinco modelos especializados em geração de \textit{embeddings}, é perceptível que n1a grande maioria das vezes em que o fragmento original estava entre os recuperados, ele se achava entre os 5 primeiros fragmentos -- como visível na Tabela \ref{tab:recuperacao-5-top}. Isso nos permite avaliar que configurar o banco vetorial para retornar somente 5 registros por busca, dentro deste conjunto de dados, pode ser uma decisão segura, diminuindo a quantidade de dados a ser repassada para o \ac{LLM} gerar a resposta, implicando em menos ocorrência de alucinações.
+Adicionalmente, observando o que resultou dos cinco modelos especializados em geração de \textit{embeddings}, é perceptível que na grande maioria das vezes em que o fragmento original estava entre os recuperados, ele se achava entre os 5 primeiros fragmentos -- como visível na Tabela \ref{tab:recuperacao-5-top}. Isso nos permite avaliar que configurar o banco vetorial para retornar somente 5 registros por busca, dentro deste conjunto de dados, pode ser uma decisão segura, diminuindo a quantidade de dados a ser repassada para o \ac{LLM} gerar a resposta, implicando em menos ocorrência de alucinações.
 
 \begin{table}[H]
     \caption{Presença do fragmento original entre os top 5 - documentos sem sobreposição temática}
     \centering
-    \begin{tabular}{ l c c c }
+    \begin{tabular}{ l r r r }
         \hline
         \textbf{Modelo} & \textbf{Total Recuperações} & \textbf{Top 5 Resultados} & \textbf{Top 5 Resultados (\%)} \\
         \hline
@@ -232,7 +515,7 @@ A Figura \ref{fig:tempo-recuperacao-box} explicita de forma mais intuitiva os da
 \begin{table}[H]
     \caption{Estatísticas de tempo de recuperação de fragmentos por modelo (segundos)}
     \centering
-    \begin{tabular}{ l c c c c }
+    \begin{tabular}{ l r r r r }
         \hline
         \textbf{Modelo} & \textbf{Média} & \textbf{Mínimo} & \textbf{Máximo} & \textbf{Desvio Padrão} \\
         \hline
@@ -259,7 +542,7 @@ A Figura \ref{fig:tempo-recuperacao-box} explicita de forma mais intuitiva os da
 
 A análise dos tempos de execução dos modelos de uma forma mais generalista foi suficiente para identificar as características dos modelos para fins de comparação entre si. Não obstante, ao se fazer uma plotagem do tempo de recuperação dos modelos para cada uma das consultas feitas, podemos identificar comportamentos intrigantes, conforme podemos averiguar na Figura \ref{fig:tempo-recuperacao-dist}.
 
-Curiosamente, distribuição do tempo de resposta do \textit{instructor-xl} aponta para duas faixas distintas de tempo de resposta, com médias em torno de 0,1 segundos e 0,5 segundos. O mesmo fenômeno ocorre com a distribuição do \textit{DeepSeek-r1}, se mostrando em duas faixas, uma com média em torno de 1,85 e outra em torno de 1,65 segundos. O \textit{BGE-m3} também mostra um comportamento peculiar no seu tempo de resposta. Ele segue em tempo consistente, em torno de 0,25 e 0,35 segundos. Todavia, após um certo número de consultas, o tempo caiu para algo em torno de 0,1 segundos e permaneceu assim até o final da bateria de testes. Uma investigação mais aprofundada seria necessária para entender esses fenômenos.
+Curiosamente, a distribuição do tempo de resposta do \textit{instructor-xl} aponta para duas faixas distintas de tempo de resposta, com médias em torno de 0,1 segundos e 0,5 segundos. O mesmo fenômeno ocorre com a distribuição do \textit{DeepSeek-r1}, se mostrando em duas faixas, uma com média em torno de 1,85 e outra em torno de 1,65 segundos. O \textit{BGE-m3} também mostra um comportamento peculiar no seu tempo de resposta. Ele segue em tempo consistente, em torno de 0,25 e 0,35 segundos. Todavia, após um certo número de consultas, o tempo caiu para algo em torno de 0,1 segundos e permaneceu assim até o final da bateria de testes. Uma investigação mais aprofundada seria necessária para entender esses fenômenos.
 
 \begin{figure}[H]
     \centering
@@ -274,9 +557,9 @@ Um ponto adicional a se considerar sobre essa metodologia de teste automatizado 
 Por último, é importante considerar os casos em que respostas para uma pergunta específica estão em conteúdo distribuído em múltiplos artigos/fragmentos. Visto que as perguntas sintéticas foram criadas a partir de um fragmento específico e unicamente dele, não houve ocorrência desse tipo específico de questões nesta parte dos testes.
 
 \subsubsection{Recuperação de Documentos Articulados e com Sobreposição Temática}
-\label{subsec:Resultados.2.1.3}
+\label{subsubsec:Resultados.2.1.4}
 
-Para avaliar o desempenho dos modelos de \textit{embeddings} sobre um conjunto de fragmentos que inclui documentos com sobreposição de assuntos, realizamos experimento semelhante ao que foi executado com dados tematicamente isolados (descrito na Seção \ref{subsec:Resultados.2.1.3}), mantendo o mesmo grupo de documentos, salvo que acrescidos do conteúdo não divido em artigos, composto pelo Manual de Processo Legislativo. O teor do documento acrescentado encontra eco em parte dos documentos anteriores, em especial do Regimento Interno da Alern, -- já que ambos regulam e descrevem os meandros da atividade parlamentar no âmbito da Casa.
+Para avaliar o desempenho dos modelos de \textit{embeddings} sobre um conjunto de fragmentos que inclui documentos com sobreposição de assuntos, realizamos experimento semelhante ao que foi executado com dados tematicamente isolados (descrito na Seção \ref{subsubsec:Resultados.2.1.3}), mantendo o mesmo grupo de documentos, salvo que acrescidos do conteúdo não dividido em artigos, composto pelo Manual de Processo Legislativo. O teor do documento acrescentado encontra eco em parte dos documentos anteriores, em especial do Regimento Interno da Alern, -- já que ambos regulam e descrevem os meandros da atividade parlamentar no âmbito da Casa.
 
 Assim, utilizamos os documentos em questão para criar uma coleção para cada um dos modelos. cada uma dessas coleções documentais foi exposta a consultas feitas com base na já aludida lista perguntas artificiais. Para cada consulta, verificou-se se o fragmento original -- aquele que deu origem à formulação da respectiva pergunta -- estava incluído entre os itens recuperados.
 
@@ -285,7 +568,7 @@ Os dados obtidos estão sistematizados nas Tabelas \ref{tab:recuperacao-rank-mar
 \begin{table}[H]
     \caption{Ocorrência de posição do fragmento original na recuperação - documentos com sobreposição temática}
     \centering
-    \begin{tabular}{ l c c c c c c c c c c c }
+    \begin{tabular}{ l r r r r r r r r r r r }
         \hline
             & \multicolumn{11}{c}{\textbf{Posição do fragmento original nos resultados}} \\
         \textbf{Modelo} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} & \textbf{Ausente} \\  
@@ -309,7 +592,7 @@ Os dados obtidos estão sistematizados nas Tabelas \ref{tab:recuperacao-rank-mar
 \begin{table}[H]
     \caption{Diferença da taxa de recuperação com e sem sobreposição de tópicos}
     \centering
-    \begin{tabular}{ l c c c }
+    \begin{tabular}{ l r r r }
         \hline
         \textbf{Modelos} & \textbf{Sem Sobreposição} & \textbf{Com Sobreposição} & \textbf{Diferença} \\
         \hline
@@ -333,7 +616,7 @@ As taxas de recuperação dos modelos mostraram-se consistentes com os resultado
 \begin{table}[H]
     \caption{Presença do fragmento original entre os top 5 - documentos com sobreposição temática}
     \centering
-    \begin{tabular}{ l c c c }
+    \begin{tabular}{ l r r r }
         \hline
         \textbf{Modelo} & \textbf{Total Recuperações} & \textbf{Top 5 Resultados} & \textbf{Top 5 Resultados (\%)} \\
         \hline
@@ -374,7 +657,7 @@ Como forma de intuição sobre esses pontos apresentados, podemos visualizar na 
 Os dados plotados correspondem à representação dos fragmentos pelos \textit{embeddings} gerados pelo \textit{text-embedding-3-large} -- o modelo com melhor desempenho dentre os testados -- havendo sido ``achatados'' num plano de menor dimensionalidade utilizando \ac{TSNE}.
 
 \subsubsection{Recuperação de Documentos não Articulados e com Sobreposição Temática}
-\label{subsec:Resultados.2.1.4}
+\label{subsubsec:Resultados.2.1.5}
 
 Para avaliar o desempenho dos modelos junto ao conjunto de dados de notícias, cuja descrição e preparação são mencionadas na Seção \ref{subsec:Metodologia.6.2}, seguimos o mesmo procedimento descrito para os documentos sem e com sobreposição de temas. 
 
@@ -384,19 +667,20 @@ Dada a natureza dos documentos utilizados nesta etapa do experimento -- fragment
 
 As pontuações dos modelos nesse cenário, pois, são apresentadas nas Tabelas \ref{tab:recuperacao-rank-noticias} e \ref{tab:recuperacao-top-noticias}.
 
+
 \begin{table}[H]
     \caption{Ocorrência de posição do fragmento original na recuperação - documentos não articulados com sobreposição temática}
     \centering
-    \begin{tabular}{ l c c c c c c c c c c c }
+    \begin{tabular}{ l r r r r r r r r r r r }
         \hline
             & \multicolumn{11}{c}{\textbf{Posição do fragmento original nos resultados}} \\
         \textbf{Modelo} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} & \textbf{Ausente} \\  
         \hline
         \textit{Ada} & 1.776 & 519 & 311 & 230 & 166 & 116 & 85 & 70 & 59 & 49 & 1.197 \\
         \textit{3-Large} & 1.663 & 539 & 357 & 221 & 164 & 127 & 89 & 83 & 54 & 52 & 1.229 \\
+        \textit{BGE} & 1.794 & 451 & 244 & 150 & 112 & 75 & 70 & 57 & 38 & 44 & 1.543 \\
         \textit{Instructor} & 1.542 & 446 & 190 & 138 & 112 & 90 & 88 & 49 & 44 & 51 & 1.828 \\
         \textit{GTE} & 1.390 & 433 & 234 & 144 & 93 & 97 & 77 & 57 & 58 & 49 & 1.946 \\
-        \textit{BGE} & 418 & 111 & 65 & 43 & 23 & 24 & 13 & 21 & 15 & 17 & 3.828 \\
         \textit{BERT} & 73 & 31 & 23 & 22 & 16 & 25 & 25 & 11 & 18 & 15 & 4.319 \\
         \textit{Llama} & 38 & 17 & 13 & 13 & 15 & 12 & 16 & 9 & 9 & 19 & 4.417 \\
         \textit{DeepSeek} & 7 & 4 & 9 & 7 & 5 & 1 & 4 & 3 & 3 & 6 & 4.529 \\
@@ -407,20 +691,20 @@ As pontuações dos modelos nesse cenário, pois, são apresentadas nas Tabelas 
     \label{tab:recuperacao-rank-noticias}
 \end{table}
 
-Curiosamente, modelo \textit{ada-002} -- que nos contextos anteriores alcançou resultados inferiores aos do \textit{3-large} --  apresentou a melhor taxa de recuperação, com 73,85\% de sucesso. O modelo \textit{3-large} o seguiu de perto, com 73,15\%, apesar de ser mais avançado e de haver sido mais eficaz nos testes anteriores. Ambos os modelos, desenvolvidos pela OpenAI, demonstraram robustez mesmo diante da confusão semântica gerada por fragmentos com temáticas semelhantes. Modelos como \textit{instructor-xl} (60,07\%) e \textit{GTE} (57,49\%) apresentaram desempenho intermediário, com uma queda notável em relação ao desempenho que haviam mostrado no cenário com documentos tematicamente mais distintos. Já o modelo \textit{BGE}, que havia se destacado anteriormente, teve uma redução drástica de desempenho, com taxa de recuperação de apenas 16,38\% diante do contexto menos controlado. Os modelos generalistas -- \textit{BERT-QA}, \textit{DeepSeek-r1} e \textit{Llama3.1} -- continuaram com desempenho bastante insatisfatório, falhando em mais de 94\% dos casos.
+Curiosamente, o modelo \textit{ada-002} -- que nos contextos anteriores alcançou resultados inferiores aos do \textit{3-large} --  apresentou a melhor taxa de recuperação, com 73,85\% de sucesso, ao passo que o modelo \textit{3-large} alcançou 73,15\%, 0,7 pontos percentuais mais baixo, apesar de ser mais avançado e de haver sido mais eficaz nos testes anteriores. Ambos os modelos, desenvolvidos pela OpenAI, demonstraram robustez mesmo diante da confusão semântica gerada por fragmentos com temáticas semelhantes. Dentre os modelos abertos, o \textit{BGE} permaneceu com o melhor desempenho, com 66,30\% de taxa de recuperação (mais que 6 pontos percentuais a mais que o segundo melhor dentre os modelos abertos e 7 pontos percentuais aquém do modelo mais poderoso da OpenAI. Modelos como \textit{instructor-xl} (60,07\%) e \textit{GTE} (57,49\%) apresentaram desempenho intermediário, com uma queda notável em relação ao desempenho que haviam mostrado no cenário com documentos tematicamente mais distintos. Os modelos generalistas -- \textit{BERT-QA}, \textit{DeepSeek-r1} e \textit{Llama3.1} -- continuaram com desempenho bastante insatisfatório, falhando em mais de 94\% dos casos.
 
 \begin{table}[H]
     \caption{Taxa de Recuperação do fragmento original - documentos não articulados com sobreposição temática}
     \centering
-    \begin{tabular}{ l c c c }
+    \begin{tabular}{ l r r r }
         \hline
         \textbf{Modelos} & \textbf{Recuperados} & \textbf{Falhas} & \textbf{Taxa de Recuperação} \\
         \hline
         \textit{Ada} & 3.381 & 1.197 & 73,85\% \\
         \textit{3-Large} & 3.349 & 1.229 & 73,15\% \\
+        \textit{BGE} & 3.035 & 1.543 & 66,30\% \\
         \textit{Instructor} & 2.750 & 1.828 & 60,07\% \\
         \textit{GTE} & 2.632 & 1.946 & 57,49\% \\
-        \textit{BGE} & 750 & 3.828 & 16,38\% \\
         \textit{BERT} & 259 & 4.319 & 5,66\% \\
         \textit{Llama} & 161 & 4.417 & 3,52\% \\
         \textit{DeepSeek} & 49 & 4.529 & 1,07\% \\
@@ -431,21 +715,21 @@ Curiosamente, modelo \textit{ada-002} -- que nos contextos anteriores alcançou 
     \label{tab:recuperacao-top-noticias}
 \end{table}
 
-Quando se observa a presença dos fragmentos originais entre os cinco primeiros resultados, mesmo em um cenário com sobreposição temática, a maioria dos modelos mais eficazes ainda apresenta alta concentração nos 5 fragmentos com melhor classificação. Com os modelos \textit{ada-002}, \textit{3-large}, \textit{instructor-xl}, \textit{GTE} e o \textit{BGE-m3} -- apesar do baixo desempenho geral -- do total de ocasiões em que recuperou o fragmento original, em cerca de 88\% dos casos este figurava entre os 5 primeiros resultados.
+Quando se observa a presença dos fragmentos originais entre os cinco primeiros resultados, mesmo em um cenário com sobreposição temática, a maioria dos modelos mais eficazes ainda apresenta alta concentração nos 5 fragmentos com melhor classificação. Com os modelos \textit{ada-002}, \textit{3-large}, \textit{BGE-m3}, \textit{instructor-xl} e o \textit{GTE}, do total de ocasiões em que se recuperou o fragmento original, em 88\% - 91\% dos casos este figurava entre os 5 primeiros resultados.
 
 
 \begin{table}[H]
     \caption{Presença do fragmento original entre os top 5 - documentos não articulados com sobreposição temática}
     \centering
-    \begin{tabular}{ l c c c }
+    \begin{tabular}{ l r r r }
         \hline
         \textbf{Modelo} & \textbf{Total Recuperações} & \textbf{Top 5 Resultados} & \textbf{Top 5 Resultados (\%)} \\
         \hline
         \textit{Ada} & 3.381 & 3.002 & 88,79\% \\
         \textit{3-Large} & 3.349 & 2.944 & 87,91\% \\
+        \textit{BGE} & 3.035 & 27.51 & 90,64\% \\
         \textit{Instructor} & 2.750 & 2.428 & 88,29\% \\
         \textit{GTE} & 2.632 & 2.294 & 87,16\% \\
-        \textit{BGE} & 750 & 660 & 88,00\% \\
         \textit{BERT} & 259 & 165 & 63,71\% \\
         \textit{Llama} & 161 & 96 & 59,63\% \\
         \textit{DeepSeek} & 49 & 32 & 65,31\% \\
@@ -456,17 +740,16 @@ Quando se observa a presença dos fragmentos originais entre os cinco primeiros 
     \label{tab:recuperacao-5-top-noticias}
 \end{table}
 
+Esses resultados reforçam a validade da estratégia de limitar as buscas a cinco resultados como forma prática de reduzir carga computacional e risco de alucinação em sistemas baseados em \ac{LLM}s. Por outro lado, os modelos de pior desempenho, como BERT, DeepSeek e Llama, não apenas apresentam baixa taxa de recuperação, mas também, mesmo quando encontram o fragmento original, tendem a classificá-lo além dos cinco primeiros resultados mais similares à pergunta.
 
-Esses resultados reforçam a validade da estratégia de limitar as buscas a cinco resultados como forma prática de reduzir carga computacional e risco de alucinação em sistemas baseados em \ac{LLM}s. Por outro lado, os modelos de pior desempenho, como BERT, DeepSeek e Llama, além de apresentarem baixa taxa de recuperação, mesmo quando o recuperam sua classificação fica para além dos top 5 resultados.
-
-Neste cenário, é importante destacar uma mudança de perspectiva metodológica: o fato de o fragmento original não ter sido recuperado não deve considerado uma falha definitiva. Embora essa tenha sido a abordagem utilizada como medida \textit{proxy} da eficiência dos modelos, o mais importante em um sistema que se baseia em recuperação de informação por similaridade semântica é fornecer dados de qualidade e relevância em relação aos critérios de busca, ainda que não estritamente atreladas a um ou outro fragmento de informação específico.
+Neste cenário, é importante destacar uma mudança de perspectiva metodológica: o fato de o fragmento original não ter sido recuperado não deve ser considerado uma falha definitiva. Embora essa tenha sido a abordagem utilizada como medida \textit{proxy} da eficiência dos modelos, o mais importante em um sistema que se baseia em recuperação de informação por similaridade semântica é fornecer dados de qualidade e relevância em relação aos critérios de busca, ainda que não estritamente atreladas a um ou outro fragmento de informação específico.
 
 \subsection{Avaliando a Geração da Resposta}
 \label{subsec:Resultados.2.2}
 
-Para realizar a avaliação do desempenho dos modelos generativos para formulação das respostas finais da aplicação, a saber, o \textit{Llama3.1:latest} e o \textit{DeepSeek-r1:7b} (Seções \ref{sec:Metodologia.3} e \ref{sec:Assistente.2}) seguiremos o que foi exposto quanto ao método de avaliação da geração das respostas pelo \ac{LLM} (Seção \ref{subsec:Metodologia.6.3}), utilizando como elementos de teste o conjunto de perguntas sintéticas geradas por meio do que se descreveu na Seção \ref{subsec:Metodologia.6.1}, juntamente com as respostas de referência inferidas pelo \textit{GPT-4o} quando desse mesmo processo de geração.
+Para realizar a avaliação do desempenho dos modelos generativos para formulação das respostas finais da aplicação, a saber, o \textit{Llama3.1:latest} e o \textit{DeepSeek-r1:7b} (Seções \ref{sec:Metodologia.3} e \ref{sec:Assistente.2}), seguiremos o que foi exposto quanto ao método de avaliação da geração das respostas pelo \ac{LLM} (Seção \ref{subsec:Metodologia.6.3}). Como elementos de teste, utilizamos o conjunto de perguntas sintéticas geradas por meio do que se descreveu na Seção \ref{subsec:Metodologia.6.1}, juntamente com as respostas de referência inferidas pelo \textit{GPT-4o}, quando desse mesmo processo de geração.
 
-A isso foi acrescentado o conjunto de fragmentos resultantes de cada uma das consultas feitas no banco de vetores, utilizando as perguntas em questão. A escolha de qual modelo de geração de \textit{embeddings} utilizar para esta fase da avaliação considerou o conteúdo abordado pelo recorte do conjunto de dados que deveria ser utilizado, em função das condições de teste. Os voluntários para avaliação humana das respostas geradas pelo \ac{LLM} foram servidores atuantes nos setores de gestão de pessoas (\ac{CDHO}), sendo, portanto, especialistas em conteúdo voltado à regulação de assuntos abordados no conjunto de documentos estruturados de nossa coleção (Seção \ref{sec:Metodologia.1}. Considerando que nesse recorte em particular a qualidade de recuperação de documentos utilizando o modelo \textit{BGE-m3} se provou como a melhor dentre a de todos os modelos abertos testados (Seção \ref{subsec:Resultados.2.1}), utilizamo-lo como gerador de \textit{embeddings} na recuperação dos documentos a serem utilizados como contexto fornecido aos \ac{LLM}s.
+A isso foi acrescentado o conjunto de fragmentos resultantes de cada uma das consultas feitas no banco de vetores, utilizando as perguntas em questão. A escolha de qual modelo de geração de \textit{embeddings} utilizar para esta fase da avaliação considerou o conteúdo abordado pelo recorte do conjunto de dados que deveria ser utilizado, em função das condições de teste. Os voluntários para avaliação humana das respostas geradas pelo \ac{LLM} foram servidores atuantes nos setores de gestão de pessoas (\ac{CDHO}), sendo, portanto, especialistas em conteúdo voltado à regulação de assuntos abordados no conjunto de documentos estruturados de nossa coleção (Seção \ref{sec:Metodologia.1}). Considerando que nesse recorte em particular a qualidade de recuperação de documentos utilizando o modelo \textit{BGE-m3} se provou como a melhor dentre a de todos os modelos abertos testados (Seção \ref{subsec:Resultados.2.1}), utilizamo-lo como gerador de \textit{embeddings} na recuperação dos documentos a serem utilizados como contexto fornecido aos \ac{LLM}s.
 
 Em suma, para cada um dos pares ``pergunta sintética''/``resposta de referência'', realizou-se o seguinte:
 
@@ -484,11 +767,11 @@ A Tabela \ref{tab:bertscore-medias} mostra as médias de Precisão, \textit{Reca
 \begin{table}[H]
     \caption{Médias da pontuação \textit{BERTScore} por \ac{LLM}}
     \centering
-    \begin{tabular}{ l c c c }
+    \begin{tabular}{ l r r r }
         \hline
         \textbf{scores} & \textbf{Llama3.1} & \textbf{DeepSeek-r1} & \textbf{GPT-4o} \\
         \hline
-        precisão & 0,685 & 0,5405 & 0,678 \\
+        precisão & 0,685 & 0,541 & 0,678 \\
         \textit{recall} & 0,757 & 0,667 & 0,831 \\
         \textit{f1-score} & 0,717 & 0,596  & 0,746\\
     \hline
@@ -507,17 +790,17 @@ A Tabela \ref{tab:bertscore-medias} mostra as médias de Precisão, \textit{Reca
 \end{figure}
 
 
-É relevante apontar que as pontuações do \textit{BERTScore} de precisão e \textit{recall}, diferentemente de outras aplicações, somente tendem a ficar com valores muito próximos de 1 quando da correspondência exata das palavras da resposta gerada com as palavras da resposta desejada. Mesmo em casos de respostas corretas, geradas por atores humanos, é incrementalmente mais improvável a redação de uma resposta a uma pergunta com teor exatamente igual a um texto de referência, salvo em casos de citação direta. Assim, valores em torno de 0,7-0,8 são considerados bons, ao passo que acima de 0,8 são extraordinários.
+É relevante apontar que as pontuações do \textit{BERTScore} de precisão e \textit{recall}, diferentemente de outras aplicações, somente tendem a ficar com valores muito próximos de 1, quando da correspondência exata das palavras da resposta gerada com as palavras da resposta desejada. Mesmo em casos de respostas corretas, geradas por atores humanos, é incrementalmente mais improvável a redação de uma resposta a uma pergunta com teor exatamente igual a um texto de referência, salvo em casos de citação direta. Assim, valores em torno de 0,7-0,8 são considerados bons, ao passo que acima de 0,8 são extraordinários.
 
 Por meio de avaliar as pontuações médias alcançadas pelos modelos, vemos (com base na precisão) que o teor das respostas geradas possui relevância em relação ao texto da resposta de referência, apontando fidelidade do conteúdo gerado em relação ao esperado. Quanto à completude da resposta gerada, podemos ver que o \textit{recall} sugere que o texto gerado cobre bem as informações essenciais da pergunta de referência. Destarte, a média geral da qualidade das respostas às perguntas do conjunto como um todo foram também satisfatórias. Não obstante, uma avaliação humana das respostas e seleção de fragmentos retornados do banco vetorial pode dar mais informações dos pontos de falha do Assistente.
 
 Ao se analisar o desempenho de ambos os modelos, todavia, é evidente que o \textit{Llama3.1} alcança melhores resultados em todas as métricas do \textit{BERTScore}, em relação ao \textit{DeepSeek-r1}, conforme visto na Tabela \ref{tab:bertscore-medias} e na Figura \ref{fig:bertscore-distribuicao}. Já comparando-o ao \textit{GPT-4o} -- que foi o modelo utilizado para geração as perguntas sintéticas e respostas de referência, logo possuindo vantagem no processo de inferência -- o \textit{Llama3.1} obteve uma precisão levemente mais alta e um \textit{recall} consideravelmente mais baixo (embora não se possa dizer que é um valor ruim). No contexto de uma avaliação \textit{BERTSCore}, portanto, o \textit{Llama3.1} produz um conteúdo que é levemente mais alinhado às partes com maior relevância no texto de referência, resultando em respostas que são mais focadas nos ``pontos chave'' do conteúdo esperado, em detrimento de garantir a cobertura de todo o teor do referencial (menor taxa de \textit{recall}). 
 
-No que concerne ao tempo decorrido no processo de geração das respostas, por sua vez, podemos perceber, nas Figuras \ref{fig:tempos-llm} e \ref{fig:tempo-llm-carregamento}, que os tempos de carregamento dos modelos são bastante aproximados, sendo o \textit{Llama3.1} levemente mais rápido (0,03 segundos) que o \textit{DeepSeek-r1} (0,06 segundos). Todavia, em tempo de processamento do \textit{prompt} a situação se inverte (0,68 segundos com o \textit{Llama3.1} e 0,61 com o \textit{DeepSeek-r1)}. Assim, são os modelos inicialmente equivalentes quando se compara a parte inicial do processo de geração. A tabela \ref{tab:tempo-llms-carregamento} mostra mais detalhes do tempo de execução nessa fase inicial de todo o fluxo generativo.
+No que concerne ao tempo decorrido no processo de geração das respostas, por sua vez, podemos perceber, nas Figuras \ref{fig:tempos-llm} e \ref{fig:tempo-llm-carregamento}, que os tempos de carregamento dos modelos são bastante aproximados, sendo o \textit{Llama3.1} levemente mais rápido (0,03 segundos) que o \textit{DeepSeek-r1} (0,06 segundos). Todavia, em tempo de processamento do \textit{prompt} a situação se inverte (0,68 segundos com o \textit{Llama3.1} e 0,61 com o \textit{DeepSeek-r1)}. Assim, são os modelos inicialmente equivalentes quando se compara a parte inicial do processo de geração. A Tabela \ref{tab:tempo-llms-carregamento} mostra mais detalhes do tempo de execução nessa fase inicial de todo o fluxo generativo.
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{l cc | cc}
+    \begin{tabular}{l rr | rr}
         \hline
         & \multicolumn{2}{c|}{\textbf{carregamento}} & \multicolumn{2}{c}{\textbf{processamento do prompt}} \\
         & \textbf{Llama3.1} & \textbf{DeepSeek-r1} & \textbf{Llama3.1} & \textbf{DeepSeek-r1} \\
@@ -540,18 +823,18 @@ No que concerne ao tempo decorrido no processo de geração das respostas, por s
     \label{fig:tempo-llm-carregamento}
 \end{figure}
 
-Todavia, quando analisamos os dados referente ao tempo da predição dos \textit{tokens} da resposta, podemos ver uma diferença gritante entre ambos os modelos (ver Tabela \ref{tab:tempo-llms-total} e Figura \ref{fig:tempo-llm-total-boxplot}). O \textit{DeepSeek-r1} leva em média quase 5 vezes mais tempo (12,99 segundos) para gerar respostas do que o \textit{Llama3.1} (2,62 segundos). Mesmo nos casos de melhor performance do \textit{DeepSeek-r1}, seu tempo de execução (2,06 segundos) é da ordem de 10 vezes mais longo que o menor tempo levado pelo \textit{Llama3.1} (0,205 segundos).
+Todavia, quando analisamos os dados referente ao tempo da predição dos \textit{tokens} da resposta, podemos ver uma diferença entre ambos os modelos (ver Tabela \ref{tab:tempo-llms-total} e Figura \ref{fig:tempo-llm-total-boxplot}). O \textit{DeepSeek-r1} leva em média quase 5 vezes mais tempo (12,99 segundos) para gerar respostas do que o \textit{Llama3.1} (2,62 segundos). Mesmo nos casos de melhor performance do \textit{DeepSeek-r1}, seu tempo de execução (2,06 segundos) é da ordem de 10 vezes mais longo que o menor tempo levado pelo \textit{Llama3.1} (0,205 segundos).
 
 Adicionalmente, comparando a variabilidade do tempo total de execução de ambos os modelos, vemos o \textit{Llama3.1} com menos dispersão (desvio padrão de 2,39), ao passo que os valores do \textit{DeepSeek-r1} são mais dispersos, em termos de valores (desvio padrão de 5,04), como visto na Figura \ref{fig:tempo-llm-total-boxplot}.
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{l cc | cc}
+    \begin{tabular}{l rr | rr}
         \hline
         & \multicolumn{2}{c|}{\textbf{geração da resposta}} & \multicolumn{2}{c}{\textbf{tempo total}} \\
         & \textbf{Llama3.1} & \textbf{DeepSeek-r1} & \textbf{Llama3.1} & \textbf{DeepSeek-r1} \\
         \hline
-        \textbf{mínimo} & 0,205 & 2,06 & 0,502 & 2,527 \\
+        \textbf{mínimo} & 0,205 & 2,060 & 0,502 & 2,527 \\
         \textbf{média} & 2,623 & 12,999 & 3,361 & 13,721 \\
         \textbf{mediana} & 1,908 & 12,222 & 2,651 & 12,945 \\
         \textbf{máximo} & 19,451 & 47,238 & 20,203 & 47,922 \\
@@ -579,15 +862,6 @@ A Figura \ref{fig:tempos-llm} nos apresenta um sumário dos tempos de execução
     \label{fig:tempos-llm}
 \end{figure}
 
-\subsection{Nota Sobre as Medições do Tempo de Performance}
-\label{subsec:Resultados.2.3}
-
-Os experimentos de testes descritos neste estudo foram implementados por meio de \textit{scripts} desenvolvidos na linguagem de programação Python e armazenados em um repositório público no GitHub \cite{REPOSITORIO:1}, tanto para fins de transparência, quanto para fins de agilizar e simplificar o processo de execução, independente do local e da máquina utilizada. Devido à indisponibilidade de \textit{hardware} local adequado para a execução dos testes -- especialmente considerando a alta demanda computacional associada à utilização de modelos de \ac{LLM}s em execução paralela com uma instância do Ollama com o \textit{Llama3.1:8b} e o \textit{DeepSeek-r1:7b} -- optou-se por clonar o repositório em instâncias do Google Colab para a condução dos experimentos. Essa abordagem garantiu acesso a recursos computacionais menos limitados, mitigando as restrições do ambiente local.
-
-O ambiente de execução no Google Colab foi configurado com uma GPU NVIDIA T4, que dispõe de 16 GB de memória dedicada, sendo a configuração padrão de utilização gratuita da plataforma. Essa arquitetura foi fundamental para permitir a execução eficiente de modelos pesados, assegurando um desempenho adequado tanto para o processo de recuperação de documentos do banco vetorial, quanto para a execução do modelo \textit{Llama} para gerar as respostas. A integração entre os recursos oferecidos pelo Google Colab e as capacidades do Ollama foi configurada de forma a maximizar a compatibilidade e o desempenho dos experimentos.
-
-Por meio dessa infraestrutura, foi possível realizar os testes necessários sem comprometer a validade dos resultados, assegurando que a execução dos experimentos fosse realizada de maneira confiável e reprodutível. Adicionalmente, a utilização do repositório GitHub \cite{REPOSITORIO:1} como plataforma para versionamento e controle do código contribuiu para a transparência e rastreabilidade das implementações, elementos essenciais em um contexto de pesquisa científica.
-
 \section{Avaliações Humanas da Abordagem RAG}
 \label{sec:Resultados.3}
 
@@ -595,7 +869,7 @@ Nesta seção, abordamos a avaliação do resultado final da ferramenta, a saber
 
 \subsection{Avaliando a Estrutura do Texto das Respostas}
 \label{subsec:Resultados.3.1}
-Durante uma observação meramente visual das respostas dos modelos (\textit{Llama3.1}, \textit{DeepSeek-r1} -- objetos deste estudo -- e do \textit{GPT-4o} -- usado para fins de referência), chamou a atenção a tendência que o \textit{DeepSeek} tem para gerar respostas mais longas que os outros dois modelos -- sendo o \textit{Llama3.1} o que produziu respostas mais compactas, em conformidade com o identificado na Seção \ref{subsec:Resultados.2.2}. A figura \ref{fig:testes-tamanho-respostas-llm} mostra exatamente esse fenômeno. Outra característica marcante do \textit{DeepSeek}, em contraste com os outros dois, é precisamente o tamanho mais extenso das respostas e a recorrência ao uso de divisão em tópicos, mesmo em situações dispensáveis.
+Durante uma observação meramente visual das respostas dos modelos (\textit{Llama3.1}, \textit{DeepSeek-r1} -- objetos deste estudo -- e do \textit{GPT-4o} -- usado para fins de referência), chamou a atenção a tendência que o \textit{DeepSeek} tem para gerar respostas mais longas que os outros dois modelos -- sendo o \textit{Llama3.1} o que produziu respostas mais compactas, em conformidade com o identificado na Seção \ref{subsec:Resultados.2.2}. A Figura \ref{fig:testes-tamanho-respostas-llm} mostra exatamente esse fenômeno. Outra característica marcante do \textit{DeepSeek}, em contraste com os outros dois, é precisamente o tamanho mais extenso das respostas e a recorrência ao uso de divisão em tópicos, mesmo em situações dispensáveis.
 
 \begin{figure}[H]
     \centering
@@ -643,22 +917,13 @@ O \textit{Llama3.1}, portanto, dentre os \ac{LLM}s avaliados para utilização n
 \subsection{Avaliando o Conteúdo do Texto das Respostas}
 \label{subsec:Resultados.3.2}
 
-Com o fim de realizar uma análise mais criteriosa do conteúdo textual gerado pelos modelos, lançamos mão de avaliação humana. Para isso, contamos com a ajuda de servidores da \ac{Alern}, aos quais for solicitado que elaborassem perguntas que pudessem ser respondidas através de conteúdo presente nos documentos integrantes do nosso conjunto de dados, juntamente com suas respectivas respostas. As perguntas foram utilizadas para gerar respostas, seguindo todo o fluxo da aplicação \ac{RAG} (recuperação de documentos, formatação do conteúdo, injeção do resultado para criação de um \textit{prompt} e sua submissão à API da ferramenta de execução de \ac{LLM}s, para geração da resposta). Ao todo, colaboraram para esta parte do processo 4 servidores, gerando um total de 20 perguntas. O teor das perguntas elaboradas, bem como das respostas geradas pelos modelos pode ser conferido no Apêndice \ref{apendice:apendice1}.
+Com o fim de realizar uma análise mais criteriosa do conteúdo textual gerado pelos modelos, lançamos mão de avaliação humana, seguindo o exposto na Seção \ref{subsubsec:Metodologia.6.3.2}. Em suma, os voluntários participantes da avaliação geraram um conjunto de perguntas a serem submetidas ao fluxo da aplicação, avaliando a qualidade das respostas quanto aos seguintes critérios: Corretude, Coerência, Gramática e Adequação. Cada critério recebe uma pontuação com os valores ``0 - desempenho ruim'',  ``1 - desempenho aceitável'' ou ``2 - desempenho bom''. Sob tais condições, cada resposta teria uma pontuação total indo de 0 a 8.  O teor das perguntas elaboradas, bem como das respostas geradas pelos modelos pode ser conferido no Apêndice \ref{apendice:apendice1}.
 
-Após isso, as respostas foram apresentadas aos avaliadores, os quais foram orientados a avaliar as respostas sob os seguintes critérios:
-
-\begin{itemize}
-    \item Corretude: avalia o quão correta a resposta está, tanto em termos de não apresentar informações falsas, quanto em termos de responder a pergunta;
-    \item Coerência: avalia o quanto o teor da resposta (correta ou não) está escrito de forma coerente -- apresenta sentido coerente, incluindo mostrar consistência no idioma utilizado;
-    \item Gramática e Ortografia: avalia se as palavras utilizadas estão corretamente grafadas e se as frases têm escrita gramaticalmente correta;
-    \item Adequação: avalia se o nível de escrita apresenta vocabulário adequado à compreensão do usuário comum, conforme definido nas diretrizes passadas via \textit{prompt}.
-\end{itemize}
-
-Para cada um dos critérios, o avaliador deveria atribuir um valor de 0 nos casos em que a pergunta gerada tivesse um desempenho ``ruim'', 1 para um desempenho ``aceitável'' ou 2 para um desempenho ``bom'' / plenamente satisfatório. Para cada um dos modelos utilizados, calculou-se o somatório dos pontos em cada um dos critérios e a porcentagem da pontuação máxima possível de ser alcançada. A Tabela \ref{tab:testes-avaliacao-respostas-llm-por-pergunta} detalha o desempenho geral de cada modelo em cada uma das perguntas, ao passo que a Tabela \ref{tab:testes-avaliacao-respostas-llm} mostra as porcentagens alcançadas nos critérios de avaliação por cada modelo, demonstrando-se o \textit{Llama3.1} como a melhor opção de modelo a ser utilizado na aplicação.
+A Tabela \ref{tab:testes-avaliacao-respostas-llm-por-pergunta} detalha o desempenho geral de cada modelo em cada uma das perguntas, ao passo que a Tabela \ref{tab:testes-avaliacao-respostas-llm} mostra as porcentagens alcançadas nos critérios de avaliação por cada modelo, demonstrando-se o \textit{Llama3.1} como a melhor opção de modelo a ser utilizado na aplicação.
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{c c c}
+    \begin{tabular}{c r r}
         \hline
         \textbf{Pergunta} &\textbf{Llama3.1} & \textbf{DeepSeek-r1} \\
         \hline
@@ -692,7 +957,7 @@ Para cada um dos critérios, o avaliador deveria atribuir um valor de 0 nos caso
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{l c c}
+    \begin{tabular}{l r r}
         \hline
         \textbf{Critério} &\textbf{Llama3.1} & \textbf{DeepSeek-r1} \\
         \hline
@@ -708,11 +973,11 @@ Para cada um dos critérios, o avaliador deveria atribuir um valor de 0 nos caso
     \label{tab:testes-avaliacao-respostas-llm}
 \end{table}
 
-As pontuações alcançadas tanto pelo \textit{Llama3.1} quanto pelo \textit{DeepSeek-r1} em \textbf{Coerência} e \textbf{Gramática e ortografia} confirmam o que foi visualmente identificado nas respostas geradas pelas perguntas sintéticas, tal qual discutido na Seção \ref{subsec:Resultados.3.1}, em especial as falhas de idioma e ``neologismos'' do \textit{DeepSeek-r1}. Todavia, os valores de Corretude e Adequação chamaram a atenção por não serem tão altos, o que motivou inspeção mais cuidadosa das perguntas e respostas, bem como os subprodutos intermediários do processo. Com isto. identificamos que houve em pouco mais que 10\% dos casos o conteúdo recuperado do banco vetorial continha fragmentos que se contradiziam. Tais fragmentos presentes no conjunto de dados se enquadram na situação que foi apresentada na Seção \ref{sec:Metodologia.1}, na qual uma parte dos fragmentos pertencem a uma peça normativa mais antiga que foi atualizada por meio de outro ato normativo -- mas ainda não possui versão compilada oficial --, enquanto outros fragmentos fazem parte precisamente dos textos normativos que determinam a alteração do teor daquelas. Destarte seus conteúdos são naturalmente contraditórios.
+As pontuações alcançadas tanto pelo \textit{Llama3.1} quanto pelo \textit{DeepSeek-r1} em \textbf{Coerência} e \textbf{Gramática e ortografia} confirmam o que foi visualmente identificado nas respostas geradas pelas perguntas sintéticas, tal qual discutido na Seção \ref{subsec:Resultados.3.1}, em especial as falhas de idioma e ``neologismos'' do \textit{DeepSeek-r1}. Todavia, os valores de Corretude e Adequação chamaram a atenção por não serem tão altos, o que motivou inspeção mais cuidadosa das perguntas e respostas, bem como os subprodutos intermediários do processo. Com isto, identificamos que houve em pouco mais que 10\% dos casos o conteúdo recuperado do banco vetorial continha fragmentos que se contradiziam. Tais fragmentos presentes no conjunto de dados se enquadram na situação que foi apresentada na Seção \ref{sec:Metodologia.1}, na qual uma parte dos fragmentos pertencem a uma peça normativa mais antiga que foi atualizada por meio de outro ato normativo -- mas ainda não possui versão compilada oficial --, enquanto outros fragmentos fazem parte precisamente dos textos normativos que determinam a alteração do teor daquelas. Destarte seus conteúdos são naturalmente contraditórios.
 
 Ao se desprezar esses casos, a \textbf{Corretude} é alterada de 52,5\% do \textit{Llama3.1} e 30\% do \textit{DeepSeek-r1} para 67,5\% e 45,5\%, respectivamente, ao passo que a \textbf{Adequação} aumenta para 80,0\% no \textit{Llama3.1} e 11,0\% no \textit{DeepSeek-r1}. Destarte, no contexto das perguntas elaboradas e respostas avaliadas pelos voluntários, desconsiderando os resultados pobres causados por problemas nos dados base, o \textit{Llama3.1} alcançaria em torno de 85,6\% da pontuação máxima possível, ao passo que o \textit{DeepSeek-r1} atingiria 19,6\% dessa mesma pontuação.
 
-Ademais, identificou-se que, em alguns casos, que a similaridade semântica calculada entre a pergunta (tal qual foi formulada) e os fragmentos no banco vetorial não foi capaz de captar os nuances da intenção do usuário, quer por formulação pobre ou por a resposta depender de dois ou mais recortes de conteúdo. Uma potencial forma de contornar essa situação seria por meio de se implementar uma camada anterior, que pré-processasse a pergunta, utilizando um método de aplicação de reformulações que melhorassem seu alinhamento com a intenção do usuário antes de realizar a consulta; ou mesmo derivar de uma só pergunta, duas ou mais consultas, de forma a realizar múltiplas buscas de similaridade semântica no banco vetorial. Tais abordagens, contudo, ficaram de fora do escopo deste trabalho.
+Ademais, identificou-se que, em alguns casos,  a similaridade semântica calculada entre a pergunta (tal qual foi formulada) e os fragmentos no banco vetorial não foi capaz de captar as nuances da intenção do usuário, quer por formulação pobre ou por a resposta depender de dois ou mais recortes de conteúdo. Uma potencial forma de contornar essa situação seria por meio de se implementar uma camada anterior, que pré-processasse a pergunta, utilizando um método de aplicação de reformulações que melhorassem seu alinhamento com a intenção do usuário antes de realizar a consulta; ou mesmo derivar de uma só pergunta, duas ou mais consultas, de forma a realizar múltiplas buscas de similaridade semântica no banco vetorial. Tais abordagens, contudo, ficaram de fora do escopo deste trabalho.
 
 Ainda nesse contexto, verificou-se casos em que uma pergunta feita pelo usuário remetia ao contexto de perguntas anteriores, como acontece na comunicação oral natural. Em um caso como esse, no que se refere ao \ac{LLM}, não há problema, dado que o histórico de mensagens é enviado junto com a mensagem atual, de forma que o modelo consegue inferir a intenção do usuário pelo contexto. Quanto à consulta feita junto ao banco de vetores, não há uma forma direta de obter o mesmo resultado, dado que incluir o histórico de consultas e respostas junto com a busca corrente impactará negativamente a recuperação dos documentos por semelhança. Outra vez, um pré-processamento da pergunta, buscando reformulá-la, extraindo do contexto as informações faltantes e utilizando-as para compor uma pergunta mais completa, seria uma estratégia viável, passível de testes e análise.
 
@@ -830,7 +1095,7 @@ Para fins de comparação, utilizamos o mesmo \textit{prompt} com o \textit{GPT-
 
 Como parte da análise do conteúdo gerado pelo Assistente conduzida por humanos, após sua disponibilização ao público interno da Alern, em versão de testes, foram coletados dados sobre as interações com usuários entre os meses de abril e julho de 2025. A configuração utilizada incluiu o modelo \textit{BGE-m3} e o \textit{Llama3.1:7B}, considerando os resultados alcançados e descrito nas Seções anteriores.
 
-O acesso à aplicação foi concedido para além dos voluntários da \ac{CDHO}, de forma que tudo o conjunto de servidores com acesso à rede interna do Palácio José Augusto (sede da Alern) foi habilitado a interagir com a ferramenta. 
+O acesso à aplicação foi concedido para além dos voluntários da \ac{CDHO}, de forma que todo o conjunto de servidores com acesso à rede interna do Palácio José Augusto (sede da Alern) foi habilitado a interagir com a ferramenta. 
 
 No período em questão, foram registradas 431 interações livres e fora de circunstâncias controladas. Os usuários foram informados, desde o acesso inicial, sobre o escopo da aplicação, bem como sobre quais conteúdos estavam passíveis de serem buscados, além de serem instados a fazerem perguntas claras e diretas.
 
@@ -848,7 +1113,7 @@ A Tabela \ref{tab:testes-interacoes-aberto} descreve os quantitativos e distribu
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{l c c}
+    \begin{tabular}{l r r}
         \hline
         \textbf{Tipo} &\textbf{Quantidade} & \textbf{Proporção} \\
         \hline
@@ -873,7 +1138,7 @@ Avaliamos em detalhes o conteúdo gerado no contexto das 265 perguntas adequadas
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{l c c}
+    \begin{tabular}{l c r}
         \hline
         \textbf{Tipo} &\textbf{Quantidade} & \textbf{Proporção} \\
         \hline
@@ -894,19 +1159,17 @@ Em 2,64\% dos casos, o Assistente manifestou casos de alucinação de conteúdo,
 
 Uma porção igual das respostas (7 de 265) apresentou informações irrelevantes, junto com a declaração de que o tema perguntado pelo usuário não tinha definição específica nas resoluções vigentes. A título de exemplo, o usuário perguntou se havia regulação para servidores de ausentarem do trabalho para acompanhar filho menor em evento esportivo, ao que o assistente de fato respondeu que não havia nada no Regimento Interno que abordasse a situação descrita, porém somente depois de expor, de forma abrangente, os diversos outros tipos de licença. Acrescente-se, porém, que foram somente em casos marginais, geralmente com perguntas não muito bem definidas e ambíguas.
 
-Em 1,13\% dos casos o Assistente deu respostas não consistentes para perguntas que buscavam pela mesma informação, porém tinhas formulações não muito claras e que abrangiam temas fragmentários no texto da própria regulação (como a exigência ou não de estágio probatório para servidores em comissão, que é uma informação \textit{não explícita} nos textos, os quais só tratam da questão em relação a servidores efetivos).
+Em 1,13\% dos casos o Assistente deu respostas não consistentes para perguntas que buscavam pela mesma informação, porém tinham formulações não muito claras e que abrangiam temas fragmentários no texto da própria regulação (como a exigência ou não de estágio probatório para servidores em comissão, que é uma informação \textit{não explícita} nos textos, os quais só tratam da questão em relação a servidores efetivos).
 
-Em 3 das 265 perguntas (1,13\%) o assistente forneceu informações corretas, porém advindas de seu conhecimento prévio, sem fazer parte do contexto fornecido, o que é uma violação das diretrizes que lhe foram passadas, de se limitar ao teor dos fragmentos de documentos recuperados. Em todos os casos, porém, o conteúdo alheio ao escopo da aplicação estava correto.
+Em 3 das 265 perguntas (1,13\%) o assistente forneceu informações corretas, porém advindas de seu conhecimento prévio, sem fazer parte do contexto fornecido, o que é uma violação das diretrizes que lhe foram passadas, de se limitar ao teor dos fragmentos de documentos recuperados. Em todos os casos, porém, o conteúdo alheio ao escopo da aplicação estava correto. Em duas das respostas houve erro de grafia de palavras, sendo uma delas \textit{Oudior} em vez de \textit{Ouvidor}, já mencionado anteriormente.
 
-Em duas das respostas houve erro de grafia de palavras, sendo uma delas \textit{Oudior} em vez de \textit{Ouvidor}, já mencionado anteriormente.
-
-Ocorreram casos em que as respostas continham informações questionáveis, porém explicáveis dados certos conflitos de redação entre documentos. Por exemplo, quando perguntado sobre o tempo de duração do estágio probatório, o texto da Lei Estadual Complementar 122/1994, que discorre sobre o regime jurídico dos servidores estaduais potiguares, define como 24 meses, ao passo que o Regimento Interno da Alern o descreve como durando 36 meses. Nesse contexto, é natural o conflito entre as informações.
+Ocorreram casos em que as respostas continham informações questionáveis, porém explicáveis, dados certos conflitos de redação entre documentos. Por exemplo, quando perguntado sobre o tempo de duração do estágio probatório, o texto da Lei Estadual Complementar 122/1994, que discorre sobre o regime jurídico dos servidores estaduais potiguares, define como 24 meses, ao passo que o Regimento Interno da Alern o descreve como durando 36 meses. Nesse contexto, é natural o conflito entre as informações.
 
 Observamos, como uma medida adicional da qualidade das respostas fornecidas pelo assistente a cada uma das 265 perguntas com boa estrutura, a avaliação dada pelos usuários na interface de utilização. Assim como nas avaliações feitas pelos voluntários da \ac{CDHO} (Seção \ref{subsec:Resultados.3.2}), cada resultado ficou passível de ser avaliado como ``bom'', ``aceitável'' e ``ruim'' por parte dos usuários; avaliação esta a ser feita pelo simples toque/clique em um ícone logo abaixo da resposta concedida. A Tabela \ref{tab:testes-interacoes-avaliacoes-usuarios} mostra os quantitativos de cada categoria da avaliação.
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{l c c}
+    \begin{tabular}{l r r}
         \hline
         \textbf{Avaliação} &\textbf{Quantidade} & \textbf{Proporção} \\
         \hline
@@ -921,7 +1184,7 @@ Observamos, como uma medida adicional da qualidade das respostas fornecidas pelo
     \label{tab:testes-interacoes-avaliacoes-usuarios}
 \end{table}
 
-É facilmente perceptível a preponderância das avaliações feitas como ``aceitável'' (mais de 96\%) sobre ``bom'' e ``ruim'' (que, somados não chegam a 3,5\%). Esses resultados são compatíveis com o que foi identificado na avaliação individual de cada interação, exposta anteriormente, no sentido de que as perguntas foram adequadamente respondidas na grande maioria dos casos. Todavia, há bastante espaço para aprimoramento, de forma a aumentar a qualidade das respostas, de forma que fiquem adequadas ao uma avaliação mais positiva dos usuários.
+É facilmente perceptível a preponderância das avaliações feitas como ``aceitável'' (mais de 96\%) sobre ``bom'' e ``ruim'' (que, somados não chegam a 3,5\%). Esses resultados são compatíveis com o que foi identificado na avaliação individual de cada interação, exposta anteriormente, no sentido de que as perguntas foram adequadamente respondidas na grande maioria dos casos. Todavia, há bastante espaço para aprimoramento, de forma a aumentar a qualidade das respostas, de forma que fiquem adequadas a uma avaliação mais positiva dos usuários.
 
 
 
